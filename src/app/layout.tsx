@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
+import Footer from "@/components/Footer";
+import { Navbar } from "@/components/Navbar/Navbar";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -19,13 +21,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col`}
+      >
+        <header className="fixed top-6 left-0 w-full z-50">
+          <Navbar />
+        </header>
+        <AppRouterCacheProvider options={{ key: "mui", prepend: true }}>
+          <main className="flex-1">{children}</main>
+        </AppRouterCacheProvider>
+        <Footer />
       </body>
     </html>
   );

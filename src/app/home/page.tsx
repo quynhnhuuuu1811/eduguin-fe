@@ -1,7 +1,11 @@
+import HeroBanner from "./components/BannerSection";
+import IntroductSection from "./components/IntroductSection";
+
 const HomePage = () => {
   return (
-    <div className="">
-      <h1 className="text-blueA">QuynhNhu</h1>
+    <div className="flex flex-col gap-[64px]">
+      <HeroBanner />
+      <IntroductSection />
     </div>
   );
 };

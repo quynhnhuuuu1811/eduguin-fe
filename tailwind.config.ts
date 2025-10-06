@@ -8,8 +8,11 @@ export default {
         sugar: ["Sugar", "sans-serif"],
       },
       colors: {
-        blueA: "#cfe7fc",
-        primaryB: "var(--primary200)",
+        blue100: "var(--color-blue100)",
+        primary200: "var(--color-primary200)",
+        primary500: "var(--color-primary500)",
+        blue700: "var(--color-blue700)",
+        blue600: "var(--color-blue600)",
       },
     },
   },
