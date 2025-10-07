@@ -4,11 +4,19 @@ import LogoImg from "../../assets/images/Logo-Photoroom.png";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { ensureNetwork } from "@/lib/eth";
+import { getSignerAddress } from "@/lib/escrow";
 
 export const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
-
+  async function handleConnect() {
+    try {
+      await ensureNetwork("sepolia");
+      const addr = await getSignerAddress();
+      console.log("addr", addr);
+    } catch (e: any) {}
+  }
   const navItems = [
     { href: "/home", label: "Trang chủ" },
     { href: "/find-tutor", label: "Tìm gia sư" },
@@ -29,25 +37,25 @@ export const Navbar = () => {
           />
         </div>
 
-        <nav className="flex gap-4 bg-blue100 !p-[5px] h-[40px] rounded-full">
+        <nav className="flex gap-4 bg-blue100 p-[5px] h-[40px] rounded-full">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`!px-8 !py-2 rounded-full transition flex justify-center items-center text-[12px] font-semibold ${
+              className={`px-8 py-2 text-black rounded-full transition flex justify-center items-center text-[12px] font-semibold ${
                 pathname === item.href
-                  ? "bg-white text-blue-600 px-4"
-                  : "bg-transparent text-gray-700 hover:bg-white/40"
-              }`}
-            >
+                  ? "bg-white  px-4"
+                  : "bg-transparent  hover:bg-white/40"
+              }`}>
               {item.label}
             </Link>
           ))}
         </nav>
         <button
-          className="!px-8 !py-2 h-[40px] bg-blue100 rounded-full text-[12px] font-semibold"
-          onClick={() => router.push("/login")}
-        >
+          className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[12px] font-semibold"
+          onClick={() => {
+            handleConnect();
+          }}>
           Đăng nhập
         </button>
       </div>

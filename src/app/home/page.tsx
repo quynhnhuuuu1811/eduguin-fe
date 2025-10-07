@@ -1,12 +1,10 @@
-import HeroBanner from "./components/BannerSection";
-import IntroductSection from "./components/IntroductSection";
+import { HomePageView } from "@/pages/home/page-view";
 
 const HomePage = () => {
   return (
-    <div className="flex flex-col gap-[64px]">
-      <HeroBanner />
-      <IntroductSection />
-    </div>
+    <>
+      <HomePageView />
+    </>
   );
 };
 

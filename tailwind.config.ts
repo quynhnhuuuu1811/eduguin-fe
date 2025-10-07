@@ -2,6 +2,17 @@
 export default {
   content: ["./src/**/*.{js,ts,jsx,tsx}", "./app/**/*.{js,ts,jsx,tsx}"],
   theme: {
+    screens: {
+      xsss: "375px",
+      xss: "425px",
+      xs: "481px",
+      sm: "641px",
+      md: "900px",
+      lg: "1025px",
+      xl: "1281px",
+      "2xl": "1441px",
+      "3xl": "1544px",
+    },
     extend: {
       fontFamily: {
         quicksand: ["Quicksand", "sans-serif"],
