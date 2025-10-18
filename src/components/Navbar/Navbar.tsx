@@ -42,20 +42,22 @@ export const Navbar = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`px-8 py-2 text-black rounded-full transition flex justify-center items-center text-[12px] font-semibold ${
+              className={`px-8 py-2 text-black rounded-full transition flex justify-center items-center text-[10px] lg:text-[12px] font-semibold ${
                 pathname === item.href
                   ? "bg-white  px-4"
                   : "bg-transparent  hover:bg-white/40"
-              }`}>
+              }`}
+            >
               {item.label}
             </Link>
           ))}
         </nav>
         <button
-          className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[12px] font-semibold"
+          className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold"
           onClick={() => {
             handleConnect();
-          }}>
+          }}
+        >
           Đăng nhập
         </button>
       </div>

@@ -1,41 +1,25 @@
 import Image from "next/image";
-import { Box } from "@mui/material";
 import Users from "../../../../assets/images/users.png";
 
 const OverallRating = () => {
   return (
-    <div>
-      <Box
-        sx={{
-          position: "relative",
-          width: 420,
-          height: 292,
-        }}
+    <div className="relative">
+      <div
+        className="absolute top-0 left-0 
+        w-[200px] h-[92px] sm:w-[250px] sm:h-[142px] 
+        md:w-[300px] md:h-[190px] lg:w-[380px] lg:h-[272px]
+        bg-[#028E4B] rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-3xl
+        rotate-[-5deg]"
+      ></div>
+      <div
+        className="relative overflow-hidden 
+        w-[200px] h-[92px] sm:w-[250px] sm:h-[142px] 
+        md:w-[300px] md:h-[190px] lg:w-[400px] lg:h-[292px]
+        rounded-lg sm:rounded-xl md:rounded-2xl lg:rounded-3xl
+        rotate-[3deg]"
       >
-        <Box
-          sx={{
-            backgroundColor: "#028E4B",
-            width: 420,
-            height: 292,
-            transform: "rotate(-5deg)",
-            borderRadius: 8,
-          }}
-        ></Box>
-        <Image
-          alt="user"
-          src={Users.src}
-          fill
-          style={{
-            objectFit: "cover",
-            zIndex: 1,
-            position: "absolute",
-            top: 0,
-            left: 0,
-            transform: "rotate(3deg)",
-            borderRadius: 40,
-          }}
-        />
-      </Box>
+        <Image alt="user" src={Users.src} fill style={{ objectFit: "cover" }} />
+      </div>
     </div>
   );
 };

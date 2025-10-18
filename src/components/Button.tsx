@@ -7,60 +7,69 @@ interface Props extends React.PropsWithChildren {
 }
 
 export const CustomButton: React.FC<Props> = ({ children, type }) => {
-  let buttonProps = {};
+  let sx: any = {};
+  let className = "";
 
   switch (type) {
     case "Primary":
-      buttonProps = {
-        sx: {
-          color: "white",
-          fontSize: "16px",
-          borderRadius: 2,
-        },
-        className: "!bg-primary500 !px-6 !py-3",
+      sx = {
+        backgroundColor: "var(--color-primary500)",
+        color: "white",
+        "&:hover": { backgroundColor: "var(--color-primary600)" },
       };
+      className =
+        "lg:!px-6 lg:!py-3 md:!px-5 md:!py-2 sm:!px-4 sm:!py-1.5 rounded-[8px]";
       break;
 
     case "PrimaryOutlined":
-      buttonProps = {
-        sx: {
-          color: "#02743D",
-          fontSize: "16px",
-          borderRadius: 2,
-        },
-        className: "!bg-white !px-6 !py-3",
+      sx = {
+        color: "var(--color-primary500)",
+        backgroundColor: "white",
+        "&:hover": { backgroundColor: "var(--color-primary100)" },
       };
+      className =
+        "lg:!px-6 lg:!py-3 md:!px-5 md:!py-2 sm:!px-4 sm:!py-1.5 rounded-[8px]";
       break;
 
     case "Secondary":
-      buttonProps = {
-        sx: {
-          color: "white",
-        },
-        className: "!bg-primary500",
+      sx = {
+        backgroundColor: "var(--color-secondary500)",
+        color: "white",
+        "&:hover": { backgroundColor: "var(--color-secondary600)" },
       };
+      className =
+        "lg:!px-6 lg:!py-3 md:!px-5 md:!py-2 sm:!px-4 sm:!py-1.5 rounded-[8px]";
       break;
 
     case "SecondaryOutlined":
-      buttonProps = {
-        sx: {
-          color: "white",
-        },
-        className: "!bg-primary500",
+      sx = {
+        border: "2px solid var(--color-secondary500)",
+        color: "var(--color-secondary500)",
+        backgroundColor: "white",
+        "&:hover": { backgroundColor: "var(--color-secondary100)" },
       };
+      className =
+        "lg:!px-6 lg:!py-3 md:!px-5 md:!py-2 sm:!px-4 sm:!py-1.5 rounded-[8px]";
       break;
-
-    default:
   }
 
   return (
     <Button
-      {...buttonProps}
+      disableElevation
+      className={className}
       sx={{
-        ...buttonProps?.sx,
+        ...sx,
         textTransform: "none",
         fontFamily: "Quicksand",
-        fontWeight: "600",
+        fontWeight: 600,
+        borderRadius: 2,
+        transition: "all 0.2s ease-in-out",
+        fontSize: {
+          xs: "10px",
+          sm: "12px",
+          md: "14px",
+          lg: "16px",
+        },
       }}
     >
       {children}
