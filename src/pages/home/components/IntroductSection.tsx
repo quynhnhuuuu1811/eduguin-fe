@@ -3,24 +3,24 @@ import React from "react";
 
 const IntroductSection = () => {
   return (
-    <div className="px-[135px] w-full flex flex-col gap-5">
-      <Box
-        sx={{
-          fontSize: 40,
+    <div className="px-[50px] lg:px-[135px] sm:px-[80px] md:[100px] w-full flex flex-col gap-2 md:gap-4 lg:gap-5">
+      <div
+        style={{
           width: "100%",
           display: "flex",
           justifyContent: "center",
           fontFamily: "sugar",
           color: "#0F7FE5",
         }}
+        className="text-[20px] sm:text-[25px] md:text-[30px] lg:text-[40px]"
       >
         Gia sư phù hợp – Học gì cũng dễ.
-      </Box>
-      <Box
-        sx={{
+      </div>
+      <div
+        style={{
           textAlign: "center",
-          lineHeight: "30px",
         }}
+        className="text-[11px] sm:text-[11px] md:text-[12px] lg:text-[14px]"
       >
         Chúng tôi giúp bạn kết nối với người thầy phù hợp – để mỗi buổi học
         không còn là áp lực, mà trở thành trải nghiệm nhẹ nhàng, hiệu quả và đầy
@@ -29,7 +29,7 @@ const IntroductSection = () => {
         tiến bộ. Mỗi gia sư không chỉ là người dạy kiến thức, mà còn là người
         bạn đồng hành tận tâm – luôn sẵn sàng giải đáp, động viên và tiếp thêm
         động lực để bạn tự tin chinh phục mọi mục tiêu học tập.
-      </Box>
+      </div>
     </div>
   );
 };

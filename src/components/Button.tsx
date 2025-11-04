@@ -4,64 +4,81 @@ import Button from "@mui/material/Button";
 
 interface Props extends React.PropsWithChildren {
   type: "Primary" | "Secondary" | "PrimaryOutlined" | "SecondaryOutlined";
+  className?: string;
+  onClick?: () => void;
 }
 
-export const CustomButton: React.FC<Props> = ({ children, type }) => {
-  let buttonProps = {};
+export const CustomButton: React.FC<Props> = ({
+  children,
+  type,
+  className = "",
+  onClick,
+}) => {
+  let sx: any = {};
 
   switch (type) {
     case "Primary":
-      buttonProps = {
-        sx: {
-          color: "white",
-          fontSize: "16px",
-          borderRadius: 2,
-        },
-        className: "!bg-primary500 !px-6 !py-3",
+      sx = {
+        backgroundColor: "var(--color-primary500)",
+        color: "white",
+        "&:hover": { backgroundColor: "var(--color-primary600)" },
+        px: { xs: 2, sm: 3, md: 5, lg: 6 },
+        py: { xs: 1, sm: 1.5, md: 2, lg: 3 },
+        borderRadius: "8px",
+        fontSize: { xs: "10px", sm: "12px", md: "14px", lg: "16px" },
       };
       break;
 
     case "PrimaryOutlined":
-      buttonProps = {
-        sx: {
-          color: "#02743D",
-          fontSize: "16px",
-          borderRadius: 2,
-        },
-        className: "!bg-white !px-6 !py-3",
+      sx = {
+        color: "var(--color-primary500)",
+        backgroundColor: "white",
+        "&:hover": { backgroundColor: "var(--color-primary100)" },
+        px: { xs: 2, sm: 3, md: 5, lg: 6 },
+        py: { xs: 1, sm: 1.5, md: 2, lg: 3 },
+        borderRadius: "8px",
+        fontSize: { xs: "10px", sm: "12px", md: "14px", lg: "16px" },
       };
       break;
 
     case "Secondary":
-      buttonProps = {
-        sx: {
-          color: "white",
-        },
-        className: "!bg-primary500",
+      sx = {
+        backgroundColor: "var(--color-primary700)",
+        color: "white",
+        "&:hover": { backgroundColor: "var(--color-primary500) !important" },
+        px: { xs: 1, sm: 2, md: 3, lg: 3 },
+        py: { xs: 0.5, sm: 1, md: 1, lg: 1 },
+        borderRadius: "999px",
+        fontSize: { xs: "6px", sm: "8px", md: "12px", lg: "14px" },
       };
       break;
 
     case "SecondaryOutlined":
-      buttonProps = {
-        sx: {
-          color: "white",
-        },
-        className: "!bg-primary500",
+      sx = {
+        backgroundColor: "transparent",
+        color: "var(--color-primary700)",
+        border: "1px solid var(--color-primary700)",
+        "&:hover": { color: "var(--color-primary500) !important" },
+        px: { xs: 1, sm: 2, md: 3, lg: 3 },
+        py: { xs: 0.5, sm: 1, md: 1, lg: 1 },
+        borderRadius: "999px",
+        fontSize: { xs: "6px", sm: "8px", md: "12px", lg: "14px" },
       };
       break;
-
-    default:
   }
 
   return (
     <Button
-      {...buttonProps}
+      disableElevation
+      className={className}
       sx={{
-        ...buttonProps?.sx,
+        ...sx,
         textTransform: "none",
         fontFamily: "Quicksand",
-        fontWeight: "600",
+        fontWeight: 600,
+        transition: "all 0.2s ease-in-out",
       }}
+      onClick={onClick}
     >
       {children}
     </Button>

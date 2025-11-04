@@ -98,6 +98,15 @@ span {
   --color-primary500: #02a959;
   --color-blue700: #0c65b6;
   --color-blue600: #0f7fe5;
+  --color-gray100: #f4f5f5;
+  --color-gray900: #414853;
+  --color-blue50: #f5fafe;
+  --color-blue800: #094a86;
+  --color-primary50: #f6fef7;
+  --color-primary700: #02743d;
+  --color-blue900: #06325b;
+  --color-yellow500: #f59e0b;
+  --color-primary600: #028e4b;
   --font-sugar: "Sugar", sans-serif;
 }
 
