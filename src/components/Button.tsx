@@ -4,11 +4,17 @@ import Button from "@mui/material/Button";
 
 interface Props extends React.PropsWithChildren {
   type: "Primary" | "Secondary" | "PrimaryOutlined" | "SecondaryOutlined";
+  className?: string;
+  onClick?: () => void;
 }
 
-export const CustomButton: React.FC<Props> = ({ children, type }) => {
+export const CustomButton: React.FC<Props> = ({
+  children,
+  type,
+  className = "",
+  onClick,
+}) => {
   let sx: any = {};
-  let className = "";
 
   switch (type) {
     case "Primary":
@@ -16,9 +22,11 @@ export const CustomButton: React.FC<Props> = ({ children, type }) => {
         backgroundColor: "var(--color-primary500)",
         color: "white",
         "&:hover": { backgroundColor: "var(--color-primary600)" },
+        px: { xs: 2, sm: 3, md: 5, lg: 6 },
+        py: { xs: 1, sm: 1.5, md: 2, lg: 3 },
+        borderRadius: "8px",
+        fontSize: { xs: "10px", sm: "12px", md: "14px", lg: "16px" },
       };
-      className =
-        "lg:!px-6 lg:!py-3 md:!px-5 md:!py-2 sm:!px-4 sm:!py-1.5 rounded-[8px]";
       break;
 
     case "PrimaryOutlined":
@@ -26,30 +34,36 @@ export const CustomButton: React.FC<Props> = ({ children, type }) => {
         color: "var(--color-primary500)",
         backgroundColor: "white",
         "&:hover": { backgroundColor: "var(--color-primary100)" },
+        px: { xs: 2, sm: 3, md: 5, lg: 6 },
+        py: { xs: 1, sm: 1.5, md: 2, lg: 3 },
+        borderRadius: "8px",
+        fontSize: { xs: "10px", sm: "12px", md: "14px", lg: "16px" },
       };
-      className =
-        "lg:!px-6 lg:!py-3 md:!px-5 md:!py-2 sm:!px-4 sm:!py-1.5 rounded-[8px]";
       break;
 
     case "Secondary":
       sx = {
-        backgroundColor: "var(--color-secondary500)",
+        backgroundColor: "var(--color-primary700)",
         color: "white",
-        "&:hover": { backgroundColor: "var(--color-secondary600)" },
+        "&:hover": { backgroundColor: "var(--color-primary500) !important" },
+        px: { xs: 1, sm: 2, md: 3, lg: 3 },
+        py: { xs: 0.5, sm: 1, md: 1, lg: 1 },
+        borderRadius: "999px",
+        fontSize: { xs: "6px", sm: "8px", md: "12px", lg: "14px" },
       };
-      className =
-        "lg:!px-6 lg:!py-3 md:!px-5 md:!py-2 sm:!px-4 sm:!py-1.5 rounded-[8px]";
       break;
 
     case "SecondaryOutlined":
       sx = {
-        border: "2px solid var(--color-secondary500)",
-        color: "var(--color-secondary500)",
-        backgroundColor: "white",
-        "&:hover": { backgroundColor: "var(--color-secondary100)" },
+        backgroundColor: "transparent",
+        color: "var(--color-primary700)",
+        border: "1px solid var(--color-primary700)",
+        "&:hover": { color: "var(--color-primary500) !important" },
+        px: { xs: 1, sm: 2, md: 3, lg: 3 },
+        py: { xs: 0.5, sm: 1, md: 1, lg: 1 },
+        borderRadius: "999px",
+        fontSize: { xs: "6px", sm: "8px", md: "12px", lg: "14px" },
       };
-      className =
-        "lg:!px-6 lg:!py-3 md:!px-5 md:!py-2 sm:!px-4 sm:!py-1.5 rounded-[8px]";
       break;
   }
 
@@ -62,15 +76,9 @@ export const CustomButton: React.FC<Props> = ({ children, type }) => {
         textTransform: "none",
         fontFamily: "Quicksand",
         fontWeight: 600,
-        borderRadius: 2,
         transition: "all 0.2s ease-in-out",
-        fontSize: {
-          xs: "10px",
-          sm: "12px",
-          md: "14px",
-          lg: "16px",
-        },
       }}
+      onClick={onClick}
     >
       {children}
     </Button>
