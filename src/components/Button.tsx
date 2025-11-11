@@ -22,8 +22,8 @@ export const CustomButton: React.FC<Props> = ({
         backgroundColor: "var(--color-primary500)",
         color: "white",
         "&:hover": { backgroundColor: "var(--color-primary600)" },
-        px: { xs: 2, sm: 3, md: 5, lg: 6 },
-        py: { xs: 1, sm: 1.5, md: 2, lg: 3 },
+        px: { xs: 2, sm: 3, md: 4, lg: 5 },
+        py: { xs: 1, sm: 1, md: 1.5, lg: 1.5 },
         borderRadius: "8px",
         fontSize: { xs: "10px", sm: "12px", md: "14px", lg: "16px" },
       };
@@ -33,9 +33,9 @@ export const CustomButton: React.FC<Props> = ({
       sx = {
         color: "var(--color-primary500)",
         backgroundColor: "white",
-        "&:hover": { backgroundColor: "var(--color-primary100)" },
-        px: { xs: 2, sm: 3, md: 5, lg: 6 },
-        py: { xs: 1, sm: 1.5, md: 2, lg: 3 },
+        "&:hover": { backgroundColor: "#F0F0F0" },
+        px: { xs: 2, sm: 3, md: 4, lg: 5 },
+        py: { xs: 1, sm: 1, md: 1.5, lg: 1.5 },
         borderRadius: "8px",
         fontSize: { xs: "10px", sm: "12px", md: "14px", lg: "16px" },
       };

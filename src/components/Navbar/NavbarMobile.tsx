@@ -2,10 +2,13 @@
 import { Menu, MenuItem } from "@mui/material";
 import React, { useState } from "react";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
+import { useRouter, usePathname } from "next/navigation";
 
 const NavbarMobile = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -14,6 +17,18 @@ const NavbarMobile = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleNavigate = (path: string) => {
+    handleClose();
+    router.push(path);
+  };
+
+  const navItems = [
+    { label: "Trang chủ", path: "/home" },
+    { label: "Tìm gia sư", path: "/find-tutor" },
+    { label: "Trở thành gia sư", path: "/become-tutor" },
+    { label: "Liên hệ", path: "/contact" },
+  ];
 
   return (
     <div>
@@ -38,30 +53,20 @@ const NavbarMobile = () => {
           horizontal: "left",
         }}
       >
-        <MenuItem
-          className="!text-[12px] !font-[Quicksand] !font-semibold active:bg-gray-200"
-          onClick={handleClose}
-        >
-          Trang chủ
-        </MenuItem>
-        <MenuItem
-          onClick={handleClose}
-          className="!text-[12px] !font-[Quicksand] !font-semibold  active:bg-gray-200"
-        >
-          Tìm gia sư
-        </MenuItem>
-        <MenuItem
-          onClick={handleClose}
-          className="!text-[12px] !font-[Quicksand] !font-semibold  active:bg-gray-200"
-        >
-          Tở thành gia sư
-        </MenuItem>
-        <MenuItem
-          onClick={handleClose}
-          className="!text-[12px] !font-[Quicksand] !font-semibold  active:bg-gray-200"
-        >
-          Liên hệ
-        </MenuItem>
+        {navItems.map((item) => {
+          const isActive = pathname === item.path;
+          return (
+            <MenuItem
+              key={item.path}
+              onClick={() => handleNavigate(item.path)}
+              className={`!text-[12px] !font-[Quicksand] active:bg-gray-200 ${
+                isActive ? "!font-bold text-primary500" : "!font-semibold"
+              }`}
+            >
+              {item.label}
+            </MenuItem>
+          );
+        })}
       </Menu>
     </div>
   );
