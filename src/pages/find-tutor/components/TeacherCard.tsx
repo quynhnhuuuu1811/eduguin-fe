@@ -7,7 +7,6 @@ import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import { CustomButton } from "@/components/Button";
 import { useRouter } from "next/navigation";
 import VideoImg from "../../../assets/images/VideoThumbnail.png";
-import ArrowRightAltRoundedIcon from "@mui/icons-material/ArrowRightAltRounded";
 
 interface Props {
   teacher: {
@@ -270,7 +269,7 @@ const TeacherCard: FC<Props> = ({ teacher }) => {
               >
                 <CustomButton type="Secondary">Đăng kí ngay</CustomButton>
                 <CustomButton type="SecondaryOutlined" className="border-none">
-                  Thông tin chi tiết <ArrowRightAltRoundedIcon />
+                  Xem chi tiết
                 </CustomButton>
               </Box>
             </Box>
