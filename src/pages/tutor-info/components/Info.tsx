@@ -1,3 +1,4 @@
+"use client";
 import { Box, Grid, Typography } from "@mui/material";
 import React, { FC } from "react";
 import TutorImg from "../../../assets/images/student.png";

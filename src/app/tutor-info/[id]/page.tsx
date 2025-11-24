@@ -1,10 +1,10 @@
 import TutorInfo from "@/pages/tutor-info/page-view";
 import React from "react";
 
-const TutorInfoPage = () => {
+const TutorInfoPage = ({ param }: { param: any }) => {
   return (
     <div>
-      <TutorInfo />
+      <TutorInfo id={param} />
     </div>
   );
 };
