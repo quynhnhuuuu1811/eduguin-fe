@@ -26,7 +26,7 @@ export default function RootLayout({
           <NavbarMobile />
         </header>
         <AppRouterCacheProvider options={{ key: "mui", prepend: true }}>
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 mb-12">{children}</main>
         </AppRouterCacheProvider>
         <Footer />
       </body>

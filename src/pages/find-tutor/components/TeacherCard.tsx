@@ -9,16 +9,7 @@ import { useRouter } from "next/navigation";
 import VideoImg from "../../../assets/images/VideoThumbnail.png";
 
 interface Props {
-  teacher: {
-    id?: string | number;
-    name?: string;
-    subject?: string;
-    desciption?: string;
-    rating?: number | string;
-    cmt?: number | string;
-    price?: number | string;
-    videoUrl?: string;
-  };
+  teacher: {};
 }
 
 const TeacherCard: FC<Props> = ({ teacher }) => {
@@ -31,7 +22,7 @@ const TeacherCard: FC<Props> = ({ teacher }) => {
     const video = videoRef.current;
     if (!video || !teacher?.videoUrl) return;
 
-    const isHls = /\.m3u8(\?|$)/i.test(teacher.videoUrl);
+    const isHls = /\.m3u8(\?|$)/i.test(teacher?.videoUrl);
     let cancelled = false;
 
     async function setup() {
@@ -40,19 +31,19 @@ const TeacherCard: FC<Props> = ({ teacher }) => {
           "canPlayType" in video &&
           video.canPlayType("application/vnd.apple.mpegurl")
         ) {
-          video.src = teacher.videoUrl!;
+          video.src = teacher?.videoUrl!;
         } else {
           const { default: Hls } = await import("hls.js");
           if (cancelled) return;
           if (Hls.isSupported()) {
             const hls = new Hls();
             hlsRef.current = hls;
-            hls.loadSource(teacher.videoUrl!);
+            hls.loadSource(teacher?.videoUrl!);
             hls.attachMedia(video);
           }
         }
       } else {
-        video.src = teacher.videoUrl!;
+        video.src = teacher?.videoUrl!;
       }
     }
 
@@ -86,10 +77,10 @@ const TeacherCard: FC<Props> = ({ teacher }) => {
       v.pause();
       v.currentTime = 0;
     }
-  }, [hovering, teacher?.videoUrl]);
+  }, [hovering, teacher.tutorProfile?.introVideoUrl]);
 
   const handlePlayClick = () => {
-    const href = teacher.videoUrl;
+    const href = teacher.tutorProfile?.introVideoUrl;
     window.open(href);
   };
 
@@ -149,7 +140,7 @@ const TeacherCard: FC<Props> = ({ teacher }) => {
                   fontSize: { xs: "10px", sm: "12px", md: "15px", lg: "17px" },
                 }}
               >
-                {teacher?.name}
+                {teacher?.fullName}
               </Typography>
               <Typography
                 sx={{
@@ -159,7 +150,7 @@ const TeacherCard: FC<Props> = ({ teacher }) => {
                 }}
                 className="text-blue600"
               >
-                Gia sư {teacher?.subject}
+                Gia sư {teacher?.tutorProfile?.subject}
               </Typography>
               <Typography
                 sx={{
@@ -168,7 +159,7 @@ const TeacherCard: FC<Props> = ({ teacher }) => {
                   fontSize: { xs: "7px", sm: "9px", md: "13px", lg: "15px" },
                 }}
               >
-                {teacher?.desciption}
+                {teacher?.tutorProfile?.description || "Không có mô tả"}
               </Typography>
             </Box>
 
@@ -205,7 +196,7 @@ const TeacherCard: FC<Props> = ({ teacher }) => {
                       alignItems: "center",
                     }}
                   >
-                    {teacher?.rating}{" "}
+                    {teacher?.rating == 0 ? teacher?.rating : "-"}{" "}
                     <StarRateRoundedIcon
                       sx={{
                         fontSize: {
@@ -246,7 +237,7 @@ const TeacherCard: FC<Props> = ({ teacher }) => {
                       },
                     }}
                   >
-                    {teacher?.price} VND
+                    {teacher?.tutorProfile?.price} VND
                   </Typography>
                   <Typography
                     sx={{
@@ -268,7 +259,11 @@ const TeacherCard: FC<Props> = ({ teacher }) => {
                 }}
               >
                 <CustomButton type="Secondary">Đăng kí ngay</CustomButton>
-                <CustomButton type="SecondaryOutlined" className="border-none">
+                <CustomButton
+                  type="SecondaryOutlined"
+                  className="border-none"
+                  onClick={() => router.push(`/tutor-info/${teacher?.id}`)}
+                >
                   Xem chi tiết
                 </CustomButton>
               </Box>
@@ -315,7 +310,7 @@ const TeacherCard: FC<Props> = ({ teacher }) => {
               }}
             />
 
-            {teacher?.videoUrl ? (
+            {teacher?.tutorProfile?.introVideoUrl ? (
               <IconButton
                 aria-label="Xem video giới thiệu"
                 onClick={handlePlayClick}

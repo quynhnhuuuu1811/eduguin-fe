@@ -4,23 +4,13 @@ import LogoImg from "../../assets/images/Logo-Photoroom.png";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ensureNetwork } from "@/lib/eth";
-import { getSignerAddress } from "@/lib/escrow";
-
 export const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
-  async function handleConnect() {
-    try {
-      await ensureNetwork("sepolia");
-      const addr = await getSignerAddress();
-      console.log("addr", addr);
-    } catch (e: any) {}
-  }
   const navItems = [
     { href: "/home", label: "Trang chủ" },
     { href: "/find-tutor", label: "Tìm gia sư" },
-    { href: "/is-tutor", label: "Trở thành gia sư" },
+    { href: "/my-tutor", label: "Gia sư của tôi" },
     { href: "/contact", label: "Liên hệ" },
   ];
 
