@@ -12,16 +12,14 @@ const IntroductSection = () => {
           fontFamily: "sugar",
           color: "#0F7FE5",
         }}
-        className="text-[20px] sm:text-[25px] md:text-[30px] lg:text-[40px]"
-      >
+        className="text-[20px] sm:text-[25px] md:text-[30px] lg:text-[40px]">
         Gia sư phù hợp – Học gì cũng dễ.
       </div>
       <div
         style={{
           textAlign: "center",
         }}
-        className="text-[11px] sm:text-[11px] md:text-[12px] lg:text-[14px]"
-      >
+        className="text-[11px] sm:text-[11px] md:text-[12px] lg:text-[14px] text-black">
         Chúng tôi giúp bạn kết nối với người thầy phù hợp – để mỗi buổi học
         không còn là áp lực, mà trở thành trải nghiệm nhẹ nhàng, hiệu quả và đầy
         cảm hứng. Từ việc lắng nghe nhu cầu học tập, đánh giá năng lực hiện tại
