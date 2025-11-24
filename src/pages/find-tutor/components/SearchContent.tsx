@@ -71,7 +71,6 @@ const SearchContent = () => {
 
   const teachers = users;
 
-  console.log(111, teachers);
   const subjectOptions = [
     { value: "toan", label: "Toán học" },
     { value: "vatly", label: "Vật lý" },
@@ -122,8 +121,7 @@ const SearchContent = () => {
           md: "100px",
           lg: "135px",
         },
-      }}
-    >
+      }}>
       <Typography
         sx={{
           fontFamily: "quicksand",
@@ -134,8 +132,7 @@ const SearchContent = () => {
             lg: "25px",
           },
           fontWeight: 600,
-        }}
-      >
+        }}>
         {teachers.length} giáo viên đang chờ để được giúp bạn
         <Grid
           container
@@ -147,8 +144,7 @@ const SearchContent = () => {
               md: "5px",
               lg: "15px",
             },
-          }}
-        >
+          }}>
           <Grid item size={{ xs: 6, sm: 6, md: 4, lg: 3 }}>
             <CustomInput label="Môn học" select options={subjectOptions} />
           </Grid>

@@ -2,7 +2,7 @@ import { Box, Grid, Typography } from "@mui/material";
 import React from "react";
 import Info from "./components/Info";
 
-const TutorInfo = () => {
+const TutorInfo = ({ id }: { id: string }) => {
   return (
     <div>
       <Typography
@@ -32,27 +32,11 @@ const TutorInfo = () => {
             md: "50px",
             lg: "50px",
           },
-        }}
-      >
+        }}>
         Thông tin giáo viên
       </Typography>
-      <Box
-        width="100%"
-        sx={{
-          paddingInline: {
-            xs: "50px",
-            sm: "80px",
-            md: "100px",
-            lg: "135px",
-          },
-        }}
-      >
-        <Grid container size={12}>
-          <Grid item size={8}>
-            <Info />
-          </Grid>
-          <Grid item size={4}></Grid>
-        </Grid>
+      <Box width="100%" className="max-w-[80%] mx-auto">
+        <Info id={id} />
       </Box>
     </div>
   );
