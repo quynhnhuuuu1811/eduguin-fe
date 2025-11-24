@@ -32,7 +32,8 @@ const Info = ({ id }: { id: string }) => {
   }
 
   const rating = teacher.tutorProfile?.rating ?? 0;
-  const comments = teacher.cmt ?? 0;
+  const comments = 0;
+  // teacher.cmt ??
   const price = teacher.tutorProfile?.price ?? 0;
   const introUrl = teacher.tutorProfile?.introVideoUrl;
   const getYoutubeEmbedUrl = (url: string) => {
