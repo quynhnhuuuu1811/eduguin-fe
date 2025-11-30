@@ -5,6 +5,8 @@ import { useEffect } from "react";
 import { useUserStore } from "@/zustand/stores/UserStore";
 import Img from "../../../assets/images/teacher.png";
 import Banner from "../../../assets/images/VideoThumbnail.png"; // ảnh bên phải
+import { Comment } from "./Comment";
+import { InputComment } from "./InputComment";
 
 const Info = ({ id }: { id: string }) => {
   const {
@@ -147,6 +149,38 @@ const Info = ({ id }: { id: string }) => {
           </div>
         </div>
       </div>
+      <div className="flex flex-col gap-5 text-black font-quicksand ">
+        <h3 className=" font-bold">Thông tin cơ bản</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <p className="font-bold">
+            Ngày sinh <span className="font-normal">{teacher.birthDate}</span>
+          </p>
+          <p className="font-bold">
+            Email <span className="font-normal">{teacher.email}</span>
+          </p>
+          <p className="font-bold">
+            Giới tính{" "}
+            <span className="font-normal">
+              {teacher.sex == "male" ? "Nam" : "Nữ"}
+            </span>
+          </p>
+        </div>
+      </div>
+      <hr className="my-5 border-2 border-[#737E91]" />
+      <div className="flex flex-col gap-5 text-black font-quicksand">
+        <h3 className=" font-bold">Đánh giá của học viên</h3>
+        <div className="flex flex-col gap-[20px] max-h-[300px] overflow-auto">
+          <Comment />
+          <Comment />
+          <Comment />
+          <Comment />
+          <Comment />
+          <Comment />
+        </div>
+      </div>
+      <InputComment
+        user={{ avatar: "https://example.com/avatar.jpg", name: "User Name" }}
+      />
     </div>
   );
 };
