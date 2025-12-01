@@ -18,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={` min-h-screen flex flex-col `}>
+      <body className={` min-h-screen flex flex-col bg-white `}>
         <header className="fixed top-6 left-0 w-full z-50 hidden md:block">
           <Navbar />
         </header>
@@ -26,7 +26,7 @@ export default function RootLayout({
           <NavbarMobile />
         </header>
         <AppRouterCacheProvider options={{ key: "mui", prepend: true }}>
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 mb-12">{children}</main>
         </AppRouterCacheProvider>
         <Footer />
       </body>

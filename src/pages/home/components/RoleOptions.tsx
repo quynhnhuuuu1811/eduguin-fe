@@ -17,8 +17,7 @@ const RoleOptions = () => {
     gap-2 sm:gap-2 md:gap-4 lg:gap-4
     px-[50px] sm:px-[65px] md:px-[80px] lg:px-[135px]
     py-5 sm:py-7 md:py-9 lg:py-11"
-      spacing={2}
-    >
+      spacing={2}>
       <Grid
         className="!aspect-square !flex-1/3 w-full border p-5"
         size={4}
@@ -26,8 +25,7 @@ const RoleOptions = () => {
           borderRadius: 3,
           backgroundColor: "#F4F5F5",
           border: "2px solid var(--color-gray900)",
-        }}
-      >
+        }}>
         <div className="py-3">
           <Typography
             sx={{
@@ -39,7 +37,7 @@ const RoleOptions = () => {
                 lg: "25px",
               },
             }}
-          >
+            color="#414853">
             "Chúng tôi tự hào"
           </Typography>
           <Typography
@@ -52,7 +50,7 @@ const RoleOptions = () => {
                 lg: "15px",
               },
             }}
-          >
+            color="#414853">
             khi là cầu nối vững chắc cho học sinh và gia sư
           </Typography>
         </div>
@@ -71,14 +69,12 @@ const RoleOptions = () => {
           flexDirection: "column",
           gap: 2,
         }}
-        container
-      >
+        container>
         <div
           className="flex flex-1 flex-col md:flex-row w-full items-center !h-full bg-blue50 p-5 border-2 border-blue700"
           style={{
             borderRadius: "12px !important",
-          }}
-        >
+          }}>
           <img
             src={studentImg.src}
             alt="img"
@@ -96,8 +92,8 @@ const RoleOptions = () => {
                 },
                 fontWeight: "bold",
                 marginBottom: "8px",
-              }}
-            >
+                color: "#000000",
+              }}>
               Cần tìm gia sư?
             </Typography>
             <Typography
@@ -110,16 +106,15 @@ const RoleOptions = () => {
                   md: "14px",
                   lg: "14px",
                 },
-              }}
-            >
+                color: "#000000",
+              }}>
               Với bộ lọc cá nhân hóa, bạn sẽ dễ dàng dàng tìm được người bạn
               đồng hành trên chặng đường tìm kiếm tri thức.
             </Typography>
             <CustomButton
               type="SecondaryOutlined"
               className="!border-blue700 !text-blue700"
-              onClick={() => router.push("/find-tutor")}
-            >
+              onClick={() => router.push("/find-tutor")}>
               Tìm gia sư ngay!
             </CustomButton>
           </div>
@@ -129,8 +124,7 @@ const RoleOptions = () => {
           className="flex flex-col md:flex-row w-full items-center !h-1/2 bg-blue50 p-5 border-2 border-blue700"
           style={{
             borderRadius: "12px !important",
-          }}
-        >
+          }}>
           <img
             src={teacherImg.src}
             alt="img"
@@ -148,8 +142,8 @@ const RoleOptions = () => {
                 },
                 fontWeight: "bold",
                 marginBottom: "8px",
-              }}
-            >
+                color: "#000000",
+              }}>
               Cần tìm kiếm công việc gia sư?{" "}
             </Typography>
             <Typography
@@ -162,16 +156,15 @@ const RoleOptions = () => {
                   md: "14px",
                   lg: "14px",
                 },
-              }}
-            >
+                color: "#000000",
+              }}>
               Cùng tạo ra những CV đặc sắc, tìm công việc gia sư một cách dễ
               dàng, không còn phải mất nhiều công sức và thời gian!
             </Typography>
             <CustomButton
               type="SecondaryOutlined"
               className="!border-blue700 !text-blue700"
-              onClick={() => router.push("/find-tutor")}
-            >
+              onClick={() => router.push("/find-tutor")}>
               Tạo CV ngay!
             </CustomButton>
           </div>

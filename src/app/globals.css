@@ -1,14 +1,62 @@
 @import "tailwindcss";
 
+/* ---- GLOBAL BASE RESET ---- */
 @layer base {
   *,
   ::before,
   ::after {
     box-sizing: border-box;
   }
+
   * {
     margin: 0;
     padding: 0;
+  }
+
+  body {
+    background-color: #ffffff;
+    color: var(--foreground);
+    font-family: "Quicksand", Arial, Helvetica, sans-serif;
+    font-size: 15px; /* nhớ có đơn vị */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding: 10px; /* đừng để trong dấu " " */
+  }
+
+  h1 {
+    font-family: "Quicksand";
+    font-weight: 600;
+    font-size: 37px;
+  }
+
+  h2 {
+    font-family: "Quicksand";
+    font-weight: 400;
+    font-size: 28px;
+  }
+
+  h3 {
+    font-family: "Quicksand";
+    font-weight: 400;
+    font-size: 20px;
+  }
+
+  h4 {
+    font-family: "Quicksand";
+    font-weight: 400;
+    font-size: 17px;
+  }
+
+  h5 {
+    font-family: "Quicksand";
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  h6 {
+    font-family: "Quicksand";
+    font-weight: 500;
+    font-size: 15px;
   }
 }
 
@@ -18,60 +66,12 @@
   font-weight: 400;
   font-style: normal;
 }
+
 @font-face {
   font-family: "Sugar";
   src: url("../assets/fonts/White-Sugar.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
-}
-
-h1 {
-  font-family: "Quicksand";
-  font-weight: 600;
-  font-style: normal;
-  font-size: 37;
-}
-
-h2 {
-  font-family: "Quicksand";
-  font-weight: 400;
-  font-style: normal;
-  font-size: 28;
-}
-
-h3 {
-  font-family: "Quicksand";
-  font-weight: 400;
-  font-style: normal;
-  font-size: 20;
-}
-
-h4 {
-  font-family: "Quicksand";
-  font-weight: 400;
-  font-style: normal;
-  font-size: 17;
-}
-
-h5 {
-  font-family: "Quicksand";
-  font-weight: 600;
-  font-style: normal;
-  font-size: 15;
-}
-
-h6 {
-  font-family: "Quicksand";
-  font-weight: 500;
-  font-style: normal;
-  font-size: 15;
-}
-
-span {
-  font-family: "Quicksand";
-  font-weight: 400;
-  font-style: normal;
-  font-size: 13;
 }
 
 :root {
@@ -110,20 +110,11 @@ span {
   --color-primary300: #36ce7c;
   --color-primary200: #86e99f;
   --font-sugar: "Sugar", sans-serif;
+  --font-quicksand: "Quicksand", sans-serif;
 }
 
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: "Quicksand", Arial, Helvetica, sans-serif;
-  font-size: 15;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  padding: "10px !important";
 }

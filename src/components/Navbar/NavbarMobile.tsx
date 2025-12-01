@@ -26,7 +26,7 @@ const NavbarMobile = () => {
   const navItems = [
     { label: "Trang chủ", path: "/home" },
     { label: "Tìm gia sư", path: "/find-tutor" },
-    { label: "Trở thành gia sư", path: "/become-tutor" },
+    { label: "Gia sư của tôi", path: "/my-tutor" },
     { label: "Liên hệ", path: "/contact" },
   ];
 

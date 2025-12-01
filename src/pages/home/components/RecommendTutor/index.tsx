@@ -58,8 +58,7 @@ const RecommnendTutor = () => {
           md: "100px",
           lg: "135px",
         },
-      }}
-    >
+      }}>
       <Typography
         sx={{
           fontFamily: "quicksand",
@@ -71,8 +70,8 @@ const RecommnendTutor = () => {
           },
           fontWeight: 700,
           marginBottom: 4,
-        }}
-      >
+          color: "#000000",
+        }}>
         Đề xuất cho bạn...
       </Typography>
       <Box className="w-full flex justify-center items-center !bg-transparent">
@@ -84,16 +83,14 @@ const RecommnendTutor = () => {
             640: { slidesPerView: 2 },
             900: { slidesPerView: 3 },
             1200: { slidesPerView: 4 },
-          }}
-        >
+          }}>
           {rcmTutors.map((tutor, index) => (
             <SwiperSlide
               key={index}
               style={{
                 display: "flex",
                 justifyContent: "center",
-              }}
-            >
+              }}>
               <CardItem tutor={tutor} />
             </SwiperSlide>
           ))}

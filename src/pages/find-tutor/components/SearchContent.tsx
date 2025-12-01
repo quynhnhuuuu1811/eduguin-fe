@@ -1,54 +1,75 @@
+"use client";
 import CustomInput from "@/components/Input";
 import { Box, Typography, Grid } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import TeacherCard from "./TeacherCard";
+import TutorImg from "../../../assets/images/student.png";
+import { useUserStore } from "@/zustand/stores/UserStore";
 
 const SearchContent = () => {
-  const teachers = [
-    {
-      name: "Nguyễn Văn A",
-      subject: "Toán học",
-      rating: 4.8,
-      location: "Hà Nội",
-      desciption:
-        "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
-      cmt: 4,
-      price: 500000,
-      videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
-    },
-    {
-      name: "Trần Thị B",
-      subject: "Vật lý",
-      rating: 4.6,
-      location: "Hồ Chí Minh",
-      desciption:
-        "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
-      cmt: 5,
-      price: 600000,
-      videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
-    },
-    {
-      name: "Lê Văn C",
-      subject: "Hóa học",
-      rating: 4.9,
-      location: "Đà Nẵng",
-      desciption:
-        "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
-      cmt: 5,
-      price: 450000,
-      videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
-    },
-    {
-      name: "Phạm Thị D",
-      subject: "Sinh học",
-      rating: 4.7,
-      location: "Cần Thơ",
-      desciption:
-        "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
-      price: 550000,
-      videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
-    },
-  ];
+  // const teachers = [
+  //   {
+  //     id: 1,
+  //     avatar: TutorImg.src,
+  //     name: "Nguyễn Văn A",
+  //     subject: "Toán học",
+  //     rating: 4.8,
+  //     location: "Hà Nội",
+  //     desciption:
+  //       "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
+  //     cmt: 4,
+  //     price: 500000,
+  //     videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
+  //   },
+  //   {
+  //     id: 2,
+  //     avatar: TutorImg.src,
+  //     name: "Trần Thị B",
+  //     subject: "Vật lý",
+  //     rating: 4.6,
+  //     location: "Hồ Chí Minh",
+  //     desciption:
+  //       "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
+  //     cmt: 5,
+  //     price: 600000,
+  //     videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
+  //   },
+  //   {
+  //     id: 3,
+  //     avatar: TutorImg.src,
+  //     name: "Lê Văn C",
+  //     subject: "Hóa học",
+  //     rating: 4.9,
+  //     location: "Đà Nẵng",
+  //     desciption:
+  //       "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
+  //     cmt: 5,
+  //     price: 450000,
+  //     videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Phạm Thị D",
+  //     subject: "Sinh học",
+  //     rating: 4.7,
+  //     location: "Cần Thơ",
+  //     desciption:
+  //       "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
+  //     price: 550000,
+  //     // videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
+  //   },
+  // ];
+
+  const { fetchAllTutors, users } = useUserStore();
+
+  useEffect(() => {
+    fetchAllTutors({
+      page: 1,
+      limit: 10,
+    });
+  }, [fetchAllTutors]);
+
+  const teachers = users;
 
   const subjectOptions = [
     { value: "toan", label: "Toán học" },
@@ -100,8 +121,7 @@ const SearchContent = () => {
           md: "100px",
           lg: "135px",
         },
-      }}
-    >
+      }}>
       <Typography
         sx={{
           fontFamily: "quicksand",
@@ -112,8 +132,7 @@ const SearchContent = () => {
             lg: "25px",
           },
           fontWeight: 600,
-        }}
-      >
+        }}>
         {teachers.length} giáo viên đang chờ để được giúp bạn
         <Grid
           container
@@ -125,8 +144,7 @@ const SearchContent = () => {
               md: "5px",
               lg: "15px",
             },
-          }}
-        >
+          }}>
           <Grid item size={{ xs: 6, sm: 6, md: 4, lg: 3 }}>
             <CustomInput label="Môn học" select options={subjectOptions} />
           </Grid>
@@ -138,12 +156,6 @@ const SearchContent = () => {
           </Grid>
           <Grid item size={{ xs: 6, sm: 6, md: 4, lg: 3 }}>
             <CustomInput label="Được đánh giá" select options={ratingOptions} />
-          </Grid>
-          <Grid item size={{ xs: 6, sm: 6, md: 4, lg: 3 }}>
-            <CustomInput label="Khu vực" select options={locationOptions} />
-          </Grid>
-          <Grid item size={{ xs: 6, sm: 6, md: 4, lg: 3 }}>
-            <CustomInput label="Sắp xếp theo" select options={sortOptions} />
           </Grid>
         </Grid>
         {teachers.map((item, index) => (
