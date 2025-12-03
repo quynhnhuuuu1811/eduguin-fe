@@ -1,10 +1,12 @@
 "use client";
 import React from "react";
 import bkg from "../../../../assets/images/rcmTutor.png";
-import { Box, ButtonGroupContext, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import Img from "../../../../assets/images/teacher.png";
 import CardItem from "./CardItem";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css/pagination';
 import "swiper/css";
 const RecommnendTutor = () => {
   const rcmTutors = [
@@ -76,14 +78,26 @@ const RecommnendTutor = () => {
       </Typography>
       <Box className="w-full flex justify-center items-center !bg-transparent">
         <Swiper
-          style={{ width: "100%", paddingBottom: "20px" }}
+          style={{ width: "100%", paddingBottom: "50px" }}
           spaceBetween={15}
           breakpoints={{
             0: { slidesPerView: 1 },
             640: { slidesPerView: 2 },
             900: { slidesPerView: 3 },
             1200: { slidesPerView: 4 },
-          }}>
+          }}
+          loop={true}
+          pagination={{
+            clickable: true,
+            dynamicBullets: true,
+          }}
+          modules={[Pagination, Autoplay]}
+          autoplay={{
+            delay: 2500,
+            disableOnInteraction: false,
+          }}
+          className="recommend-tutor-swiper"
+        >
           {rcmTutors.map((tutor, index) => (
             <SwiperSlide
               key={index}
