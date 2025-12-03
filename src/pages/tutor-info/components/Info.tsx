@@ -7,6 +7,7 @@ import Img from "../../../assets/images/teacher.png";
 import Banner from "../../../assets/images/VideoThumbnail.png"; // ảnh bên phải
 import { Comment } from "./Comment";
 import { InputComment } from "./InputComment";
+import { useCommentStore } from "@/zustand/stores/CommentStore";
 
 const Info = ({ id }: { id: string }) => {
   const {
@@ -15,17 +16,23 @@ const Info = ({ id }: { id: string }) => {
     error,
     fetchTutorByID,
   } = useUserStore();
-
+  const {
+    comments: commentList,
+    loading: commentLoading,
+    error: commentError,
+    getListCmtByTutorID,
+  } = useCommentStore();
   useEffect(() => {
     if (!id) return;
     fetchTutorByID(id);
-  }, [id, fetchTutorByID]);
+    getListCmtByTutorID(id);
+  }, [id, fetchTutorByID, getListCmtByTutorID]);
 
   if (!id) {
     return <div>No tutor ID provided</div>;
   }
 
-  if (loading || !teacher) {
+  if (loading || !teacher || commentLoading) {
     return <div>Loading...</div>;
   }
 
@@ -51,7 +58,6 @@ const Info = ({ id }: { id: string }) => {
     } catch {}
     return null;
   };
-
   const embedUrl = introUrl ? getYoutubeEmbedUrl(introUrl) : null;
   return (
     <div className="font-quicksand">
@@ -127,7 +133,7 @@ const Info = ({ id }: { id: string }) => {
                   <span>★</span>
                 </div>
                 <span className="text-[12px] text-gray-700">
-                  {comments} bình luận
+                  {commentList.length || 0} bình luận
                 </span>
               </div>
 
@@ -170,15 +176,19 @@ const Info = ({ id }: { id: string }) => {
       <div className="flex flex-col gap-5 text-black font-quicksand">
         <h3 className=" font-bold">Đánh giá của học viên</h3>
         <div className="flex flex-col gap-[20px] max-h-[300px] overflow-auto">
-          <Comment />
-          <Comment />
-          <Comment />
-          <Comment />
-          <Comment />
-          <Comment />
+          {commentList && commentList.length > 0 ? (
+            commentList.map((comment) => (
+              <Comment key={comment.id} {...comment} />
+            ))
+          ) : (
+            <div className="flex justify-center ">
+              <h5>Không có bình luận nào</h5>
+            </div>
+          )}
         </div>
       </div>
       <InputComment
+        idTutor={id}
         user={{ avatar: "https://example.com/avatar.jpg", name: "User Name" }}
       />
     </div>

@@ -1,18 +1,25 @@
+import { useCommentStore } from "@/zustand/stores/CommentStore";
 import { useState } from "react";
 
 export const InputComment = ({
+  idTutor,
   user,
 }: {
   user: { avatar: string; name: string };
+  idTutor: string;
 }) => {
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState("");
-
+  const {
+    newComment,
+    loading: commentLoading,
+    error: commentError,
+    createComment,
+  } = useCommentStore();
   const totalStars = 5;
 
   const handleSubmit = () => {
-    console.log("Rating:", rating);
-    console.log("Content:", content);
+    createComment(idTutor, content, rating);
   };
 
   return (
