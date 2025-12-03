@@ -3,13 +3,28 @@ import { Menu, MenuItem } from "@mui/material";
 import React, { useState } from "react";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import { useRouter, usePathname } from "next/navigation";
+import { useAuthStore } from "@/zustand/stores/AuthStore";
 
 const NavbarMobile = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const router = useRouter();
   const pathname = usePathname();
+  const isAuthenticated = useAuthStore((state) => !!state.data.accessToken);
 
+  const navItems = isAuthenticated ? [
+    { label: "Trang chủ", path: "/" },
+    { label: "Tìm gia sư", path: "/find-tutor" },
+    { label: "Gia sư của tôi", path: "/my-tutor" },
+    { label: "Liên hệ", path: "/contact" },
+    { label: "Tài khoản", path: "/profile" },
+  ] : [
+    { label: "Trang chủ", path: "/" },
+    { label: "Tìm gia sư", path: "/find-tutor" },
+    { label: "Gia sư của tôi", path: "/my-tutor" },
+    { label: "Liên hệ", path: "/contact" },
+    { label: "Đăng nhập", path: "/login" },
+  ];
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -23,12 +38,7 @@ const NavbarMobile = () => {
     router.push(path);
   };
 
-  const navItems = [
-    { label: "Trang chủ", path: "/home" },
-    { label: "Tìm gia sư", path: "/find-tutor" },
-    { label: "Gia sư của tôi", path: "/my-tutor" },
-    { label: "Liên hệ", path: "/contact" },
-  ];
+
 
   return (
     <div>
@@ -59,9 +69,8 @@ const NavbarMobile = () => {
             <MenuItem
               key={item.path}
               onClick={() => handleNavigate(item.path)}
-              className={`!text-[12px] !font-[Quicksand] active:bg-gray-200 ${
-                isActive ? "!font-bold text-primary500" : "!font-semibold"
-              }`}
+              className={`!text-[12px] !font-[Quicksand] active:bg-gray-200 ${isActive ? "!font-bold text-primary500" : "!font-semibold"
+                }`}
             >
               {item.label}
             </MenuItem>

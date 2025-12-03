@@ -12,6 +12,10 @@ import { Box, Typography } from "@mui/material";
 const Footer = () => {
   const pathname = usePathname();
 
+  if (pathname === "/login" || pathname === "/register") {
+    return null;
+  }
+
   const linkItems = [
     {
       href: "/home",
@@ -94,7 +98,7 @@ const Footer = () => {
           lg: 4,
         },
       }}
-      className="flex flex-col items-center justify-center w-full"
+      className="flex flex-col items-center justify-center w-full mt-12"
     >
       <div className="flex gap-6">
         {linkItems.map((item) => (

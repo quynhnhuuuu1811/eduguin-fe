@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import Footer from "@/components/Footer";
-import { Navbar } from "@/components/Navbar/Navbar";
-import NavbarMobile from "@/components/Navbar/NavbarMobile";
+import { ConditionalFooter } from "@/components/Footer/ConditionalFooter";
+import { ConditionalNavbar } from "@/components/Navbar/ConditionalNavbar";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,16 +18,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={` min-h-screen flex flex-col `}>
-        <header className="fixed top-6 left-0 w-full z-50 hidden md:block">
-          <Navbar />
-        </header>
-        <header className="fixed top-8 left-8 w-full z-50 md:hidden sm:block">
-          <NavbarMobile />
-        </header>
-        <AppRouterCacheProvider options={{ key: "mui", prepend: true }}>
-          <main className="flex-1 mb-12">{children}</main>
-        </AppRouterCacheProvider>
-        <Footer />
+        <Providers>
+          <ConditionalNavbar />
+          <AppRouterCacheProvider options={{ key: "mui", prepend: true }}>
+            <main className="flex-1 ">{children}</main>
+          </AppRouterCacheProvider>
+          <ConditionalFooter />
+        </Providers>
       </body>
     </html>
   );

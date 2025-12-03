@@ -6,6 +6,7 @@ interface Props extends React.PropsWithChildren {
   type: "Primary" | "Secondary" | "PrimaryOutlined" | "SecondaryOutlined";
   className?: string;
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 export const CustomButton: React.FC<Props> = ({
@@ -13,6 +14,7 @@ export const CustomButton: React.FC<Props> = ({
   type,
   className = "",
   onClick,
+  disabled = false,
 }) => {
   let sx: any = {};
 
@@ -79,6 +81,7 @@ export const CustomButton: React.FC<Props> = ({
         transition: "all 0.2s ease-in-out",
       }}
       onClick={onClick}
+      disabled={disabled}
     >
       {children}
     </Button>

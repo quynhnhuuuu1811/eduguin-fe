@@ -1,18 +1,21 @@
 "use client";
-import { CustomButton } from "../Button";
 import LogoImg from "../../assets/images/Logo-Photoroom.png";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useAuthStore } from "@/zustand/stores/AuthStore";
+
 export const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const navItems = [
-    { href: "/home", label: "Trang chủ" },
+    { href: "/", label: "Trang chủ" },
     { href: "/find-tutor", label: "Tìm gia sư" },
     { href: "/my-tutor", label: "Gia sư của tôi" },
     { href: "/contact", label: "Liên hệ" },
   ];
+
+  const isAuthenticated = useAuthStore((state) => !!state.data.accessToken);
 
   return (
     <div className="flex w-full justify-center">
@@ -32,24 +35,34 @@ export const Navbar = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`px-8 py-2 text-black rounded-full transition flex justify-center items-center text-[10px] lg:text-[12px] font-semibold ${
-                pathname === item.href
-                  ? "bg-white  px-4"
-                  : "bg-transparent  hover:bg-white/40"
-              }`}
+              className={`px-8 py-2 text-black rounded-full transition flex justify-center items-center text-[10px] lg:text-[12px] font-semibold ${pathname === item.href
+                ? "bg-white  px-4"
+                : "bg-transparent  hover:bg-white/40"
+                }`}
             >
               {item.label}
             </Link>
           ))}
         </nav>
-        <button
-          className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold"
-          onClick={() => {
-            handleConnect();
-          }}
-        >
-          Đăng nhập
-        </button>
+        {isAuthenticated ? (
+          <button
+            className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold cursor-pointer"
+            onClick={() => {
+              router.push("/profile");
+            }}
+          >
+            Tài khoản
+          </button>
+        ) : (
+          <button
+            className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold cursor-pointer"
+            onClick={() => {
+              router.push("/login");
+            }}
+          >
+            Đăng nhập
+          </button>
+        )}
       </div>
     </div>
   );
