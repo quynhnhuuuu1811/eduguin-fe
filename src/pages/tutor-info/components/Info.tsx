@@ -8,6 +8,9 @@ import Banner from "../../../assets/images/VideoThumbnail.png"; // ảnh bên ph
 import { Comment } from "./Comment";
 import { InputComment } from "./InputComment";
 import { useCommentStore } from "@/zustand/stores/CommentStore";
+import { CustomButton } from "@/components/Button";
+import StarRateRoundedIcon from '@mui/icons-material/StarRateRounded';
+import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
 
 const Info = ({ id }: { id: string }) => {
   const {
@@ -55,14 +58,15 @@ const Info = ({ id }: { id: string }) => {
       if (u.hostname === "youtu.be") {
         return `https://www.youtube.com/embed${u.pathname}`;
       }
-    } catch {}
+    } catch { }
     return null;
   };
   const embedUrl = introUrl ? getYoutubeEmbedUrl(introUrl) : null;
   return (
     <div className="font-quicksand">
       <div className="grid grid-cols-12 gap-5 md:gap-6 items-start">
-        <div className="flex gap-6 col-span-12 md:col-span-2 items-center md:items-start justify-center md:justify-start">
+        {/* Avatar */}
+        <div className="flex gap-6 col-span-12 md:col-span-3 items-center md:items-start justify-center md:justify-start">
           <div className="w-full  shrink-0">
             {teacher.avatarUrl ? (
               <Image
@@ -83,7 +87,8 @@ const Info = ({ id }: { id: string }) => {
             )}
           </div>
         </div>
-        <div className="flex flex-col col-span-12 md:col-span-6 gap-3">
+        {/* Info */}
+        <div className="flex flex-col col-span-12 md:col-span-5 gap-3">
           <div className="flex flex-col gap-[10px]">
             <h2 className="text-black text-[28px] font-bold">
               {teacher.fullName}
@@ -125,12 +130,13 @@ const Info = ({ id }: { id: string }) => {
                 />
               )}
             </div>
-
+            {/* Rating and Price */}
             <div className="px-4 py-3 flex items-stretch justify-between text-[20px] md:text-[28px] min-h-[80px]">
-              <div className="flex flex-col pr-4">
-                <div className="flex items-center gap-1 font-bold text-yellow-500">
+              {/* Rating */}
+              <div className="flex flex-col pr-4 items-center justify-center w-full">
+                <div className="flex items-center justify-center gap-1 font-bold text-[15px] md:text-[20px] lg:text-[28px] text-yellow-500">
                   <span>{rating || 5}</span>
-                  <span>★</span>
+                  <StarRateRoundedIcon sx={{ fontSize: { xs: "15px", sm: "20px", md: "25px", lg: "30px" }, verticalAlign: "middle", color: "var(--color-yellow500)", marginBlock: 0.5 }} />
                 </div>
                 <span className="text-[12px] text-gray-700">
                   {commentList.length || 0} bình luận
@@ -139,24 +145,29 @@ const Info = ({ id }: { id: string }) => {
 
               <div className="w-px bg-[#FBBF77]" />
 
-              <div className="flex flex-col pl-4">
-                <span className="font-bold text-[#F97316] text-[18px] md:text-[20px]">
+              {/* Price */}
+              <div className="flex flex-col pl-4 items-center justify-center w-full text-[15px] md:text-[20px] lg:text-[28px]">
+                <span className="font-bold text-yellow-500 font-bold">
                   {price.toLocaleString("vi-VN")} VND
                 </span>
                 <span className="text-[12px] text-gray-700">/tháng</span>
               </div>
             </div>
 
-            <button
-              type="button"
-              className="w-full bg-primary500 text-white text-[14px] font-semibold py-3 px-2 rounded-full hover:bg-primary600 transition-colors">
-              Đăng ký học ngay
-            </button>
+            {/* Register Button */}
+            <div className="flex justify-center">
+              <CustomButton
+                type="Secondary"
+                className="w-2/3">
+                Đăng ký học ngay!
+                <ArrowForwardRoundedIcon sx={{ fontSize: { xs: "15px", sm: "15px", md: "20px", lg: "20px" }, verticalAlign: "middle", color: "var(--color-white)", marginBlock: 0.5 }} />
+              </CustomButton>
+            </div>
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-5 text-black font-quicksand ">
-        <h3 className=" font-bold">Thông tin cơ bản</h3>
+      <div className="flex flex-col gap-5 text-black font-quicksand mt-10 ">
+        <h3 className=" font-bold text-[15px] md:text-[20px] lg:text-[20px]">Thông tin cơ bản</h3>
         <div className="grid grid-cols-2 gap-3">
           <p className="font-bold">
             Ngày sinh <span className="font-normal">{teacher.birthDate}</span>
@@ -172,7 +183,7 @@ const Info = ({ id }: { id: string }) => {
           </p>
         </div>
       </div>
-      <hr className="my-5 border-2 border-[#737E91]" />
+      <hr className="my-5 border-t-2 border-[#737E91]" />
       <div className="flex flex-col gap-5 text-black font-quicksand">
         <h3 className=" font-bold">Đánh giá của học viên</h3>
         <div className="flex flex-col gap-[20px] max-h-[300px] overflow-auto">
@@ -181,8 +192,10 @@ const Info = ({ id }: { id: string }) => {
               <Comment key={comment.id} {...comment} />
             ))
           ) : (
-            <div className="flex justify-center ">
-              <h5>Không có bình luận nào</h5>
+            <div className="flex justify-center flex-col items-center gap-2 ">
+              <img src="https://res.cloudinary.com/dh2uwapb8/image/upload/v1764778004/fe/fxvnauqnwitk0ixpkq2y.png"
+                style={{ width: "70px", height: "70px" }} />
+              <h5 className=" text-gray-700 font-bold opacity-50">Có vẻ không có bình luận nào ở đây...</h5>
             </div>
           )}
         </div>
