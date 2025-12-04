@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { AuthUser, LoginRequest, RegisterRequest } from "../types/Auth";
+import { AuthUser, LoginRequest, RegisterRequest, RegisterResponse } from "../types/Auth";
 import { AuthApi } from "../api/AuthApi";
 
 interface AuthState {
@@ -11,7 +11,7 @@ interface AuthState {
   error: string | null;
 
   login: (credentials: LoginRequest) => Promise<void>;
-  register: (credentials: RegisterRequest) => Promise<void>;
+  register: (credentials: RegisterRequest) => Promise<RegisterResponse>;
   logout: () => void;
   clearError: () => void;
 }
@@ -46,7 +46,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       const user = res.data?.data?.user;
       const accessToken = res.data?.data?.access_token;
 
-      // Lưu vào localStorage
       if (typeof window !== "undefined" && accessToken) {
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("user", JSON.stringify(user));

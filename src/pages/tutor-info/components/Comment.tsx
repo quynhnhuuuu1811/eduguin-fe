@@ -1,15 +1,32 @@
 import Img from "../../../assets/images/teacher.png";
+type CommentProps = {
+  rating?: number;
+  content?: string;
+  name?: string;
+  date?: string;
+  avatar?: string;
+};
 
-export const Comment = ({ rating = 3 }) => {
+export const Comment = ({
+  rating = 3,
+  content,
+  name,
+  date,
+  avatar,
+}: CommentProps) => {
   const totalStars = 5;
 
   return (
     <div className="flex flex-col gap-[10px]">
       <div className="flex items-center gap-3 ">
-        <img src={Img.src} alt="Teacher" className="w-10 h-10 rounded-full" />
+        <img
+          src={avatar || Img.src}
+          alt="Teacher"
+          className="w-10 h-10 rounded-full"
+        />
         <div>
-          <h5>Học sinh 1</h5>
-          <p className="text-xs mt-1">28/08/2025</p>
+          <h5>{name}</h5>
+          <p className="text-xs mt-1">{date}</p>
         </div>
       </div>
 
@@ -28,7 +45,7 @@ export const Comment = ({ rating = 3 }) => {
         ))}
       </div>
       <div className="text-sm text-black">
-        <p>Thường xuyên đến trễ giờ và bỏ buổi 😠 </p>
+        <p>{content}</p>
       </div>
     </div>
   );

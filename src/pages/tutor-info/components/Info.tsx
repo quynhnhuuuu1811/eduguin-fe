@@ -9,8 +9,8 @@ import { Comment } from "./Comment";
 import { InputComment } from "./InputComment";
 import { useCommentStore } from "@/zustand/stores/CommentStore";
 import { CustomButton } from "@/components/Button";
-import StarRateRoundedIcon from '@mui/icons-material/StarRateRounded';
-import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
+import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 
 const Info = ({ id }: { id: string }) => {
   const {
@@ -45,7 +45,6 @@ const Info = ({ id }: { id: string }) => {
 
   const rating = teacher.tutorProfile?.rating ?? 0;
   const comments = 0;
-  // teacher.cmt ??
   const price = teacher.tutorProfile?.price ?? 0;
   const introUrl = teacher.tutorProfile?.introVideoUrl;
   const getYoutubeEmbedUrl = (url: string) => {
@@ -58,7 +57,7 @@ const Info = ({ id }: { id: string }) => {
       if (u.hostname === "youtu.be") {
         return `https://www.youtube.com/embed${u.pathname}`;
       }
-    } catch { }
+    } catch {}
     return null;
   };
   const embedUrl = introUrl ? getYoutubeEmbedUrl(introUrl) : null;
@@ -136,7 +135,19 @@ const Info = ({ id }: { id: string }) => {
               <div className="flex flex-col pr-4 items-center justify-center w-full">
                 <div className="flex items-center justify-center gap-1 font-bold text-[15px] md:text-[20px] lg:text-[28px] text-yellow-500">
                   <span>{rating || 5}</span>
-                  <StarRateRoundedIcon sx={{ fontSize: { xs: "15px", sm: "20px", md: "25px", lg: "30px" }, verticalAlign: "middle", color: "var(--color-yellow500)", marginBlock: 0.5 }} />
+                  <StarRateRoundedIcon
+                    sx={{
+                      fontSize: {
+                        xs: "15px",
+                        sm: "20px",
+                        md: "25px",
+                        lg: "30px",
+                      },
+                      verticalAlign: "middle",
+                      color: "var(--color-yellow500)",
+                      marginBlock: 0.5,
+                    }}
+                  />
                 </div>
                 <span className="text-[12px] text-gray-700">
                   {commentList.length || 0} bình luận
@@ -156,18 +167,30 @@ const Info = ({ id }: { id: string }) => {
 
             {/* Register Button */}
             <div className="flex justify-center">
-              <CustomButton
-                type="Secondary"
-                className="w-2/3">
+              <CustomButton type="Secondary" className="w-2/3">
                 Đăng ký học ngay!
-                <ArrowForwardRoundedIcon sx={{ fontSize: { xs: "15px", sm: "15px", md: "20px", lg: "20px" }, verticalAlign: "middle", color: "var(--color-white)", marginBlock: 0.5 }} />
+                <ArrowForwardRoundedIcon
+                  sx={{
+                    fontSize: {
+                      xs: "15px",
+                      sm: "15px",
+                      md: "20px",
+                      lg: "20px",
+                    },
+                    verticalAlign: "middle",
+                    color: "var(--color-white)",
+                    marginBlock: 0.5,
+                  }}
+                />
               </CustomButton>
             </div>
           </div>
         </div>
       </div>
       <div className="flex flex-col gap-5 text-black font-quicksand mt-10 ">
-        <h3 className=" font-bold text-[15px] md:text-[20px] lg:text-[20px]">Thông tin cơ bản</h3>
+        <h3 className=" font-bold text-[15px] md:text-[20px] lg:text-[20px]">
+          Thông tin cơ bản
+        </h3>
         <div className="grid grid-cols-2 gap-3">
           <p className="font-bold">
             Ngày sinh <span className="font-normal">{teacher.birthDate}</span>
@@ -189,13 +212,24 @@ const Info = ({ id }: { id: string }) => {
         <div className="flex flex-col gap-[20px] max-h-[300px] overflow-auto">
           {commentList && commentList.length > 0 ? (
             commentList.map((comment) => (
-              <Comment key={comment.id} {...comment} />
+              <Comment
+                key={comment.id}
+                avatar={comment.student.avatar || ""}
+                name={comment.student.name}
+                content={comment.content}
+                rating={comment.rating}
+                date={comment.createdAt}
+              />
             ))
           ) : (
             <div className="flex justify-center flex-col items-center gap-2 ">
-              <img src="https://res.cloudinary.com/dh2uwapb8/image/upload/v1764778004/fe/fxvnauqnwitk0ixpkq2y.png"
-                style={{ width: "70px", height: "70px" }} />
-              <h5 className=" text-gray-700 font-bold opacity-50">Có vẻ không có bình luận nào ở đây...</h5>
+              <img
+                src="https://res.cloudinary.com/dh2uwapb8/image/upload/v1764778004/fe/fxvnauqnwitk0ixpkq2y.png"
+                style={{ width: "70px", height: "70px" }}
+              />
+              <h5 className=" text-gray-700 font-bold opacity-50">
+                Có vẻ không có bình luận nào ở đây...
+              </h5>
             </div>
           )}
         </div>
