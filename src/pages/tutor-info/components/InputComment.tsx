@@ -1,13 +1,13 @@
 import { useCommentStore } from "@/zustand/stores/CommentStore";
 import { useEffect, useState } from "react";
 
-export const InputComment = ({
+export default function InputComment({
   idTutor,
   user,
 }: {
   user: { avatar: string; name: string };
   idTutor: string;
-}) => {
+}) {
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
@@ -102,4 +102,4 @@ export const InputComment = ({
       </div>
     </div>
   );
-};
+}

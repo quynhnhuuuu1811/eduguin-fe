@@ -7,13 +7,13 @@ type CommentProps = {
   avatar?: string;
 };
 
-export const Comment = ({
+export default function Comment({
   rating = 3,
   content,
   name,
   date,
   avatar,
-}: CommentProps) => {
+}: CommentProps) {
   const totalStars = 5;
 
   return (
@@ -49,4 +49,4 @@ export const Comment = ({
       </div>
     </div>
   );
-};
+}

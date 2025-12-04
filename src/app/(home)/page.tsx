@@ -1,11 +1,9 @@
-import { HomePageView } from "@/pages/home/page-view";
+import HomePageView from "@/pages/home/page-view";
 
-const HomePage = () => {
+export default function HomePage() {
   return (
     <>
       <HomePageView />
     </>
   );
-};
-
-export default HomePage;
+}

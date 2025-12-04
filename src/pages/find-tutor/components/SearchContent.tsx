@@ -3,7 +3,6 @@ import CustomInput from "@/components/Input";
 import { Box, Typography, Grid } from "@mui/material";
 import React, { useEffect } from "react";
 import TeacherCard from "./TeacherCard";
-import TutorImg from "../../../assets/images/student.png";
 import { useUserStore } from "@/zustand/stores/UserStore";
 
 const SearchContent = () => {
@@ -159,7 +158,7 @@ const SearchContent = () => {
           </Grid>
         </Grid>
         {teachers.map((item, index) => (
-          <TeacherCard teacher={item} />
+          <TeacherCard key={index} teacher={item} />
         ))}
       </Typography>
     </Box>

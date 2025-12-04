@@ -4,13 +4,13 @@ import Image from "next/image";
 import { useEffect } from "react";
 import { useUserStore } from "@/zustand/stores/UserStore";
 import Img from "../../../assets/images/teacher.png";
-import Banner from "../../../assets/images/VideoThumbnail.png"; // ảnh bên phải
-import { Comment } from "./Comment";
-import { InputComment } from "./InputComment";
+import Banner from "../../../assets/images/VideoThumbnail.png";
 import { useCommentStore } from "@/zustand/stores/CommentStore";
 import { CustomButton } from "@/components/Button";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import Comment from "./Comment";
+import InputComment from "./InputComment";
 
 const Info = ({ id }: { id: string }) => {
   const {
