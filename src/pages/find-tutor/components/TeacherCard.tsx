@@ -56,7 +56,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
           video.pause();
           video.removeAttribute("src");
           video.load();
-        } catch {}
+        } catch { }
       }
     };
   }, [teacher?.videoUrl]);
@@ -68,7 +68,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
       v.muted = true;
       v.playsInline = true;
       v.loop = true;
-      v.play().catch(() => {});
+      v.play().catch(() => { });
     } else {
       v.pause();
       v.currentTime = 0;
@@ -83,7 +83,9 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
   return (
     <Box
       onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}>
+      onMouseLeave={() => setHovering(false)}
+      onDoubleClick={() => router.push(`/tutor-info/${teacher?.id}`)}
+    >
       <Grid
         sx={{
           width: "100%",

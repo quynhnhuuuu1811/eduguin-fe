@@ -11,7 +11,7 @@ export const Navbar = () => {
   const navItems = [
     { href: "/", label: "Trang chủ" },
     { href: "/find-tutor", label: "Tìm gia sư" },
-    { href: "/my-tutor", label: "Gia sư của tôi" },
+    { href: "/my-classes", label: "Lớp học của tôi" },
     { href: "/contact", label: "Liên hệ" },
   ];
 
@@ -47,6 +47,9 @@ export const Navbar = () => {
         {isAuthenticated ? (
           <button
             className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold cursor-pointer"
+            style={{
+              backgroundColor: pathname === "/profile" ? "white" : "var(--color-blue100)",
+            }}
             onClick={() => {
               router.push("/profile");
             }}

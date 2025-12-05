@@ -18,7 +18,7 @@ const Footer = () => {
 
   const linkItems = [
     {
-      href: "/home",
+      href: "/",
       icon: (
         <FacebookIcon
           sx={{

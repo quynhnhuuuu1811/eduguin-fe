@@ -14,6 +14,7 @@ interface AuthState {
   register: (credentials: RegisterRequest) => Promise<RegisterResponse>;
   logout: () => void;
   clearError: () => void;
+  getMyInfo: () => Promise<void>;
 }
 
 const getInitialState = (): Pick<AuthState, 'data' | 'loading' | 'error'> => {
@@ -91,6 +92,28 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   clearError() {
     set({ error: null });
+  },
+
+  async getMyInfo() {
+    set({ loading: true, error: null });
+    try {
+      const res = await AuthApi.getMyInfo();
+      const userData = res.data.data.data;
+      set((state) => ({
+        data: {
+          user: {
+            id: userData.id,
+            name: userData.name,
+            email: userData.email,
+            role: userData.role,
+          },
+          accessToken: state.data.accessToken,
+        },
+        loading: false,
+      }));
+    } catch (error) {
+      set({ loading: false, error: "Không thể tải thông tin người dùng" });
+    }
   },
 }));
 

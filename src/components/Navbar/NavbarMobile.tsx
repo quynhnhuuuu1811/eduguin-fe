@@ -15,13 +15,13 @@ const NavbarMobile = () => {
   const navItems = isAuthenticated ? [
     { label: "Trang chủ", path: "/" },
     { label: "Tìm gia sư", path: "/find-tutor" },
-    { label: "Gia sư của tôi", path: "/my-tutor" },
+    { label: "Lớp học của tôi", path: "/my-classes" },
     { label: "Liên hệ", path: "/contact" },
     { label: "Tài khoản", path: "/profile" },
   ] : [
     { label: "Trang chủ", path: "/" },
     { label: "Tìm gia sư", path: "/find-tutor" },
-    { label: "Gia sư của tôi", path: "/my-tutor" },
+    { label: "Lớp học của tôi", path: "/my-classes" },
     { label: "Liên hệ", path: "/contact" },
     { label: "Đăng nhập", path: "/login" },
   ];

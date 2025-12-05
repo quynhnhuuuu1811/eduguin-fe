@@ -30,6 +30,8 @@ export default {
         blue800: "var(--color-blue800)",
         primary50: "var(--color-primary50)",
         primary700: "var(--color-primary700)",
+        yellow100: "var(--color-yellow100)",
+        yellow500: "var(--color-yellow500)",
       },
     },
   },

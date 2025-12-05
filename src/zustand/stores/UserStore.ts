@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { User } from "../types/User";
+import { User, UserResponse } from "../types/User";
 import { UserApi } from "../api/UserApi";
 import { Tutor } from "@/types/tutor.type";
 
@@ -16,17 +16,21 @@ interface FetchTutorParams {
 interface UserState {
   users: User[];
   selectedUser: Tutor | null;
+  userInfo: UserResponse | null;
 
   loading: boolean;
   error: string | null;
 
   fetchTutorByID: (id: string) => Promise<void>;
   fetchAllTutors: (params?: FetchTutorParams) => Promise<void>;
+  updateStudentInfo : (id: string, data: FormData) => Promise<void>;
+  clearStudentInfo: () => void;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
   users: [],
   selectedUser: null,
+  userInfo: null,
   loading: false,
   error: null,
 
@@ -46,7 +50,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
   },
 
-  async fetchAllTutors(params) {
+  async fetchAllTutors(params : any) {
     set({ loading: true, error: null });
     try {
       const res: any = await UserApi.getAllTutors(params);
@@ -58,5 +62,26 @@ export const useUserStore = create<UserState>((set, get) => ({
         error: error?.response?.data?.message || "Failed to load user list",
       });
     }
+  },
+
+  async updateStudentInfo(id: string, data: FormData) {
+    set({ loading: true, error: null });
+    try {
+      const res = await UserApi.updateStudentInfo(id, data);
+      set({
+        userInfo: res.data.data,
+        loading: false,
+      });
+    } catch (error: any) {
+      set({
+        loading: false,
+        error: error?.response?.data?.message || "Failed to update user info",
+      });
+      throw error;
+    }
+  },
+
+  clearStudentInfo() {
+    set({ userInfo: null });
   },
 }));
