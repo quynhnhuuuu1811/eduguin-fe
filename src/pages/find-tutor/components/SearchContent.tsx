@@ -1,64 +1,12 @@
 "use client";
+
 import CustomInput from "@/components/Input";
-import { Box, Typography, Grid } from "@mui/material";
+import { Box, Typography, GridLegacy as Grid } from "@mui/material";
 import React, { useEffect } from "react";
 import TeacherCard from "./TeacherCard";
 import { useUserStore } from "@/zustand/stores/UserStore";
 
 const SearchContent = () => {
-  // const teachers = [
-  //   {
-  //     id: 1,
-  //     avatar: TutorImg.src,
-  //     name: "Nguyễn Văn A",
-  //     subject: "Toán học",
-  //     rating: 4.8,
-  //     location: "Hà Nội",
-  //     desciption:
-  //       "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
-  //     cmt: 4,
-  //     price: 500000,
-  //     videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
-  //   },
-  //   {
-  //     id: 2,
-  //     avatar: TutorImg.src,
-  //     name: "Trần Thị B",
-  //     subject: "Vật lý",
-  //     rating: 4.6,
-  //     location: "Hồ Chí Minh",
-  //     desciption:
-  //       "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
-  //     cmt: 5,
-  //     price: 600000,
-  //     videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
-  //   },
-  //   {
-  //     id: 3,
-  //     avatar: TutorImg.src,
-  //     name: "Lê Văn C",
-  //     subject: "Hóa học",
-  //     rating: 4.9,
-  //     location: "Đà Nẵng",
-  //     desciption:
-  //       "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
-  //     cmt: 5,
-  //     price: 450000,
-  //     videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "Phạm Thị D",
-  //     subject: "Sinh học",
-  //     rating: 4.7,
-  //     location: "Cần Thơ",
-  //     desciption:
-  //       "Xin chào! Nếu bạn muốn luyện thi đại học và vào được ngôi trường đại học mơ ước, hãy liên hệ với tôi nhé!",
-  //     price: 550000,
-  //     // videoUrl: "https://www.youtube.com/watch?v=RFXrPwsV1kM",
-  //   },
-  // ];
-
   const { fetchAllTutors, users } = useUserStore();
 
   useEffect(() => {
@@ -68,7 +16,7 @@ const SearchContent = () => {
     });
   }, [fetchAllTutors]);
 
-  const teachers = users;
+  const teachers = users ?? [];
 
   const subjectOptions = [
     { value: "toan", label: "Toán học" },
@@ -110,6 +58,7 @@ const SearchContent = () => {
     { value: "lowestpriced", label: "Giá cao đến thấp" },
     { value: "ratinghigh", label: "Đánh giá cao đến thấp" },
   ];
+
   return (
     <Box
       className="w-full"
@@ -121,6 +70,7 @@ const SearchContent = () => {
           lg: "135px",
         },
       }}>
+      {/* Chỉ để text trong Typography, không nhét Grid vào trong */}
       <Typography
         sx={{
           fontFamily: "quicksand",
@@ -133,34 +83,70 @@ const SearchContent = () => {
           fontWeight: 600,
         }}>
         {teachers.length} giáo viên đang chờ để được giúp bạn
-        <Grid
-          container
-          spacing={{ xs: 1, sm: 1, md: 2, lg: 3 }}
-          sx={{
-            marginTop: {
-              xs: "5px",
-              sm: "10px",
-              md: "5px",
-              lg: "15px",
-            },
-          }}>
-          <Grid item size={{ xs: 6, sm: 6, md: 4, lg: 3 }}>
-            <CustomInput label="Môn học" select options={subjectOptions} />
-          </Grid>
-          <Grid item size={{ xs: 6, sm: 6, md: 4, lg: 3 }}>
-            <CustomInput label="Lớp" select options={GradeOptions} />
-          </Grid>
-          <Grid item size={{ xs: 6, sm: 6, md: 4, lg: 3 }}>
-            <CustomInput label="Giới tính" select options={genderOptions} />
-          </Grid>
-          <Grid item size={{ xs: 6, sm: 6, md: 4, lg: 3 }}>
-            <CustomInput label="Được đánh giá" select options={ratingOptions} />
-          </Grid>
-        </Grid>
-        {teachers.map((item, index) => (
-          <TeacherCard key={index} teacher={item} />
-        ))}
       </Typography>
+
+      {/* Hàng filter */}
+      <Grid
+        container
+        spacing={{ xs: 1, sm: 1, md: 2, lg: 3 }}
+        sx={{
+          marginTop: {
+            xs: "5px",
+            sm: "10px",
+            md: "5px",
+            lg: "15px",
+          },
+        }}>
+        <Grid xs={6} sm={6} md={4} lg={3}>
+          <CustomInput
+            label="Môn học"
+            select
+            options={subjectOptions}
+            value=""
+            onChange={() => {}}
+            name=""
+          />
+        </Grid>
+
+        <Grid xs={6} sm={6} md={4} lg={3}>
+          <CustomInput
+            label="Lớp"
+            select
+            options={GradeOptions}
+            value=""
+            onChange={() => {}}
+            name=""
+          />
+        </Grid>
+
+        <Grid xs={6} sm={6} md={4} lg={3}>
+          <CustomInput
+            label="Giới tính"
+            select
+            options={genderOptions}
+            value=""
+            onChange={() => {}}
+            name=""
+          />
+        </Grid>
+
+        <Grid xs={6} sm={6} md={4} lg={3}>
+          <CustomInput
+            label="Được đánh giá"
+            select
+            options={ratingOptions}
+            value=""
+            onChange={() => {}}
+            name=""
+          />
+        </Grid>
+      </Grid>
+
+      <Box mt={2}>
+        {teachers.map((item: any, index: number) => (
+          <TeacherCard key={item.id ?? index} teacher={item} />
+        ))}
+      </Box>
     </Box>
   );
 };

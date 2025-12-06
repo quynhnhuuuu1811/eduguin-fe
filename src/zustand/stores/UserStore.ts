@@ -17,14 +17,15 @@ interface UserState {
   users: User[];
   selectedUser: Tutor | null;
   userInfo: UserResponse | null;
-
+  tutorList: Tutor[];
   loading: boolean;
   error: string | null;
 
   fetchTutorByID: (id: string) => Promise<void>;
   fetchAllTutors: (params?: FetchTutorParams) => Promise<void>;
-  updateStudentInfo : (id: string, data: FormData) => Promise<void>;
+  updateStudentInfo: (id: string, data: FormData) => Promise<void>;
   clearStudentInfo: () => void;
+  recommendTutor: () => Promise<void>;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
@@ -33,7 +34,7 @@ export const useUserStore = create<UserState>((set, get) => ({
   userInfo: null,
   loading: false,
   error: null,
-
+  tutorList: [],
   async fetchTutorByID(id: string) {
     set({ loading: true, error: null });
     try {
@@ -50,7 +51,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
   },
 
-  async fetchAllTutors(params : any) {
+  async fetchAllTutors(params: any) {
     set({ loading: true, error: null });
     try {
       const res: any = await UserApi.getAllTutors(params);
@@ -80,7 +81,19 @@ export const useUserStore = create<UserState>((set, get) => ({
       throw error;
     }
   },
-
+  async recommendTutor() {
+    set({ loading: true, error: null });
+    try {
+      const res: any = await UserApi.recommendTutor();
+      const tutors = res.data.data;
+      set({ tutorList: tutors, loading: false });
+    } catch (error: any) {
+      set({
+        loading: false,
+        error: error?.response?.data?.message || "Failed to recommend tutors",
+      });
+    }
+  },
   clearStudentInfo() {
     set({ userInfo: null });
   },

@@ -24,7 +24,7 @@ const ProfilePageView = () => {
       data: {
         data: authData.user,
       },
-    } as UserInfo;
+    } as unknown as UserInfo;
   }, [authData?.user]);
 
   console.log(userInfo);

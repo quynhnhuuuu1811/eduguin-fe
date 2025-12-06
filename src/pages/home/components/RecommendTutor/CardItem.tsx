@@ -2,29 +2,41 @@ import { Card, Icon, Typography } from "@mui/material";
 import React from "react";
 import LocationIcon from "@mui/icons-material/FmdGoodOutlined";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
-interface CardItemProps {
-  tutor: {
-    name: string;
-    subject: string;
-    rating: number;
-    img: any;
-    location: string;
-  };
+import Img from "../../../../assets/images/teacher.png";
+interface TutorProfile {
+  description: string;
+  price: number;
+  introVideoUrl: string | null;
+  rating: number;
+  subject: string | null;
+  grade: number;
 }
 
-const CardItem = ({
-  tutor: { name, subject, rating, img, location },
-}: CardItemProps) => {
+interface Tutor {
+  id: string;
+  email: string;
+  fullName: string;
+  avatarUrl: string | null;
+  sex: "male" | "female" | "other" | string;
+  birthDate: string;
+  role: "tutor" | string;
+  tutorProfile: TutorProfile;
+}
+
+interface CardItemProps {
+  tutor: Tutor;
+}
+
+const CardItem = ({ tutor }: CardItemProps) => {
   return (
     <Card
       className="w-[200px] h-[280px] shadow-md flex flex-col justify-center items-center py-2.5"
       style={{
         borderRadius: 20,
         gap: 1,
-      }}
-    >
+      }}>
       <img
-        src={img.src}
+        src={tutor.avatarUrl || Img.src}
         alt="Teacher"
         className="w-[90%] h-full object-cover rounded-[16px]"
       />
@@ -36,9 +48,8 @@ const CardItem = ({
               fontSize: { xs: "10px", sm: "12px", md: "14px", lg: "14px" },
               fontWeight: 600,
               color: "var(--color-blue800)",
-            }}
-          >
-            {name}
+            }}>
+            {tutor.fullName}
           </Typography>
           <Typography
             sx={{
@@ -46,27 +57,8 @@ const CardItem = ({
               fontSize: { xs: "10px", sm: "11px", md: "12px", lg: "13px" },
               color: "var(--color-blue900)",
               fontWeight: 500,
-            }}
-          >
-            {subject}
-          </Typography>
-          <Typography
-            sx={{
-              fontFamily: "quicksand",
-              fontSize: { xs: "6px", sm: "7px", md: "8px", lg: "9px" },
-              color: "black",
-              fontWeight: 500,
-              display: "flex",
-              alignItems: "center",
-              gap: 0.5,
-            }}
-          >
-            <LocationIcon
-              sx={{
-                fontSize: { xs: "10px", sm: "11px", md: "12px", lg: "13px" },
-              }}
-            />
-            {location}
+            }}>
+            {tutor.tutorProfile.subject}
           </Typography>
         </div>
         <div className="flex items-start gap-0.5">
@@ -78,9 +70,8 @@ const CardItem = ({
               fontWeight: 600,
               display: "flex",
               alignItems: "center",
-            }}
-          >
-            {rating}
+            }}>
+            {tutor.tutorProfile.rating}
           </Typography>
           <StarRateRoundedIcon
             sx={{

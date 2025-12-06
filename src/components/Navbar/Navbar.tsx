@@ -4,10 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/zustand/stores/AuthStore";
+import { useEffect, useState } from "react";
 
 export const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const navItems = [
     { href: "/", label: "Trang chủ" },
     { href: "/find-tutor", label: "Tìm gia sư" },
@@ -16,6 +23,46 @@ export const Navbar = () => {
   ];
 
   const isAuthenticated = useAuthStore((state) => !!state.data.accessToken);
+
+  const renderAuthButton = () => {
+    if (!hasMounted) {
+      return (
+        <button
+          className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold cursor-pointer"
+          onClick={() => {
+            router.push("/login");
+          }}>
+          Đăng nhập
+        </button>
+      );
+    }
+
+    if (isAuthenticated) {
+      return (
+        <button
+          className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold cursor-pointer"
+          style={{
+            backgroundColor:
+              pathname === "/profile" ? "white" : "var(--color-blue100)",
+          }}
+          onClick={() => {
+            router.push("/profile");
+          }}>
+          Tài khoản
+        </button>
+      );
+    }
+
+    return (
+      <button
+        className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold cursor-pointer"
+        onClick={() => {
+          router.push("/login");
+        }}>
+        Đăng nhập
+      </button>
+    );
+  };
 
   return (
     <div className="flex w-full justify-center">
@@ -35,37 +82,17 @@ export const Navbar = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`px-8 py-2 text-black rounded-full transition flex justify-center items-center text-[10px] lg:text-[12px] font-semibold ${pathname === item.href
-                ? "bg-white  px-4"
-                : "bg-transparent  hover:bg-white/40"
-                }`}
-            >
+              className={`px-8 py-2 text-black rounded-full transition flex justify-center items-center text-[10px] lg:text-[12px] font-semibold ${
+                pathname === item.href
+                  ? "bg-white  px-4"
+                  : "bg-transparent  hover:bg-white/40"
+              }`}>
               {item.label}
             </Link>
           ))}
         </nav>
-        {isAuthenticated ? (
-          <button
-            className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold cursor-pointer"
-            style={{
-              backgroundColor: pathname === "/profile" ? "white" : "var(--color-blue100)",
-            }}
-            onClick={() => {
-              router.push("/profile");
-            }}
-          >
-            Tài khoản
-          </button>
-        ) : (
-          <button
-            className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold cursor-pointer"
-            onClick={() => {
-              router.push("/login");
-            }}
-          >
-            Đăng nhập
-          </button>
-        )}
+
+        {renderAuthButton()}
       </div>
     </div>
   );

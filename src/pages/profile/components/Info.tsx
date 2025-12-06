@@ -6,18 +6,16 @@ import Img from "../../../assets/images/FindTutor.jpg";
 import TeacherImg from "../../../assets/images/teacher.png";
 import Banner from "../../../assets/images/VideoThumbnail.png";
 import { CustomButton } from "@/components/Button";
-import EditIcon from '@mui/icons-material/Edit';
-import LogoutIcon from '@mui/icons-material/Logout';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Cancel';
+import EditIcon from "@mui/icons-material/Edit";
+import LogoutIcon from "@mui/icons-material/Logout";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
 import { UserResponse } from "@/zustand/types/User";
 import { Typography, TextField } from "@mui/material";
 import dayjs from "dayjs";
 import CustomInput from "@/components/Input";
 import { useRouter } from "next/navigation";
-import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
-import { useUserStore } from "@/zustand/stores/UserStore";
+import UploadFileRoundedIcon from "@mui/icons-material/UploadFileRounded";
 import { useAuthStore } from "@/zustand/stores/AuthStore";
 
 interface InfoProps {
@@ -31,10 +29,10 @@ interface InfoProps {
 const Info = ({ userInfo }: InfoProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState({
-    description: userInfo.data.data.description || "",
-    dateOfBirth: userInfo.data.data.dateOfBirth || "",
-    email: userInfo.data.data.email || "",
-    sex: userInfo.data.data.sex || "",
+    description: (userInfo.data.data as any).description || "",
+    dateOfBirth: (userInfo.data.data as any).dateOfBirth || "",
+    email: (userInfo.data.data as any).email || "",
+    sex: (userInfo.data.data as any).sex || "",
   });
 
   const [previewImg, setPreviewImg] = useState<string | null>(null);
@@ -43,10 +41,8 @@ const Info = ({ userInfo }: InfoProps) => {
 
   const { updateMyInfo } = useAuthStore();
   const id = userInfo.data.data.id;
-  const isTutor = userInfo.data.data.role === "tutor" || userInfo.data.data.role === "giáo viên";
+  const isTutor = userInfo.data.data.role === "tutor";
   const introUrl = userInfo.data.data.introVideoUrl;
-
-
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -64,17 +60,16 @@ const Info = ({ userInfo }: InfoProps) => {
 
   const handleSave = async () => {
     await handleUpdate();
-
   };
 
-  const handleInputChange = (field: keyof typeof editedData) => (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setEditedData((prev) => ({
-      ...prev,
-      [field]: event.target.value,
-    }));
-  };
+  const handleInputChange =
+    (field: keyof typeof editedData) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setEditedData((prev) => ({
+        ...prev,
+        [field]: event.target.value,
+      }));
+    };
 
   const getYoutubeEmbedUrl = (url: string) => {
     try {
@@ -86,7 +81,7 @@ const Info = ({ userInfo }: InfoProps) => {
       if (u.hostname === "youtu.be") {
         return `https://www.youtube.com/embed${u.pathname}`;
       }
-    } catch { }
+    } catch {}
     return null;
   };
   const embedUrl = introUrl ? getYoutubeEmbedUrl(introUrl) : null;
@@ -111,26 +106,22 @@ const Info = ({ userInfo }: InfoProps) => {
           return;
         }
 
-        // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
           alert("Kích thước ảnh không được vượt quá 5MB");
           return;
         }
 
-        // Create preview URL
         const reader = new FileReader();
         reader.onloadend = () => {
           setPreviewImg(reader.result as string);
         };
         reader.readAsDataURL(file);
 
-        // Set upload image and create preview
         setUploadImg(file);
       }
     };
     fileInput.click();
   };
-
 
   const handleUpdate = async () => {
     setIsUploading(true);
@@ -163,9 +154,11 @@ const Info = ({ userInfo }: InfoProps) => {
       await getMyInfo();
     } catch (error: unknown) {
       console.error("Error updating user info:", error);
-      const errorMessage = error && typeof error === 'object' && 'response' in error
-        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
-        : undefined;
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
       alert(errorMessage || "Có lỗi xảy ra khi cập nhật thông tin");
       // Reset on error
       setPreviewImg(null);
@@ -204,8 +197,7 @@ const Info = ({ userInfo }: InfoProps) => {
               md: "50px",
               lg: "50px",
             },
-          }}
-        >
+          }}>
           Thông tin cá nhân
         </Typography>
 
@@ -266,27 +258,23 @@ const Info = ({ userInfo }: InfoProps) => {
                 {isTutor ? `Gia sư ${userInfo.subject || ""}` : "Học sinh"}
               </h6>
             </div>
-            {
-              isEditing ? (
-                <CustomInput
-                  label="Mô tả..."
-                  type="text"
-                  value={editedData.description}
-                  onChange={handleInputChange("description")}
-                  name="description"
-                />
-              ) : (
-                (
-                  userInfo?.description ? (
-                    <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
-                      {userInfo.description}
-                    </p>
-                  ) : (
-                    <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
-                      Chưa cập nhật
-                    </p>
-                  )
-                ))}
+            {isEditing ? (
+              <CustomInput
+                label="Mô tả..."
+                type="text"
+                value={editedData.description}
+                onChange={handleInputChange("description")}
+                name="description"
+              />
+            ) : userInfo?.description ? (
+              <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
+                {userInfo.description}
+              </p>
+            ) : (
+              <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
+                Chưa cập nhật
+              </p>
+            )}
           </div>
 
           {/* Video/Info Card */}
@@ -303,7 +291,11 @@ const Info = ({ userInfo }: InfoProps) => {
                       allowFullScreen
                     />
                   ) : introUrl ? (
-                    <video src={introUrl} controls className="w-full h-full object-cover" />
+                    <video
+                      src={introUrl}
+                      controls
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <Image
                       src={Banner}
@@ -384,12 +376,14 @@ const Info = ({ userInfo }: InfoProps) => {
               </p>
               {userInfo.phone && (
                 <p className="font-bold">
-                  Số điện thoại <span className="font-normal">{userInfo.phone}</span>
+                  Số điện thoại{" "}
+                  <span className="font-normal">{userInfo.phone}</span>
                 </p>
               )}
               {userInfo.address && (
                 <p className="font-bold col-span-2">
-                  Địa chỉ <span className="font-normal">{userInfo.address}</span>
+                  Địa chỉ{" "}
+                  <span className="font-normal">{userInfo.address}</span>
                 </p>
               )}
             </>
@@ -404,16 +398,14 @@ const Info = ({ userInfo }: InfoProps) => {
             <CustomButton
               type="Secondary"
               className="flex items-center gap-2 !bg-gray-500 !text-white hover:!bg-gray-600"
-              onClick={handleCancel}
-            >
+              onClick={handleCancel}>
               <CancelIcon sx={{ fontSize: "18px" }} />
               Hủy
             </CustomButton>
             <CustomButton
               type="Secondary"
               className="flex items-center gap-2 !bg-green-500 !text-white hover:!bg-green-600"
-              onClick={handleSave}
-            >
+              onClick={handleSave}>
               <SaveIcon sx={{ fontSize: "18px" }} />
               Lưu
             </CustomButton>
@@ -423,12 +415,14 @@ const Info = ({ userInfo }: InfoProps) => {
             <CustomButton
               type="Secondary"
               className="flex items-center gap-2 !bg-blue100 !text-blue700"
-              onClick={handleEdit}
-            >
+              onClick={handleEdit}>
               <EditIcon sx={{ fontSize: "18px" }} />
               Chỉnh sửa
             </CustomButton>
-            <CustomButton type="Secondary" className="flex items-center gap-2 !bg-yellow100 !text-yellow500" onClick={handleLogout}>
+            <CustomButton
+              type="Secondary"
+              className="flex items-center gap-2 !bg-yellow100 !text-yellow500"
+              onClick={handleLogout}>
               <LogoutIcon sx={{ fontSize: "18px" }} />
               Đăng xuất
             </CustomButton>
