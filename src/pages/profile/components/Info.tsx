@@ -11,7 +11,6 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
-import { UserResponse } from "@/zustand/types/User";
 import { Typography, TextField } from "@mui/material";
 import dayjs from "dayjs";
 import CustomInput from "@/components/Input";
@@ -19,34 +18,47 @@ import { useRouter } from "next/navigation";
 import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
 import { useUserStore } from "@/zustand/stores/UserStore";
 import { useAuthStore } from "@/zustand/stores/AuthStore";
+import { AuthUser } from "@/zustand/types/Auth";
+import LoadingScreen from "@/components/LoadingScreen";
 
 interface InfoProps {
-  userInfo: {
-    data: {
-      data: UserResponse;
-    };
-  };
+  userInfo: AuthUser;
 }
 
 const Info = ({ userInfo }: InfoProps) => {
+  const isTutor = userInfo.role === "tutor";
   const [isEditing, setIsEditing] = useState(false);
+
+  // Format dateOfBirth to YYYY-MM-DD for input type="date"
+  const formatDateForInput = (date: string | undefined | null): string => {
+    if (!date) return "";
+    const parsed = dayjs(date);
+    return parsed.isValid() ? parsed.format("YYYY-MM-DD") : "";
+  };
+
+  // Normalize sex value to lowercase
+  const normalizeSex = (sex: string | undefined | null): string => {
+    if (!sex) return "";
+    const lower = sex.toLowerCase();
+    if (lower === "male" || lower === "nam") return "male";
+    if (lower === "female" || lower === "nữ" || lower === "nu") return "female";
+    return lower;
+  };
+
   const [editedData, setEditedData] = useState({
-    description: userInfo.data.data.description || "",
-    dateOfBirth: userInfo.data.data.dateOfBirth || "",
-    email: userInfo.data.data.email || "",
-    sex: userInfo.data.data.sex || "",
+    description: userInfo.description || userInfo.tutorProfile?.bio || "",
+    dateOfBirth: formatDateForInput(userInfo.dateOfBirth || userInfo.birthDate),
+    email: userInfo.email || "",
+    sex: normalizeSex(userInfo.sex),
   });
 
   const [previewImg, setPreviewImg] = useState<string | null>(null);
+  const [previewVideo, setPreviewVideo] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadImg, setUploadImg] = useState<File | null>(null);
+  const [uploadVideo, setUploadVideo] = useState<File | null>(null);
 
-  const { updateMyInfo } = useAuthStore();
-  const id = userInfo.data.data.id;
-  const isTutor = userInfo.data.data.role === "tutor" || userInfo.data.data.role === "giáo viên";
-  const introUrl = userInfo.data.data.introVideoUrl;
-
-
+  const { updateTutorInfo } = useUserStore();
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -54,11 +66,18 @@ const Info = ({ userInfo }: InfoProps) => {
 
   const handleCancel = () => {
     setEditedData({
-      description: userInfo.description || "",
-      dateOfBirth: userInfo.dateOfBirth || "",
+      description: userInfo.description || userInfo.tutorProfile?.bio || "",
+      dateOfBirth: formatDateForInput(userInfo.dateOfBirth || userInfo.birthDate),
       email: userInfo.email || "",
-      sex: userInfo.sex || "",
+      sex: normalizeSex(userInfo.sex),
     });
+    setPreviewImg(null);
+    setUploadImg(null);
+    if (previewVideo) {
+      URL.revokeObjectURL(previewVideo);
+    }
+    setPreviewVideo(null);
+    setUploadVideo(null);
     setIsEditing(false);
   };
 
@@ -76,24 +95,11 @@ const Info = ({ userInfo }: InfoProps) => {
     }));
   };
 
-  const getYoutubeEmbedUrl = (url: string) => {
-    try {
-      const u = new URL(url);
-      if (u.hostname.includes("youtube.com")) {
-        const v = u.searchParams.get("v");
-        if (v) return `https://www.youtube.com/embed/${v}`;
-      }
-      if (u.hostname === "youtu.be") {
-        return `https://www.youtube.com/embed${u.pathname}`;
-      }
-    } catch { }
-    return null;
-  };
-  const embedUrl = introUrl ? getYoutubeEmbedUrl(introUrl) : null;
+  const introVideoUrl = userInfo.tutorProfile?.introVideoUrl;
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
     router.push("/login");
   };
 
@@ -131,6 +137,37 @@ const Info = ({ userInfo }: InfoProps) => {
     fileInput.click();
   };
 
+  const handleUploadVideo = () => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "video/*";
+    fileInput.onchange = async (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        // Validate file type
+        if (!file.type.startsWith("video/")) {
+          alert("Vui lòng chọn file video");
+          return;
+        }
+
+        // Validate file size (max 100MB)
+        if (file.size > 100 * 1024 * 1024) {
+          alert("Kích thước video không được vượt quá 100MB");
+          return;
+        }
+
+        // Create preview URL
+        const videoUrl = URL.createObjectURL(file);
+        setPreviewVideo(videoUrl);
+
+        // Set upload video
+        setUploadVideo(file);
+      }
+    };
+    fileInput.click();
+  };
+
 
   const handleUpdate = async () => {
     setIsUploading(true);
@@ -138,6 +175,9 @@ const Info = ({ userInfo }: InfoProps) => {
       const formData = new FormData();
       if (uploadImg) {
         formData.append("avatar", uploadImg);
+      }
+      if (uploadVideo) {
+        formData.append("introVideoUrl", uploadVideo);
       }
       if (editedData.description) {
         formData.append("description", editedData.description);
@@ -152,15 +192,21 @@ const Info = ({ userInfo }: InfoProps) => {
         formData.append("sex", editedData.sex);
       }
 
-      await updateMyInfo(formData);
+      await updateTutorInfo(formData);
 
       // Clear preview and upload state after successful upload
       setPreviewImg(null);
       setUploadImg(null);
+      if (previewVideo) {
+        URL.revokeObjectURL(previewVideo);
+      }
+      setPreviewVideo(null);
+      setUploadVideo(null);
 
       // Refresh user info
       const { getMyInfo } = useAuthStore.getState();
       await getMyInfo();
+      setIsEditing(false);
     } catch (error: unknown) {
       console.error("Error updating user info:", error);
       const errorMessage = error && typeof error === 'object' && 'response' in error
@@ -170,271 +216,285 @@ const Info = ({ userInfo }: InfoProps) => {
       // Reset on error
       setPreviewImg(null);
       setUploadImg(null);
+      if (previewVideo) {
+        URL.revokeObjectURL(previewVideo);
+      }
+      setPreviewVideo(null);
+      setUploadVideo(null);
     } finally {
       setIsUploading(false);
     }
   };
   return (
     <>
-      <div className="font-quicksand w-full max-w-[90%] mt-5 flex items-center flex-col justify-center mx-auto">
-        <Typography
-          sx={{
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            mt: {
-              xs: "50px",
-              sm: "80px",
-              md: "120px",
-              lg: "120px",
-            },
-            fontFamily: "quicksand",
-            fontWeight: "bold",
-            fontSize: {
-              xs: "15px",
-              sm: "20px",
-              md: "25px",
-              lg: "28px",
-            },
-            color: "#0C65B6",
-            marginBottom: {
-              xs: "20px",
-              sm: "20px",
-              md: "50px",
-              lg: "50px",
-            },
-          }}
-        >
-          Thông tin cá nhân
-        </Typography>
+      {isUploading ? <LoadingScreen /> : (
+        <>
+          <div className="font-quicksand w-full max-w-[90%] mt-5 flex items-center flex-col justify-center mx-auto">
+            <Typography
+              sx={{
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mt: {
+                  xs: "50px",
+                  sm: "80px",
+                  md: "120px",
+                  lg: "120px",
+                },
+                fontFamily: "quicksand",
+                fontWeight: "bold",
+                fontSize: {
+                  xs: "15px",
+                  sm: "20px",
+                  md: "25px",
+                  lg: "28px",
+                },
+                color: "#0C65B6",
+                marginBottom: {
+                  xs: "20px",
+                  sm: "20px",
+                  md: "50px",
+                  lg: "50px",
+                },
+              }}
+            >
+              Thông tin cá nhân
+            </Typography>
 
-        {/* Profile Section */}
-        <div className="grid grid-cols-12 gap-5 md:gap-6 items-start w-full">
-          {/* Avatar */}
-          <div className="flex gap-6 col-span-12 md:col-span-3 items-center md:items-start justify-center md:justify-start">
-            <div className="w-full shrink-0 relative group cursor-pointer">
-              {previewImg ? (
-                <Image
-                  src={previewImg}
-                  alt="Avatar Preview"
-                  width={200}
-                  height={200}
-                  className="rounded-xl w-full h-auto aspect-square object-cover"
-                />
-              ) : userInfo.avatar ? (
-                <Image
-                  src={userInfo.avatar}
-                  alt="Avatar"
-                  width={200}
-                  height={200}
-                  className="rounded-xl w-full h-auto aspect-square object-cover"
-                />
-              ) : (
-                <Image
-                  src={isTutor ? TeacherImg.src : Img.src}
-                  alt="Avatar"
-                  width={200}
-                  height={200}
-                  className="rounded-xl w-full h-full object-cover"
-                />
-              )}
-              {isUploading && (
-                <div className="absolute top-0 left-0 w-full aspect-square flex items-center justify-center bg-black bg-opacity-50 rounded-xl z-10">
-                  <Typography className="text-white">Đang tải...</Typography>
-                </div>
-              )}
-              {isEditing && (
-                <div className="absolute top-0 left-0 w-full aspect-square flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 pointer-events-none">
-                  <UploadFileRoundedIcon
-                    onClick={handleUploadAvatar}
-                    className="text-white bg-black bg-opacity-70 rounded-full p-2 hover:bg-opacity-50 cursor-pointer pointer-events-auto"
-                    sx={{ fontSize: "70px" }}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Info */}
-          <div className="flex flex-col col-span-12 md:col-span-5 gap-3">
-            <div className="flex flex-col gap-[10px]">
-              <h2 className="text-black text-[28px] font-bold">
-                {userInfo.fullName || userInfo.name}
-              </h2>
-              <h6 className="text-blue600 font-semibold text-[15px]">
-                {isTutor ? `Gia sư ${userInfo.subject || ""}` : "Học sinh"}
-              </h6>
-            </div>
-            {
-              isEditing ? (
-                <CustomInput
-                  label="Mô tả..."
-                  type="text"
-                  value={editedData.description}
-                  onChange={handleInputChange("description")}
-                  name="description"
-                />
-              ) : (
-                (
-                  userInfo?.description ? (
-                    <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
-                      {userInfo.description}
-                    </p>
-                  ) : (
-                    <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
-                      Chưa cập nhật
-                    </p>
-                  )
-                ))}
-          </div>
-
-          {/* Video/Info Card */}
-          <div className="col-span-12 md:col-span-4 lg:col-span-4 mt-4 md:mt-0">
-            <div className="bg-white overflow-hidden">
-              {isTutor && (
-                <div className="h-48 md:h-[250px] relative border-[#0C65B6] border-[3px] rounded-xl overflow-hidden bg-black">
-                  {embedUrl ? (
-                    <iframe
-                      src={embedUrl}
-                      title="Video giới thiệu"
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
+            {/* Profile Section */}
+            <div className="grid grid-cols-12 gap-5 md:gap-6 items-start w-full">
+              {/* Avatar */}
+              <div className="flex gap-8 col-span-12 md:col-span-2 items-center md:items-start justify-center md:justify-start">
+                <div className="w-full shrink-0 relative group cursor-pointer">
+                  {previewImg ? (
+                    <Image
+                      src={previewImg}
+                      alt="Avatar Preview"
+                      width={200}
+                      height={200}
+                      className="rounded-xl w-full h-full aspect-square object-cover"
                     />
-                  ) : introUrl ? (
-                    <video src={introUrl} controls className="w-full h-full object-cover" />
+                  ) : userInfo.avatarUrl || userInfo.avatar ? (
+                    <Image
+                      src={userInfo.avatarUrl || userInfo.avatar || ""}
+                      alt="Avatar"
+                      width={200}
+                      height={200}
+                      className="rounded-xl w-full h-auto aspect-square object-cover"
+                    />
                   ) : (
                     <Image
-                      src={Banner}
-                      alt="Course Banner"
-                      fill
-                      className="object-cover"
+                      src="https://res.cloudinary.com/dh2uwapb8/image/upload/v1765078223/fe/fliiqbvbsfiwel8b3k2j.jpg"
+                      alt="Avatar"
+                      width={200}
+                      height={200}
+                      className="rounded-xl w-full h-full object-cover"
                     />
                   )}
+                  {isUploading && (
+                    <div className="absolute top-0 left-0 w-full aspect-square flex items-center justify-center bg-black bg-opacity-50 rounded-xl z-10">
+                      <Typography className="text-white">Đang tải...</Typography>
+                    </div>
+                  )}
+                  {isEditing && (
+                    <div className="absolute top-0 left-0 w-full aspect-square flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 pointer-events-none">
+                      <UploadFileRoundedIcon
+                        onClick={handleUploadAvatar}
+                        className="text-white bg-black bg-opacity-70 rounded-full p-2 hover:bg-opacity-50 cursor-pointer pointer-events-auto"
+                        sx={{ fontSize: "70px" }}
+                      />
+                    </div>
+                  )}
                 </div>
+              </div>
+
+              {/* Info */}
+              <div className="flex flex-col col-span-12 md:col-span-5 gap-3">
+                <div className="flex flex-col gap-[10px]">
+                  <h2 className="text-black text-[28px] font-bold">
+                    {userInfo.fullName || userInfo.name || "Chưa cập nhật"}
+                  </h2>
+                  <h6 className="text-blue600 font-semibold text-[15px]">
+                    {isTutor ? "Gia sư" : "Học sinh"}
+                  </h6>
+                </div>
+                {
+                  isEditing ? (
+                    <CustomInput
+                      label="Mô tả..."
+                      type="text"
+                      value={editedData.description}
+                      onChange={handleInputChange("description")}
+                      name="description"
+                    />
+                  ) : (
+                    (
+                      userInfo?.description ? (
+                        <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
+                          {userInfo.description}
+                        </p>
+                      ) : (
+                        <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
+                          Chưa cập nhật
+                        </p>
+                      )
+                    ))}
+              </div>
+
+              {/* Video/Info Card */}
+              <div className="col-span-12 md:col-span-4 lg:col-span-4 mt-4 md:mt-0">
+                <div className="bg-white overflow-hidden">
+                  {isTutor && (
+                    <div className="h-48 md:h-[250px] relative border-[#0C65B6] border-[3px] rounded-xl overflow-hidden bg-black group">
+                      {previewVideo ? (
+                        <video src={previewVideo} controls className="w-full h-full object-cover" />
+                      ) : introVideoUrl ? (
+                        <video src={introVideoUrl} controls className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray900 text-white">
+                          Không có video giới thiệu
+                        </div>
+                      )}
+                      {isUploading && (
+                        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 rounded-xl z-10">
+                          <Typography className="text-white">Đang tải...</Typography>
+                        </div>
+                      )}
+                      {isEditing && (
+                        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-20 pointer-events-none">
+                          <UploadFileRoundedIcon
+                            onClick={handleUploadVideo}
+                            className="text-white bg-black bg-opacity-70 rounded-full p-2 hover:bg-opacity-50 cursor-pointer pointer-events-auto"
+                            sx={{ fontSize: "70px" }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Basic Information */}
+          <div className="flex flex-col gap-5 text-black font-quicksand mt-10 w-full max-w-[90%] mx-auto">
+            <h3 className="font-bold text-[15px] md:text-[20px] lg:text-[20px]">
+              Thông tin cơ bản
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {isEditing ? (
+                <>
+                  <div>
+                    <CustomInput
+                      label="Ngày sinh"
+                      type="date"
+                      value={editedData.dateOfBirth}
+                      onChange={handleInputChange("dateOfBirth")}
+                      name="dateOfBirth"
+                    />
+                  </div>
+                  <div>
+                    <CustomInput
+                      label="Email"
+                      type="email"
+                      value={editedData.email}
+                      onChange={handleInputChange("email")}
+                      name="email"
+                    />
+                  </div>
+                  <div>
+                    <CustomInput
+                      label="Giới tính"
+                      type="select"
+                      value={editedData.sex}
+                      onChange={handleInputChange("sex")}
+                      name="sex"
+                      options={[
+                        { value: "male", label: "Nam" },
+                        { value: "female", label: "Nữ" },
+                      ]}
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="font-bold">
+                    Ngày sinh{" "}
+                    <span className="font-normal">
+                      {(userInfo.dateOfBirth || userInfo.birthDate)
+                        ? dayjs(userInfo.dateOfBirth || userInfo.birthDate).format("DD/MM/YYYY")
+                        : "Chưa cập nhật"}
+                    </span>
+                  </p>
+                  <p className="font-bold">
+                    Email <span className="font-normal">{userInfo.email || "Chưa cập nhật"}</span>
+                  </p>
+                  <p className="font-bold">
+                    Giới tính{" "}
+                    <span className="font-normal">
+                      {userInfo.sex === "male"
+                        ? "Nam"
+                        : userInfo.sex === "female"
+                          ? "Nữ"
+                          : "Chưa cập nhật"}
+                    </span>
+                  </p>
+                  {(userInfo.phone || userInfo.phoneNumber) && (
+                    <p className="font-bold">
+                      Số điện thoại <span className="font-normal">{userInfo.phone || userInfo.phoneNumber}</span>
+                    </p>
+                  )}
+                  {userInfo.address && (
+                    <p className="font-bold col-span-2">
+                      Địa chỉ <span className="font-normal">{userInfo.address}</span>
+                    </p>
+                  )}
+                </>
               )}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Basic Information */}
-      <div className="flex flex-col gap-5 text-black font-quicksand mt-10 w-full max-w-[90%] mx-auto">
-        <h3 className="font-bold text-[15px] md:text-[20px] lg:text-[20px]">
-          Thông tin cơ bản
-        </h3>
-        <div className="grid grid-cols-2 gap-3">
-          {isEditing ? (
-            <>
-              <div>
-                <CustomInput
-                  label="Ngày sinh"
-                  type="date"
-                  value={editedData.dateOfBirth}
-                  onChange={handleInputChange("dateOfBirth")}
-                  name="dateOfBirth"
-                />
-              </div>
-              <div>
-                <CustomInput
-                  label="Email"
-                  type="email"
-                  value={editedData.email}
-                  onChange={handleInputChange("email")}
-                  name="email"
-                />
-              </div>
-              <div>
-                <CustomInput
-                  label="Giới tính"
-                  type="select"
-                  value={editedData.sex}
-                  onChange={handleInputChange("sex")}
-                  name="sex"
-                  options={[
-                    { value: "male", label: "Nam" },
-                    { value: "female", label: "Nữ" },
-                  ]}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="font-bold">
-                Ngày sinh{" "}
-                <span className="font-normal">
-                  {userInfo.dateOfBirth
-                    ? dayjs(userInfo.dateOfBirth).format("DD/MM/YYYY")
-                    : "Chưa cập nhật"}
-                </span>
-              </p>
-              <p className="font-bold">
-                Email <span className="font-normal">{userInfo.email}</span>
-              </p>
-              <p className="font-bold">
-                Giới tính{" "}
-                <span className="font-normal">
-                  {userInfo.sex === "male"
-                    ? "Nam"
-                    : userInfo.sex === "female"
-                      ? "Nữ"
-                      : "Chưa cập nhật"}
-                </span>
-              </p>
-              {userInfo.phone && (
-                <p className="font-bold">
-                  Số điện thoại <span className="font-normal">{userInfo.phone}</span>
-                </p>
-              )}
-              {userInfo.address && (
-                <p className="font-bold col-span-2">
-                  Địa chỉ <span className="font-normal">{userInfo.address}</span>
-                </p>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex flex-row gap-3 mt-6 w-full max-w-[90%] mx-auto justify-center">
-        {isEditing ? (
-          <>
-            <CustomButton
-              type="Secondary"
-              className="flex items-center gap-2 !bg-gray-500 !text-white hover:!bg-gray-600"
-              onClick={handleCancel}
-            >
-              <CancelIcon sx={{ fontSize: "18px" }} />
-              Hủy
-            </CustomButton>
-            <CustomButton
-              type="Secondary"
-              className="flex items-center gap-2 !bg-green-500 !text-white hover:!bg-green-600"
-              onClick={handleSave}
-            >
-              <SaveIcon sx={{ fontSize: "18px" }} />
-              Lưu
-            </CustomButton>
-          </>
-        ) : (
-          <>
-            <CustomButton
-              type="Secondary"
-              className="flex items-center gap-2 !bg-blue100 !text-blue700"
-              onClick={handleEdit}
-            >
-              <EditIcon sx={{ fontSize: "18px" }} />
-              Chỉnh sửa
-            </CustomButton>
-            <CustomButton type="Secondary" className="flex items-center gap-2 !bg-yellow100 !text-yellow500" onClick={handleLogout}>
-              <LogoutIcon sx={{ fontSize: "18px" }} />
-              Đăng xuất
-            </CustomButton>
-          </>
-        )}
-      </div>
+          {/* Action Buttons */}
+          <div className="flex flex-row gap-3 mt-6 w-full max-w-[90%] mx-auto justify-center">
+            {isEditing ? (
+              <>
+                <CustomButton
+                  type="Secondary"
+                  className="flex items-center gap-2 !bg-gray-500 !text-white hover:!bg-gray-600"
+                  onClick={handleCancel}
+                >
+                  <CancelIcon sx={{ fontSize: "18px" }} />
+                  Hủy
+                </CustomButton>
+                <CustomButton
+                  type="Secondary"
+                  className="flex items-center gap-2 !bg-green-500 !text-white hover:!bg-green-600"
+                  onClick={handleSave}
+                >
+                  <SaveIcon sx={{ fontSize: "18px" }} />
+                  Lưu
+                </CustomButton>
+              </>
+            ) : (
+              <>
+                <CustomButton
+                  type="Secondary"
+                  className="flex items-center gap-2 !bg-blue100 !text-blue700"
+                  onClick={handleEdit}
+                >
+                  <EditIcon sx={{ fontSize: "18px" }} />
+                  Chỉnh sửa
+                </CustomButton>
+                <CustomButton type="Secondary" className="flex items-center gap-2 !bg-yellow100 !text-yellow500" onClick={handleLogout}>
+                  <LogoutIcon sx={{ fontSize: "18px" }} />
+                  Đăng xuất
+                </CustomButton>
+              </>
+            )}
+          </div>
+        </>
+      )}
     </>
   );
 };

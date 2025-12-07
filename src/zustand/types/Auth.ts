@@ -14,9 +14,30 @@ export interface LoginResponse {
 
 export interface AuthUser {
   id: string;
-  name: string;
+  name?: string;
+  fullName?: string;
   email: string;
   role?: string;
+  avatar?: string;
+  avatarUrl?: string;
+  description?: string;
+  dateOfBirth?: string;
+  birthDate?: string;
+  sex?: string;
+  phoneNumber?: string;
+  phone?: string;
+  address?: string;
+  tutorProfile?: {
+    userId: string;
+    bio?: string;
+    monthlyPrice?: number;
+    introVideoUrl?: string;
+    rating?: string;
+    grade?: number;
+    ratingCount?: number;
+    meetingTool?: Record<string, any>;
+  };
+  studentProfile?: any;
 }
 
 export interface RegisterRequest {
@@ -28,6 +49,9 @@ export interface RegisterRequest {
   password: string;
   confirmPassword: string;
   role: string;
+  // Tutor-specific fields
+  subjectId?: string;
+  grade?: number;
 }
 
 export interface RegisterResponse {
@@ -36,5 +60,39 @@ export interface RegisterResponse {
       message: string;
     };
   };
+}
+
+export interface ProfileResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    id: string;
+    email: string;
+    passwordHash: string;
+    fullName: string;
+    phoneNumber: string | null;
+    avatarUrl: string | null;
+    role: string;
+    sex: string;
+    birthDate: string;
+    balance: number;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+    tutorProfile: {
+      userId: string;
+      bio: string;
+      monthlyPrice: number;
+      introVideoUrl: string | null;
+      rating: string;
+      grade: number;
+      ratingCount: number;
+      meetingTool: Record<string, any>;
+    } | null;
+    studentProfile: any;
+  };
+  timestamp: string;
+  path: string;
 }
 

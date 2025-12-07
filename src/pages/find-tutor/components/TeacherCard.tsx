@@ -1,5 +1,5 @@
 "use client";
-import { Box, Grid, Typography, IconButton, Icon } from "@mui/material";
+import { Box, Typography, IconButton } from "@mui/material";
 import React, { FC, useEffect, useRef, useState } from "react";
 import Img from "../../../assets/images/teacher.png";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
@@ -14,32 +14,35 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
   const hlsRef = useRef<any>(null);
   const router = useRouter();
 
+  const videoUrl = teacher?.tutorProfile?.introVideoUrl;
+
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !teacher?.videoUrl) return;
+    if (!video || !videoUrl) return;
 
-    const isHls = /\.m3u8(\?|$)/i.test(teacher?.videoUrl);
+    const isHls = /\.m3u8(\?|$)/i.test(videoUrl);
     let cancelled = false;
 
     async function setup() {
+      if (!video) return;
       if (isHls) {
         if (
           "canPlayType" in video &&
           video.canPlayType("application/vnd.apple.mpegurl")
         ) {
-          video.src = teacher?.videoUrl!;
+          video.src = videoUrl!;
         } else {
           const { default: Hls } = await import("hls.js");
-          if (cancelled) return;
+          if (cancelled || !video) return;
           if (Hls.isSupported()) {
             const hls = new Hls();
             hlsRef.current = hls;
-            hls.loadSource(teacher?.videoUrl!);
+            hls.loadSource(videoUrl!);
             hls.attachMedia(video);
           }
         }
       } else {
-        video.src = teacher?.videoUrl!;
+        video.src = videoUrl!;
       }
     }
 
@@ -59,12 +62,12 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
         } catch { }
       }
     };
-  }, [teacher?.videoUrl]);
+  }, [videoUrl]);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    if (hovering && teacher?.videoUrl) {
+    if (hovering && videoUrl) {
       v.muted = true;
       v.playsInline = true;
       v.loop = true;
@@ -73,7 +76,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
       v.pause();
       v.currentTime = 0;
     }
-  }, [hovering, teacher.tutorProfile?.introVideoUrl]);
+  }, [hovering, videoUrl]);
 
   const handlePlayClick = () => {
     const href = teacher.tutorProfile?.introVideoUrl;
@@ -86,14 +89,10 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
       onMouseLeave={() => setHovering(false)}
       onDoubleClick={() => router.push(`/tutor-info/${teacher?.id}`)}
     >
-      <Grid
-        sx={{
-          width: "100%",
-          marginTop: { xs: "10px", sm: "30px", md: "40px", lg: "50px" },
-        }}
-        container
-        spacing={2}>
-        <Grid item size={{ xs: 12, sm: 12, md: 8, lg: 8 }}>
+      <div
+        className="w-full mt-[10px] sm:mt-[30px] md:mt-[40px] lg:mt-[50px] grid grid-cols-12 gap-4"
+      >
+        <div className="col-span-12 md:col-span-8">
           <Box
             sx={{
               width: "100%",
@@ -251,9 +250,9 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
               </Box>
             </Box>
           </Box>
-        </Grid>
+        </div>
 
-        <Grid item md={4} display={hovering ? "flex" : "none"}>
+        <div className={`col-span-12 md:col-span-4 ${hovering ? "flex" : "hidden"}`}>
           <Box
             sx={{
               width: "100%",
@@ -269,18 +268,24 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
               muted
               playsInline
               loop
-              preload="none"
-              poster={VideoImg.src}
+              preload="metadata"
+              poster={teacher?.tutorProfile?.introVideoUrl ? undefined : VideoImg.src}
+              onLoadedMetadata={(e) => {
+                // Seek to 0.5s to get a better thumbnail frame
+                const video = e.currentTarget;
+                if (video.duration > 0.5) {
+                  video.currentTime = 0.5;
+                }
+              }}
               style={{
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                opacity: teacher?.videoUrl ? 1 : 0.3,
+                opacity: teacher?.tutorProfile?.introVideoUrl ? 1 : 0.3,
                 transition: "filter .2s ease, opacity .2s ease",
                 filter: hovering ? "none" : "grayscale(0.2) brightness(0.85)",
               }}
             />
-
             <Box
               sx={{
                 pointerEvents: "none",
@@ -323,8 +328,8 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
               </Typography>
             )}
           </Box>
-        </Grid>
-      </Grid>
+        </div>
+      </div>
     </Box>
   );
 };

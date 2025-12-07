@@ -1,12 +1,14 @@
 "use client";
 import { Alert, Box, Link, Snackbar, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import CustomInput from '@/components/Input';
 import { CustomButton } from '@/components/Button';
 import { useAuthStore } from '@/zustand/stores/AuthStore';
 import { useRouter } from 'next/navigation';
 import { RegisterRequest } from '@/zustand/types/Auth';
+import LoadingScreen from '@/components/LoadingScreen';
+import { useSubjectStore } from '@/zustand/stores/SubjectStore';
 
 interface RegisterFormData {
   email: string;
@@ -17,12 +19,15 @@ interface RegisterFormData {
   confirmPassword: string;
   lookingFor: string;
   displayName: string;
+  subjectId: string;
+  grade: string;
 }
 
 const RegisterPageView = () => {
   const imageUrl = 'https://res.cloudinary.com/dh2uwapb8/image/upload/v1764762832/fe/xghioug67mqjrt3sdbls.png';
   const [step, setStep] = useState(1);
-  const { register } = useAuthStore();
+  const { register: registerUser, loading } = useAuthStore();
+  const { subjects, fetchAllSubjects } = useSubjectStore();
   const [open, setOpen] = useState(false);
 
   const router = useRouter();
@@ -43,10 +48,22 @@ const RegisterPageView = () => {
       confirmPassword: '',
       lookingFor: '',
       displayName: '',
+      subjectId: '',
+      grade: '',
     },
   });
 
   const password = watch('password');
+  const lookingFor = watch('lookingFor');
+
+  // Fetch subjects when component mounts
+  useEffect(() => {
+    fetchAllSubjects();
+  }, [fetchAllSubjects]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   const genderOptions = [
     { value: 'male', label: 'Nam' },
@@ -59,6 +76,27 @@ const RegisterPageView = () => {
     { value: 'tutor', label: 'Gia sư' },
   ];
 
+  const gradeOptions = [
+    { value: '1', label: 'Lớp 1' },
+    { value: '2', label: 'Lớp 2' },
+    { value: '3', label: 'Lớp 3' },
+    { value: '4', label: 'Lớp 4' },
+    { value: '5', label: 'Lớp 5' },
+    { value: '6', label: 'Lớp 6' },
+    { value: '7', label: 'Lớp 7' },
+    { value: '8', label: 'Lớp 8' },
+    { value: '9', label: 'Lớp 9' },
+    { value: '10', label: 'Lớp 10' },
+    { value: '11', label: 'Lớp 11' },
+    { value: '12', label: 'Lớp 12' },
+  ];
+
+  // Convert subjects to options format
+  const subjectOptions = subjects.map((subject) => ({
+    value: subject.id,
+    label: subject.name,
+  }));
+
   const onNext = async () => {
     const isValid = await trigger(['email', 'fullName', 'dateOfBirth', 'displayName', 'sex']);
     if (isValid) {
@@ -68,7 +106,14 @@ const RegisterPageView = () => {
 
   const onSubmit = async (data: RegisterFormData) => {
     // Validate step 2 fields
-    const isValid = await trigger(['password', 'confirmPassword', 'lookingFor']);
+    const fieldsToValidate: (keyof RegisterFormData)[] = ['password', 'confirmPassword', 'lookingFor'];
+
+    // Add tutor-specific fields validation if user is registering as tutor
+    if (data.lookingFor === 'student') {
+      fieldsToValidate.push('subjectId', 'grade');
+    }
+
+    const isValid = await trigger(fieldsToValidate);
     if (isValid) {
       try {
         // Get all form values to ensure we have all data
@@ -82,9 +127,14 @@ const RegisterPageView = () => {
           password: allValues.password || data.password,
           confirmPassword: allValues.confirmPassword || data.confirmPassword,
           role: data.lookingFor === 'student' ? 'tutor' : 'student',
+          // Add tutor-specific fields
+          ...(data.lookingFor === 'student' && {
+            subjectId: allValues.subjectId || data.subjectId,
+            grade: Number(allValues.grade || data.grade),
+          }),
         };
         console.log('Registering with data:', registerData);
-        await register(registerData);
+        await registerUser(registerData);
         // Redirect to login or home page after successful registration
         setOpen(true);
         setTimeout(() => {
@@ -95,6 +145,9 @@ const RegisterPageView = () => {
       }
     }
   };
+
+  // Check if user is registering as tutor (looking for students)
+  const isTutor = lookingFor === 'student';
 
   return (
     <>
@@ -285,7 +338,7 @@ const RegisterPageView = () => {
                           onChange={field.onChange}
                           name="displayName"
                         />
-                        {errors.username && (
+                        {errors.displayName && (
                           <Typography
                             sx={{
                               color: 'error.main',
@@ -295,7 +348,7 @@ const RegisterPageView = () => {
                               fontFamily: 'Quicksand',
                             }}
                           >
-                            {errors.username.message}
+                            {errors.displayName.message}
                           </Typography>
                         )}
                       </div>
@@ -437,6 +490,76 @@ const RegisterPageView = () => {
                   />
                 </div>
               </div>
+
+              {/* Tutor-specific fields - Show when user selects "Học sinh" (they are a tutor) */}
+              {isTutor && (
+                <div className='w-full flex flex-row justify-center items-start' style={{ gap: '20px' }}>
+                  <div className='w-full md:w-1/2'>
+                    <Controller
+                      name="subjectId"
+                      control={control}
+                      rules={{ required: isTutor ? 'Vui lòng chọn môn dạy' : false }}
+                      render={({ field }) => (
+                        <div>
+                          <CustomInput
+                            label='Môn dạy'
+                            type="select"
+                            value={field.value || ''}
+                            onChange={field.onChange}
+                            name="subjectId"
+                            options={subjectOptions}
+                          />
+                          {errors.subjectId && (
+                            <Typography
+                              sx={{
+                                color: 'error.main',
+                                fontSize: { xs: '10px', sm: '12px' },
+                                mt: 0.5,
+                                ml: 1,
+                                fontFamily: 'Quicksand',
+                              }}
+                            >
+                              {errors.subjectId.message}
+                            </Typography>
+                          )}
+                        </div>
+                      )}
+                    />
+                  </div>
+                  <div className='w-full md:w-1/2'>
+                    <Controller
+                      name="grade"
+                      control={control}
+                      rules={{ required: isTutor ? 'Vui lòng chọn khối dạy' : false }}
+                      render={({ field }) => (
+                        <div>
+                          <CustomInput
+                            label='Khối dạy'
+                            type="select"
+                            value={field.value || ''}
+                            onChange={field.onChange}
+                            name="grade"
+                            options={gradeOptions}
+                          />
+                          {errors.grade && (
+                            <Typography
+                              sx={{
+                                color: 'error.main',
+                                fontSize: { xs: '10px', sm: '12px' },
+                                mt: 0.5,
+                                ml: 1,
+                                fontFamily: 'Quicksand',
+                              }}
+                            >
+                              {errors.grade.message}
+                            </Typography>
+                          )}
+                        </div>
+                      )}
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className='w-full flex flex-row justify-center gap-5 items-center' style={{ gap: '10px' }}>
                 <CustomButton type='Primary' onClick={handleSubmit(onSubmit)} className='w-1/2'>

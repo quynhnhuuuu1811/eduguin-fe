@@ -2,8 +2,6 @@ export interface Class {
   id: string;
   name: string;
   description?: string;
-  tutorId: string;
-  tutorName?: string;
   studentId?: string;
   studentName?: string;
   subject?: string;
@@ -12,24 +10,32 @@ export interface Class {
   status?: 'pending' | 'completed';
   createdAt?: string;
   updatedAt?: string;
+  [key: string]: unknown;
 }
 
 export interface CreateClassRequest {
   name: string;
   description?: string;
   subject?: string;
-  startDate?: string;
-  endDate?: string;
-  studentId?: string;
+  startTime?: string;
+  endTime?: string;
+  capacity?: number;
+  linkMeeting?: string;
+}
+
+export interface SetScheduleRequest {
+  classId: string;
+  days:number,
+  startTime:string,
+  endTime:string,
 }
 
 export interface UpdateClassRequest {
   name?: string;
   description?: string;
-  subject?: string;
   startDate?: string;
   endDate?: string;
-  status?: 'active' | 'completed' | 'cancelled' | 'pending';
+  onlineLink?: string;
 }
 
 export interface ClassResponse {
@@ -54,6 +60,19 @@ export interface JoinClassResponse {
     data: {
       message: string;
       class: Class;
+    };
+  };
+}
+
+export interface ClassSubscriptionRequest {
+  classId: string;
+}
+
+export interface ClassSubscriptionResponse {
+  data: {
+    data: {
+      message: string;
+      class?: Class;
     };
   };
 }

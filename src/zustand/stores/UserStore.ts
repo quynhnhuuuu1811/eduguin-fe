@@ -24,6 +24,7 @@ interface UserState {
   fetchTutorByID: (id: string) => Promise<void>;
   fetchAllTutors: (params?: FetchTutorParams) => Promise<void>;
   updateStudentInfo : (id: string, data: FormData) => Promise<void>;
+  updateTutorInfo: ( data: FormData) => Promise<void>;
   clearStudentInfo: () => void;
 }
 
@@ -68,6 +69,23 @@ export const useUserStore = create<UserState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await UserApi.updateStudentInfo(id, data);
+      set({
+        userInfo: res.data.data,
+        loading: false,
+      });
+    } catch (error: any) {
+      set({
+        loading: false,
+        error: error?.response?.data?.message || "Failed to update user info",
+      });
+      throw error;
+    }
+  },
+
+  async updateTutorInfo(data: FormData) {
+    set({ loading: true, error: null });
+    try {
+      const res: any = await UserApi.updateTutorInfo(data);
       set({
         userInfo: res.data.data,
         loading: false,
