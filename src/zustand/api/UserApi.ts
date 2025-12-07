@@ -13,8 +13,12 @@ export const UserApi = {
   updateStudentInfo(id: string, data: FormData): Promise<StudentResponse> {
     return instance.patch(`/user/student/${id}`, data);
   },
-  updateTutorInfo(id: string, data: FormData): Promise<UserResponse> {
-    return instance.patch(`/user/tutor/${id}`, data);
+  updateTutorInfo(data: FormData): Promise<UserResponse> {
+    return instance.patch(`/user/my-tutor`, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
   recommendTutor() {
     return instance.get(`/student-event/recommendations`);

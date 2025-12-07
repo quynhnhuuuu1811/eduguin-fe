@@ -7,6 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
 import { SxProps, Theme } from '@mui/material/styles';
 
@@ -31,6 +32,8 @@ export interface VirtualizedTableProps<T = Record<string, unknown>> {
   getRowId?: (row: T, index: number) => string | number;
   emptyMessage?: string;
   stickyHeader?: boolean;
+  autoHeight?: boolean;
+  maxHeight?: number | string;
 }
 
 function VirtualizedTable<T extends Record<string, unknown>>({
@@ -45,7 +48,90 @@ function VirtualizedTable<T extends Record<string, unknown>>({
   getRowId,
   emptyMessage = 'No data available',
   stickyHeader = true,
+  autoHeight = false,
+  maxHeight,
 }: VirtualizedTableProps<T>) {
+  // Empty state
+  if (data.length === 0) {
+    return (
+      <Paper style={{ height: autoHeight ? 'auto' : height, width, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 0' }}>
+        <Typography color="text.secondary" align="center">
+          {emptyMessage}
+        </Typography>
+      </Paper>
+    );
+  }
+
+  // Auto height mode - use regular MUI Table
+  if (autoHeight) {
+    return (
+      <TableContainer
+        component={Paper}
+        sx={{
+          width,
+          maxHeight: maxHeight || 'none',
+          ...sx
+        }}
+      >
+        <Table stickyHeader={stickyHeader} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }}>
+          <TableHead>
+            <TableRow>
+              {columns.map((column) => (
+                <TableCell
+                  key={String(column.dataKey)}
+                  align={column.align || (column.numeric ? 'right' : 'left')}
+                  style={{
+                    width: column.width,
+                    backgroundColor: 'var(--color-blue100)',
+                  }}
+                  sx={{
+                    fontWeight: 600,
+                    fontFamily: 'Quicksand',
+                    ...headerSx,
+                  }}
+                >
+                  {column.label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((row, index) => (
+              <TableRow
+                key={getRowId ? String(getRowId(row, index)) : index}
+                hover
+                onClick={() => onRowClick && onRowClick(row, index)}
+                sx={{ cursor: onRowClick ? 'pointer' : 'default' }}
+              >
+                {columns.map((column) => {
+                  const value = row[column.dataKey as keyof T] as unknown;
+                  const cellContent = column.render
+                    ? column.render(value, row, index)
+                    : (value as React.ReactNode);
+
+                  return (
+                    <TableCell
+                      key={String(column.dataKey)}
+                      align={column.align || (column.numeric ? 'right' : 'left')}
+                      sx={{
+                        fontFamily: 'Quicksand',
+                        fontWeight: 500,
+                        ...cellSx,
+                      }}
+                    >
+                      {cellContent}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  }
+
+  // Virtualized mode - for large datasets with fixed height
   const ScrollerComponent = React.forwardRef<HTMLDivElement>((props, ref) => (
     <TableContainer component={Paper} {...props} ref={ref} sx={sx} />
   ));
@@ -89,6 +175,7 @@ function VirtualizedTable<T extends Record<string, unknown>>({
             sx={{
               backgroundColor: 'background.paper',
               fontWeight: 600,
+              fontFamily: 'Quicksand',
               ...headerSx,
             }}
           >
@@ -114,6 +201,8 @@ function VirtualizedTable<T extends Record<string, unknown>>({
               align={column.align || (column.numeric ? 'right' : 'left')}
               sx={{
                 cursor: onRowClick ? 'pointer' : 'default',
+                fontFamily: 'Quicksand',
+                fontWeight: 500,
                 ...cellSx,
               }}
               onClick={() => onRowClick && onRowClick(row, index)}
@@ -125,16 +214,6 @@ function VirtualizedTable<T extends Record<string, unknown>>({
       </React.Fragment>
     );
   };
-
-  if (data.length === 0) {
-    return (
-      <Paper style={{ height, width, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <TableCell colSpan={columns.length} align="center">
-          {emptyMessage}
-        </TableCell>
-      </Paper>
-    );
-  }
 
   return (
     <Paper style={{ height, width }}>

@@ -98,15 +98,35 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ loading: true, error: null });
     try {
       const res = await AuthApi.getMyInfo();
-      const userData = res.data.data.data;
+      const userData = res.data.data; // res.data is ProfileResponse, res.data.data is the user object
+      const user: AuthUser = {
+        id: userData.id,
+        fullName: userData.fullName,
+        email: userData.email,
+        role: userData.role,
+        avatarUrl: userData.avatarUrl ?? undefined,
+        avatar: userData.avatarUrl ?? undefined,
+        description: userData.tutorProfile?.bio || "",
+        dateOfBirth: userData.birthDate,
+        birthDate: userData.birthDate,
+        sex: userData.sex,
+        phoneNumber: userData.phoneNumber ?? undefined,
+        phone: userData.phoneNumber ?? undefined,
+        tutorProfile: userData.tutorProfile ? {
+          userId: userData.tutorProfile.userId,
+          bio: userData.tutorProfile.bio,
+          monthlyPrice: userData.tutorProfile.monthlyPrice,
+          introVideoUrl: userData.tutorProfile.introVideoUrl ?? undefined,
+          rating: userData.tutorProfile.rating,
+          grade: userData.tutorProfile.grade,
+          ratingCount: userData.tutorProfile.ratingCount,
+          meetingTool: userData.tutorProfile.meetingTool,
+        } : undefined,
+        studentProfile: userData.studentProfile ?? undefined,
+      };
       set((state) => ({
         data: {
-          user: {
-            id: userData.id,
-            name: userData.name,
-            email: userData.email,
-            role: userData.role,
-          },
+          user,
           accessToken: state.data.accessToken,
         },
         loading: false,

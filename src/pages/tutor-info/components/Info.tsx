@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useUserStore } from "@/zustand/stores/UserStore";
 import Img from "../../../assets/images/teacher.png";
 import Banner from "../../../assets/images/VideoThumbnail.png";
@@ -11,8 +11,11 @@ import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import Comment from "./Comment";
 import InputComment from "./InputComment";
+import LoadingScreen from "@/components/LoadingScreen";
+import SubcribModal from "./SubcribModal";
 
 const Info = ({ id }: { id: string }) => {
+  const [openModal, setOpenModal] = useState(false);
   const {
     selectedUser: teacher,
     loading,
@@ -36,7 +39,7 @@ const Info = ({ id }: { id: string }) => {
   }
 
   if (loading || !teacher || commentLoading) {
-    return <div>Loading...</div>;
+    return <LoadingScreen />;
   }
 
   if (error) {
@@ -57,12 +60,21 @@ const Info = ({ id }: { id: string }) => {
       if (u.hostname === "youtu.be") {
         return `https://www.youtube.com/embed${u.pathname}`;
       }
-    } catch {}
+    } catch { }
     return null;
   };
   const embedUrl = introUrl ? getYoutubeEmbedUrl(introUrl) : null;
   return (
     <div className="font-quicksand">
+      <SubcribModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        teacherName={teacher.fullName}
+        teacherAvatar={teacher.avatarUrl}
+        teacherSubject={teacher.tutorProfile?.subject}
+        teacherGrade={teacher.tutorProfile?.grade || ''}
+        teacherPrice={teacher.tutorProfile?.monthlyPrice || 0}
+      />
       <div className="grid grid-cols-12 gap-5 md:gap-6 items-start">
         {/* Avatar */}
         <div className="flex gap-6 col-span-12 md:col-span-3 items-center md:items-start justify-center md:justify-start">
@@ -167,7 +179,7 @@ const Info = ({ id }: { id: string }) => {
 
             {/* Register Button */}
             <div className="flex justify-center">
-              <CustomButton type="Secondary" className="w-2/3">
+              <CustomButton type="Secondary" className="w-2/3" onClick={() => setOpenModal(true)}>
                 Đăng ký học ngay!
                 <ArrowForwardRoundedIcon
                   sx={{

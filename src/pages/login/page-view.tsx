@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import LoadingScreen from '@/components/LoadingScreen';
 
 const LoginPageView = () => {
   const imageUrl = 'https://res.cloudinary.com/dh2uwapb8/image/upload/v1763998645/fe/yjifhjaytvbt3fmxvdig.png';
@@ -34,8 +35,12 @@ const LoginPageView = () => {
       router.push('/');
     }
   }, [data?.accessToken, loading, router]);
-  return (
 
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  return (
     <div className='flex flex-row h-screen overflow-hidden relative'>
       <Snackbar
         open={!!error}
