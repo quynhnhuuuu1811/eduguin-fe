@@ -14,9 +14,22 @@ interface SubcribModalProps {
   teacherId: string;
 }
 
-export default function SubcribModal({ open, onClose, teacherName, teacherAvatar, teacherSubject, teacherGrade, teacherPrice, teacherId }: SubcribModalProps) {
-  const { getClassesByTutorId, classes } = useClassStore();
-  useEffect(() => {
+export default function SubcribModal({
+  open,
+  onClose,
+  teacherName,
+  teacherAvatar,
+  teacherSubject,
+  teacherGrade,
+  teacherPrice,
+}: SubcribModalProps) {
+  const { classes, subscribeToClass, fetchTutorClasses } = useClassStore();
+
+  export default function SubcribModal({ open, onClose, teacherName, teacherAvatar, teacherSubject, teacherGrade, teacherPrice, teacherId }: SubcribModalProps) {
+    const { getClassesByTutorId, classes } = useClassStore();
+    useEffect(() => {
+      fetchTutorClasses();
+    }, []);
     if (open) {
       if (teacherId) {
         getClassesByTutorId(teacherId);
@@ -37,15 +50,18 @@ export default function SubcribModal({ open, onClose, teacherName, teacherAvatar
       <div className="relative bg-white rounded-xl p-6 w-full max-w-md mx-4 shadow-lg">
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold"
-        >
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold">
           ✕
         </button>
         <h4 className="text-xl font-bold mb-4">Đăng kí học</h4>
         <div>
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <img src={teacherAvatar} alt={teacherName} className="w-10 h-10 rounded-full" />
+              <img
+                src={teacherAvatar}
+                alt={teacherName}
+                className="w-10 h-10 rounded-full"
+              />
               <h5>{teacherName}</h5>
             </div>
             <span className="text-gray-600">{`Giáo viên ${teacherSubject} - lớp ${teacherGrade}`}</span>
@@ -60,7 +76,7 @@ export default function SubcribModal({ open, onClose, teacherName, teacherAvatar
                 value: item.id,
               })) : []}
               name="classId"
-              value={''}
+              value={""}
               onChange={() => { }}
             />
           </div>

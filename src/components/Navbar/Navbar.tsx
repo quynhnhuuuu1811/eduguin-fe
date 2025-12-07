@@ -10,6 +10,13 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/
 export const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+
   const [mounted, setMounted] = useState(false);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
@@ -55,6 +62,46 @@ export const Navbar = () => {
   const handleGoToLogin = () => {
     setShowLoginPopup(false);
     router.push("/login");
+  };
+
+  const renderAuthButton = () => {
+    if (!hasMounted) {
+      return (
+        <button
+          className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold cursor-pointer"
+          onClick={() => {
+            router.push("/login");
+          }}>
+          Đăng nhập
+        </button>
+      );
+    }
+
+    if (isAuthenticated) {
+      return (
+        <button
+          className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold cursor-pointer"
+          style={{
+            backgroundColor:
+              pathname === "/profile" ? "white" : "var(--color-blue100)",
+          }}
+          onClick={() => {
+            router.push("/profile");
+          }}>
+          Tài khoản
+        </button>
+      );
+    }
+
+    return (
+      <button
+        className="!px-8 !py-2 h-[40px] bg-blue100 text-black rounded-full text-[10px] lg:text-[12px] font-semibold cursor-pointer"
+        onClick={() => {
+          router.push("/login");
+        }}>
+        Đăng nhập
+      </button>
+    );
   };
 
   return (

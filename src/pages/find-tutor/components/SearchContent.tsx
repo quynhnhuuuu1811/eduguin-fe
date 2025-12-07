@@ -1,6 +1,7 @@
 "use client";
+
 import CustomInput from "@/components/Input";
-import { Box, Typography, Grid, Button } from "@mui/material";
+import { Box, Typography, GridLegacy as Grid } from "@mui/material";
 import React, { useEffect, useMemo, useState } from "react";
 import TeacherCard from "./TeacherCard";
 import { useUserStore } from "@/zustand/stores/UserStore";
@@ -12,7 +13,11 @@ import { CustomButton } from "@/components/Button";
 const SearchContent = () => {
   const { fetchAllTutors, users, loading } = useUserStore();
 
-  const { fetchAllSubjects, subjects, loading: subjectLoading } = useSubjectStore();
+  const {
+    fetchAllSubjects,
+    subjects,
+    loading: subjectLoading,
+  } = useSubjectStore();
 
   useEffect(() => {
     fetchAllSubjects();
@@ -26,22 +31,25 @@ const SearchContent = () => {
     rating: "",
   });
 
-  const subjectOptions = useMemo(() => [
-    { value: "", label: "Tất cả" },
-    ...subjects.map((subject: Subject) => ({
-      value: subject.id,
-      label: subject.name,
-    }))
-  ], [subjects]);
+  const subjectOptions = useMemo(
+    () => [
+      { value: "", label: "Tất cả" },
+      ...subjects.map((subject: Subject) => ({
+        value: subject.id,
+        label: subject.name,
+      })),
+    ],
+    [subjects]
+  );
 
-  const handleFilterChange = (name: string) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setFilters((prev) => ({
-      ...prev,
-      [name]: e.target.value,
-    }));
-  };
+  const handleFilterChange =
+    (name: string) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setFilters((prev) => ({
+        ...prev,
+        [name]: e.target.value,
+      }));
+    };
 
   const handleFilter = () => {
     fetchAllTutors({
@@ -74,7 +82,7 @@ const SearchContent = () => {
     });
   }, [fetchAllTutors]);
 
-  const teachers = users;
+  const teachers = users ?? [];
 
   if (loading) {
     return <LoadingScreen />;
@@ -110,7 +118,6 @@ const SearchContent = () => {
     { value: "1", label: "1 sao trở lên" },
   ];
 
-
   return (
     <Box
       className="w-full"
@@ -122,6 +129,7 @@ const SearchContent = () => {
           lg: "135px",
         },
       }}>
+      {/* Chỉ để text trong Typography, không nhét Grid vào trong */}
       <Typography
         sx={{
           fontFamily: "quicksand",
@@ -133,11 +141,11 @@ const SearchContent = () => {
           },
           fontWeight: 600,
         }}>
-        {teachers.length > 0 ? `${teachers.length} giáo viên đang chờ để được giúp bạn` : "Không có kết quả"}
+        {teachers.length > 0
+          ? `${teachers.length} giáo viên đang chờ để được giúp bạn`
+          : "Không có kết quả"}
       </Typography>
-      <div
-        className="grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-4 mt-4"
-      >
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-4 mt-4">
         <CustomInput
           label="Môn học"
           type="select"
@@ -170,10 +178,16 @@ const SearchContent = () => {
           onChange={handleFilterChange("rating")}
           options={ratingOptions}
         />
-        <CustomButton type="Secondary" className="w-full! text-[14px]! md:text-[14px]! lg:text-[16px]!" onClick={() => handleFilter()}>
+        <CustomButton
+          type="Secondary"
+          className="w-full! text-[14px]! md:text-[14px]! lg:text-[16px]!"
+          onClick={() => handleFilter()}>
           Lọc
         </CustomButton>
-        <CustomButton type="SecondaryOutlined" className="w-full! text-[14px]! md:text-[14px]! lg:text-[16px]!" onClick={handleClearFilter}>
+        <CustomButton
+          type="SecondaryOutlined"
+          className="w-full! text-[14px]! md:text-[14px]! lg:text-[16px]!"
+          onClick={handleClearFilter}>
           Xoá lọc
         </CustomButton>
       </div>

@@ -15,11 +15,11 @@ import { Typography, TextField } from "@mui/material";
 import dayjs from "dayjs";
 import CustomInput from "@/components/Input";
 import { useRouter } from "next/navigation";
-import UploadFileRoundedIcon from '@mui/icons-material/UploadFileRounded';
-import { useUserStore } from "@/zustand/stores/UserStore";
+import UploadFileRoundedIcon from "@mui/icons-material/UploadFileRounded";
 import { useAuthStore } from "@/zustand/stores/AuthStore";
 import { AuthUser } from "@/zustand/types/Auth";
 import LoadingScreen from "@/components/LoadingScreen";
+import { useUserStore } from "@/zustand/stores/UserStore";
 
 interface InfoProps {
   userInfo: AuthUser;
@@ -83,17 +83,16 @@ const Info = ({ userInfo }: InfoProps) => {
 
   const handleSave = async () => {
     await handleUpdate();
-
   };
 
-  const handleInputChange = (field: keyof typeof editedData) => (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setEditedData((prev) => ({
-      ...prev,
-      [field]: event.target.value,
-    }));
-  };
+  const handleInputChange =
+    (field: keyof typeof editedData) =>
+    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setEditedData((prev) => ({
+        ...prev,
+        [field]: event.target.value,
+      }));
+    };
 
   const introVideoUrl = userInfo.tutorProfile?.introVideoUrl;
   const router = useRouter();
@@ -117,20 +116,17 @@ const Info = ({ userInfo }: InfoProps) => {
           return;
         }
 
-        // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
           alert("Kích thước ảnh không được vượt quá 5MB");
           return;
         }
 
-        // Create preview URL
         const reader = new FileReader();
         reader.onloadend = () => {
           setPreviewImg(reader.result as string);
         };
         reader.readAsDataURL(file);
 
-        // Set upload image and create preview
         setUploadImg(file);
       }
     };
@@ -209,9 +205,11 @@ const Info = ({ userInfo }: InfoProps) => {
       setIsEditing(false);
     } catch (error: unknown) {
       console.error("Error updating user info:", error);
-      const errorMessage = error && typeof error === 'object' && 'response' in error
-        ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
-        : undefined;
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
       alert(errorMessage || "Có lỗi xảy ra khi cập nhật thông tin");
       // Reset on error
       setPreviewImg(null);

@@ -1,20 +1,13 @@
-import axios, { AxiosRequestConfig } from "axios";
-
-const getAccessToken = () => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("accessToken");
-  }
-  return null;
-};
-
+import { getTokenFromLocalStorage } from "@/utils/storage";
+import axios from "axios";
 const instance = axios.create({
   baseURL: "https://api.eduguin.mtri.online/api",
 });
 
 instance.interceptors.request.use(
   (config) => {
-    const accessToken = getAccessToken();
-    
+    const accessToken = getTokenFromLocalStorage();
+
     if (config.data instanceof FormData) {
       if (accessToken) {
         config.headers.set("Authorization", `Bearer ${accessToken}`);
@@ -26,7 +19,7 @@ instance.interceptors.request.use(
         config.headers.set("Authorization", `Bearer ${accessToken}`);
       }
     }
-    
+
     return config;
   },
   (error) => {

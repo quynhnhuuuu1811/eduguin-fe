@@ -1,14 +1,15 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import bkg from "../../../../assets/images/rcmTutor.png";
 import { Box, Typography } from "@mui/material";
 import Img from "../../../../assets/images/teacher.png";
 import CardItem from "./CardItem";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay } from 'swiper/modules';
-import 'swiper/css/pagination';
+import { Pagination, Autoplay } from "swiper/modules";
+import "swiper/css/pagination";
 import "swiper/css";
-const RecommnendTutor = () => {
+import { useUserStore } from "@/zustand/stores/UserStore";
+const RecommendTutor = () => {
   const rcmTutors = [
     {
       name: "Nguyễn Văn A",
@@ -39,6 +40,10 @@ const RecommnendTutor = () => {
       location: "Cần Thơ",
     },
   ];
+  const { tutorList, recommendTutor } = useUserStore();
+  useEffect(() => {
+    recommendTutor();
+  }, []);
   return (
     <Box
       sx={{
@@ -96,16 +101,15 @@ const RecommnendTutor = () => {
             delay: 2500,
             disableOnInteraction: false,
           }}
-          className="recommend-tutor-swiper"
-        >
-          {rcmTutors.map((tutor, index) => (
+          className="recommend-tutor-swiper">
+          {tutorList.map((tutor, index) => (
             <SwiperSlide
               key={index}
               style={{
                 display: "flex",
                 justifyContent: "center",
               }}>
-              <CardItem tutor={tutor} />
+              <CardItem tutor={tutor as any} />
             </SwiperSlide>
           ))}
         </Swiper>
@@ -114,4 +118,4 @@ const RecommnendTutor = () => {
   );
 };
 
-export default RecommnendTutor;
+export default RecommendTutor;

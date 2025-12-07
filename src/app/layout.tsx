@@ -4,6 +4,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { ConditionalFooter } from "@/components/Footer/ConditionalFooter";
 import { ConditionalNavbar } from "@/components/Navbar/ConditionalNavbar";
 import { Providers } from "./providers";
+import ChatBox from "@/components/ChatBot/ChatBox";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,6 +23,7 @@ export default function RootLayout({
           <ConditionalNavbar />
           <AppRouterCacheProvider options={{ key: "mui", prepend: true }}>
             <main className="flex-1 ">{children}</main>
+            <ChatBox />
           </AppRouterCacheProvider>
           <ConditionalFooter />
         </Providers>
