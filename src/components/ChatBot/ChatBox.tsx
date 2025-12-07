@@ -56,7 +56,6 @@ export default function ChatBox() {
       setIsBotThinking(false);
     });
 
-    // Khi server gửi reply
     socket.on("msgToClient", (data: { reply: string }) => {
       console.log("📩 Tin nhắn từ server:", data);
       setIsBotThinking(false);
@@ -64,7 +63,6 @@ export default function ChatBox() {
       const fullText = data.reply || "";
       const messageId = Date.now();
 
-      // 1. Thêm message bot rỗng trước
       setMessages((prev) => [
         ...prev,
         {
