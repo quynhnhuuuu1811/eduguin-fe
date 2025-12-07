@@ -1,5 +1,7 @@
+import { Recommend } from "@mui/icons-material";
 import { User, StudentResponse, UserResponse } from "../types/User";
 import instance from "@/lib/httpService";
+import RecommnendTutor from "@/pages/home/components/RecommendTutor";
 
 export const UserApi = {
   getTutorByID(id: string): Promise<User[]> {
@@ -17,5 +19,8 @@ export const UserApi = {
         'Content-Type': 'multipart/form-data',
       },
     });
+  },
+  recommendTutor() {
+    return instance.get(`/student-event/recommendations`);
   },
 };
