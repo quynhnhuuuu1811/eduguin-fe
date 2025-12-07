@@ -1,4 +1,4 @@
-import RegisterPageView from "../../pages/register/page-view";
+import RegisterPageView from "../../page-views/register/page-view";
 const RegisterPage = () => {
   return (
     <div>

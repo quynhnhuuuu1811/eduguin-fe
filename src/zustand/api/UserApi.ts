@@ -1,7 +1,7 @@
 import { Recommend } from "@mui/icons-material";
 import { User, StudentResponse, UserResponse } from "../types/User";
 import instance from "@/lib/httpService";
-import RecommnendTutor from "@/pages/home/components/RecommendTutor";
+import RecommnendTutor from "@/page-views/home/components/RecommendTutor";
 
 export const UserApi = {
   getTutorByID(id: string): Promise<User[]> {
