@@ -1,13 +1,14 @@
 import TutorInfo from "@/pages/tutor-info/page-view";
+import { use } from "react";
 
 type TutorInfoPageProps = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export default function TutorInfoPage({ params }: TutorInfoPageProps) {
-  const { id } = params;
+  const { id } = use(params);
 
   return (
     <div>

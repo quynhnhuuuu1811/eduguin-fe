@@ -36,6 +36,7 @@ export interface AuthUser {
     grade?: number;
     ratingCount?: number;
     meetingTool?: Record<string, any>;
+    subject?: string;
   };
   studentProfile?: any;
 }
@@ -89,6 +90,7 @@ export interface ProfileResponse {
       grade: number;
       ratingCount: number;
       meetingTool: Record<string, any>;
+      subject?: string;
     } | null;
     studentProfile: any;
   };

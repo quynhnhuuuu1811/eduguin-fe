@@ -316,7 +316,7 @@ const Info = ({ userInfo }: InfoProps) => {
                     {userInfo.fullName || userInfo.name || "Chưa cập nhật"}
                   </h2>
                   <h6 className="text-blue600 font-semibold text-[15px]">
-                    {isTutor ? "Gia sư" : "Học sinh"}
+                    {isTutor ? `Gia sư ${userInfo.tutorProfile?.subject} ${userInfo.tutorProfile?.grade}` : "Học sinh"}
                   </h6>
                 </div>
                 {

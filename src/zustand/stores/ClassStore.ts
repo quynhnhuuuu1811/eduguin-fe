@@ -21,6 +21,7 @@ interface ClassState {
   createClass: (request: CreateClassRequest) => Promise<Class>;
   setSchedule: (request: SetScheduleRequest) => Promise<void>;
   deleteClass: (classId: string) => Promise<void>;
+  getClassesByTutorId: (tutorId: string) => Promise<Class[]>;
 
   // Actions cho Học sinh
   subscribeToClass: (request: ClassSubscriptionRequest) => Promise<void>;
@@ -123,6 +124,25 @@ export const useClassStore = create<ClassState>((set, get) => ({
               ?.data?.message
           : undefined;
       set({ loading: false, error: errorMessage || "Không thể đăng ký lớp học" });
+      throw error;
+    }
+  },
+
+  async getClassesByTutorId(tutorId: string) {
+    set({ loading: true, error: null });
+    try {
+      const res = await ClassesApi.getClassesByTutorId(tutorId);
+      set({
+        classes: res.data.data,
+        loading: false,
+      });
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      set({ loading: false, error: errorMessage || "Không thể tải danh sách lớp học" });
       throw error;
     }
   },

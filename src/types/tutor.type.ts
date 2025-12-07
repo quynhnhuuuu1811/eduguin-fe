@@ -18,4 +18,7 @@ export interface Tutor {
   birthDate: string;
   role: UserRole;
   tutorProfile: TutorProfile;
+  grade: string;
+  subject: string;
+  price: number;
 }

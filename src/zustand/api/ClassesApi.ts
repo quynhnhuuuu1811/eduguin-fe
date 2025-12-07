@@ -31,4 +31,7 @@ export const ClassesApi = {
   subscribeToClass(request: ClassSubscriptionRequest): Promise<ClassSubscriptionResponse> {
     return instance.post('/class-subscription', request);
   },
+  getClassesByTutorId(tutorId: string): Promise<ClassesResponse> {
+    return instance.get(`/class-schedule/tutor/${tutorId}`);
+  },
 };

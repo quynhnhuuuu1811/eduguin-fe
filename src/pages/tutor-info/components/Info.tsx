@@ -13,6 +13,8 @@ import Comment from "./Comment";
 import InputComment from "./InputComment";
 import LoadingScreen from "@/components/LoadingScreen";
 import SubcribModal from "./SubcribModal";
+import { useClassStore } from "@/zustand/stores/ClassStore";
+import Table from "@/components/Table";
 
 const Info = ({ id }: { id: string }) => {
   const [openModal, setOpenModal] = useState(false);
@@ -34,16 +36,24 @@ const Info = ({ id }: { id: string }) => {
     getListCmtByTutorID(id);
   }, [id, fetchTutorByID, getListCmtByTutorID]);
 
+  const { getClassesByTutorId } = useClassStore();
+  useEffect(() => {
+    if (!id) return;
+    getClassesByTutorId(id);
+  }, [id, getClassesByTutorId]);
+
+  const classes = useClassStore((state) => state.classes);
+
   if (!id) {
     return <div>No tutor ID provided</div>;
   }
 
-  if (loading || !teacher || commentLoading) {
-    return <LoadingScreen />;
-  }
-
   if (error) {
     return <div>Error: {error}</div>;
+  }
+
+  if (loading || !teacher || commentLoading) {
+    return <LoadingScreen />;
   }
 
   const rating = teacher.tutorProfile?.rating ?? 0;
@@ -64,6 +74,28 @@ const Info = ({ id }: { id: string }) => {
     return null;
   };
   const embedUrl = introUrl ? getYoutubeEmbedUrl(introUrl) : null;
+  const columns = [
+    {
+      label: "Lớp học",
+      dataKey: "className",
+    },
+    {
+      label: "Ngày bắt đầu",
+      dataKey: "startDate",
+    },
+    {
+      label: "Ngày kết thúc",
+      dataKey: "endDate",
+    },
+    {
+      label: "Trạng thái",
+      dataKey: "status",
+    },
+    {
+      label: "Lịch học",
+      dataKey: "schedules",
+    },
+  ];
   return (
     <div className="font-quicksand">
       <SubcribModal
@@ -74,6 +106,7 @@ const Info = ({ id }: { id: string }) => {
         teacherSubject={teacher.tutorProfile?.subject}
         teacherGrade={teacher.tutorProfile?.grade || ''}
         teacherPrice={teacher.tutorProfile?.monthlyPrice || 0}
+        teacherId={id}
       />
       <div className="grid grid-cols-12 gap-5 md:gap-6 items-start">
         {/* Avatar */}
@@ -108,7 +141,7 @@ const Info = ({ id }: { id: string }) => {
               Gia sư dạy {teacher.tutorProfile?.subject}
             </h6>
             <p className="text-[13px] text-black font-extrabold">
-              Đã dạy 5 học sinh
+              Có {classes.length} lớp học
             </p>
           </div>
           <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
@@ -244,6 +277,12 @@ const Info = ({ id }: { id: string }) => {
               </h5>
             </div>
           )}
+        </div>
+      </div>
+      <div className="flex flex-col gap-5 text-black font-quicksand w-full max-w-[90%] mx-auto">
+        <h3 className=" font-bold text-[15px] md:text-[20px] lg:text-[20px]">Danh sách lớp học</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <Table columns={columns} data={classes} />
         </div>
       </div>
       <InputComment

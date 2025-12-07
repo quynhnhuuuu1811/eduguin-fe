@@ -1,5 +1,6 @@
 import CustomInput from "@/components/Input";
 import { useClassStore } from "@/zustand/stores/ClassStore";
+import { useParams } from "next/navigation";
 import { useEffect } from "react";
 
 interface SubcribModalProps {
@@ -10,17 +11,18 @@ interface SubcribModalProps {
   teacherSubject: string;
   teacherGrade: string;
   teacherPrice: number;
+  teacherId: string;
 }
 
-export default function SubcribModal({ open, onClose, teacherName, teacherAvatar, teacherSubject, teacherGrade, teacherPrice }: SubcribModalProps) {
-  const { subscribeToClass, fetchTutorClasses } = useClassStore();
-
+export default function SubcribModal({ open, onClose, teacherName, teacherAvatar, teacherSubject, teacherGrade, teacherPrice, teacherId }: SubcribModalProps) {
+  const { getClassesByTutorId, classes } = useClassStore();
   useEffect(() => {
-    fetchTutorClasses();
-  }, []);
-
-  const classes = fetchTutorClasses();
-  console.log(classes);
+    if (open) {
+      if (teacherId) {
+        getClassesByTutorId(teacherId);
+      }
+    }
+  }, [open, getClassesByTutorId, teacherId]);
 
   if (!open) return null;
 
@@ -42,7 +44,6 @@ export default function SubcribModal({ open, onClose, teacherName, teacherAvatar
         <h4 className="text-xl font-bold mb-4">Đăng kí học</h4>
         <div>
           <div className="flex flex-col gap-2">
-            <h5 className="font-semibold">Lớp học</h5>
             <div className="flex items-center gap-2">
               <img src={teacherAvatar} alt={teacherName} className="w-10 h-10 rounded-full" />
               <h5>{teacherName}</h5>
@@ -50,13 +51,12 @@ export default function SubcribModal({ open, onClose, teacherName, teacherAvatar
             <span className="text-gray-600">{`Giáo viên ${teacherSubject} - lớp ${teacherGrade}`}</span>
           </div>
           <div className="flex flex-col gap-2 mt-4">
-            <h5 className="font-semibold">Lịch học</h5>
             <span className="text-sm text-gray-500">Chọn lịch học</span>
             <CustomInput
               label="Lịch học"
               select
               options={Array.isArray(classes) ? classes.map((item) => ({
-                label: item.name,
+                label: `${item.className} - ${item.startDate} - ${item.endDate}`,
                 value: item.id,
               })) : []}
               name="classId"
