@@ -1,20 +1,14 @@
 "use client";
-import {
-  Box,
-  GridLegacy as Grid,
-  Typography,
-  IconButton,
-  Icon,
-} from "@mui/material";
+
+import { Box, Typography, IconButton } from "@mui/material";
 import React, { FC, useEffect, useRef, useState } from "react";
-import Img from "../../../assets/images/teacher.png";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import { CustomButton } from "@/components/Button";
 import { useRouter } from "next/navigation";
 import VideoImg from "../../../assets/images/VideoThumbnail.png";
 
-const TeacherCard = ({ teacher }: { teacher: any }) => {
+const TeacherCard: FC<{ teacher: any }> = ({ teacher }) => {
   const [hovering, setHovering] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<any>(null);
@@ -33,22 +27,22 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
       if (!video) return;
       if (isHls) {
         if (
-          "canPlayType" in video! &&
+          "canPlayType" in video &&
           video.canPlayType("application/vnd.apple.mpegurl")
         ) {
-          video.src = videoUrl!;
+          video.src = videoUrl;
         } else {
           const { default: Hls } = await import("hls.js");
           if (cancelled || !video) return;
           if (Hls.isSupported()) {
             const hls = new Hls();
             hlsRef.current = hls;
-            hls.loadSource(videoUrl!);
+            hls.loadSource(videoUrl);
             hls.attachMedia(video);
           }
         }
       } else {
-        video.src = videoUrl!;
+        video.src = videoUrl;
       }
     }
 
@@ -85,19 +79,19 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
   }, [hovering, videoUrl]);
 
   const handlePlayClick = () => {
-    const href = teacher.tutorProfile?.introVideoUrl;
-    window.open(href);
+    const href = teacher?.tutorProfile?.introVideoUrl;
+    if (href) {
+      window.open(href);
+    }
   };
 
   return (
     <Box
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
-      onDoubleClick={() => router.push(`/tutor-info/${teacher?.id}`)}
-    >
-      <div
-        className="w-full mt-[10px] sm:mt-[30px] md:mt-[40px] lg:mt-[50px] grid grid-cols-12 gap-4"
-      >
+      onDoubleClick={() => router.push(`/tutor-info/${teacher?.id}`)}>
+      <div className="w-full mt-[10px] sm:mt-[30px] md:mt-[40px] lg:mt-[50px] grid grid-cols-12 gap-4">
+        {/* LEFT COLUMN: Info */}
         <div className="col-span-12 md:col-span-8">
           <Box
             sx={{
@@ -114,6 +108,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
               }}>
               {teacher?.fullName}
             </Typography>
+
             <Typography
               sx={{
                 fontFamily: "quicksand",
@@ -123,6 +118,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
               className="text-blue600">
               Gia sư {teacher?.tutorProfile?.subject}
             </Typography>
+
             <Typography
               sx={{
                 fontFamily: "quicksand",
@@ -133,7 +129,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
             </Typography>
           </Box>
 
-          {/* Rating + Buttons */}
+          {/* Rating + Price */}
           <Box
             sx={{
               display: "flex",
@@ -141,6 +137,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
               width: "40%",
               flexDirection: "column",
               justifyContent: "space-between",
+              mt: 1,
             }}>
             <Box sx={{ display: "flex", width: "100%" }}>
               <Box
@@ -163,7 +160,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                     display: "flex",
                     alignItems: "center",
                   }}>
-                  {teacher?.rating == 0 ? teacher?.rating : "-"}{" "}
+                  {teacher?.rating !== 0 ? teacher?.rating : "-"}{" "}
                   <StarRateRoundedIcon
                     sx={{
                       fontSize: {
@@ -184,6 +181,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                   {teacher?.cmt} bình luận
                 </Typography>
               </Box>
+
               <Box
                 sx={{
                   display: "flex",
@@ -216,7 +214,11 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
           </Box>
         </div>
 
-        <div className={`col-span-12 md:col-span-4 ${hovering ? "flex" : "hidden"}`}>
+        {/* RIGHT COLUMN: Video */}
+        <div
+          className={`col-span-12 md:col-span-4 ${
+            hovering ? "flex" : "hidden"
+          }`}>
           <Box
             sx={{
               width: "100%",
@@ -233,9 +235,8 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
               playsInline
               loop
               preload="metadata"
-              poster={teacher?.tutorProfile?.introVideoUrl ? undefined : VideoImg.src}
+              poster={videoUrl ? undefined : VideoImg.src}
               onLoadedMetadata={(e) => {
-                // Seek to 0.5s to get a better thumbnail frame
                 const video = e.currentTarget;
                 if (video.duration > 0.5) {
                   video.currentTime = 0.5;
@@ -245,86 +246,16 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                opacity: teacher?.tutorProfile?.introVideoUrl ? 1 : 0.3,
+                opacity: videoUrl ? 1 : 0.3,
                 transition: "filter .2s ease, opacity .2s ease",
                 filter: hovering ? "none" : "grayscale(0.2) brightness(0.85)",
               }}
             />
+
+            {/* Overlay gradient */}
             <Box
               sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: { xs: "3px", sm: "5px", md: "10px", lg: "10px" },
-              }}>
-              <CustomButton type="Secondary">Đăng kí ngay</CustomButton>
-              <CustomButton
-                type="SecondaryOutlined"
-                className="border-none"
-                onClick={() => router.push(`/tutor-info/${teacher?.id}`)}>
-                Xem chi tiết
-              </CustomButton>
-            </Box>
-          </Box>
-        </Box>
-      </Grid>
-
-      <Grid item md={4} display={hovering ? "flex" : "none"}>
-        <Box
-          sx={{
-            width: "100%",
-            height: { xs: 200, md: 200 },
-            borderRadius: 2,
-            overflow: "hidden",
-            border: "2px solid #CFE7FC",
-            position: "relative",
-            backgroundColor: "#000",
-          }}>
-          <video
-            ref={videoRef}
-            muted
-            playsInline
-            loop
-            preload="none"
-            poster={VideoImg.src}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              opacity: teacher?.videoUrl ? 1 : 0.3,
-              transition: "filter .2s ease, opacity .2s ease",
-              filter: hovering ? "none" : "grayscale(0.2) brightness(0.85)",
-            }}
-          />
-
-          <Box
-            sx={{
-              pointerEvents: "none",
-              position: "absolute",
-              inset: 0,
-              background:
-                "linear-gradient(180deg, rgba(0,0,0,0.00) 55%, rgba(0,0,0,0.45) 100%)",
-            }}
-          />
-
-          {teacher?.tutorProfile?.introVideoUrl ? (
-            <IconButton
-              aria-label="Xem video giới thiệu"
-              onClick={handlePlayClick}
-              sx={{
-                position: "absolute",
-                right: 10,
-                bottom: 10,
-                pointerEvents: "auto",
-                bgcolor: "rgba(255,255,255,0.9)",
-                backdropFilter: "blur(4px)",
-                border: "1px solid rgba(0,0,0,0.08)",
-                "&:hover": { bgcolor: "#fff" },
-              }}>
-              <PlayArrowRoundedIcon />
-            </IconButton>
-          ) : (
-            <Typography
-              sx={{
+                pointerEvents: "none",
                 position: "absolute",
                 inset: 0,
                 background:
@@ -332,7 +263,8 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
               }}
             />
 
-            {teacher?.tutorProfile?.introVideoUrl ? (
+            {/* Play button or fallback text */}
+            {videoUrl ? (
               <IconButton
                 aria-label="Xem video giới thiệu"
                 onClick={handlePlayClick}
@@ -363,6 +295,25 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                 Hiện không có video giới thiệu
               </Typography>
             )}
+
+            {/* Buttons on video */}
+            <Box
+              sx={{
+                position: "absolute",
+                left: 10,
+                bottom: 10,
+                display: "flex",
+                flexDirection: "column",
+                gap: { xs: "3px", sm: "5px", md: "10px", lg: "10px" },
+              }}>
+              <CustomButton type="Secondary">Đăng kí ngay</CustomButton>
+              <CustomButton
+                type="SecondaryOutlined"
+                className="border-none"
+                onClick={() => router.push(`/tutor-info/${teacher?.id}`)}>
+                Xem chi tiết
+              </CustomButton>
+            </Box>
           </Box>
         </div>
       </div>

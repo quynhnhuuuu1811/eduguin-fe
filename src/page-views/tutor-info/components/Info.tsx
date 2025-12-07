@@ -70,7 +70,7 @@ const Info = ({ id }: { id: string }) => {
       if (u.hostname === "youtu.be") {
         return `https://www.youtube.com/embed${u.pathname}`;
       }
-    } catch { }
+    } catch {}
     return null;
   };
   const embedUrl = introUrl ? getYoutubeEmbedUrl(introUrl) : null;
@@ -104,7 +104,7 @@ const Info = ({ id }: { id: string }) => {
         teacherName={teacher.fullName}
         teacherAvatar={teacher.avatarUrl}
         teacherSubject={teacher.tutorProfile?.subject}
-        teacherGrade={teacher.tutorProfile?.grade || ''}
+        teacherGrade={teacher.tutorProfile?.grade.toString() || ""}
         teacherPrice={teacher.tutorProfile?.monthlyPrice || 0}
         teacherId={id}
       />
@@ -212,7 +212,10 @@ const Info = ({ id }: { id: string }) => {
 
             {/* Register Button */}
             <div className="flex justify-center">
-              <CustomButton type="Secondary" className="w-2/3" onClick={() => setOpenModal(true)}>
+              <CustomButton
+                type="Secondary"
+                className="w-2/3"
+                onClick={() => setOpenModal(true)}>
                 Đăng ký học ngay!
                 <ArrowForwardRoundedIcon
                   sx={{

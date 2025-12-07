@@ -1,5 +1,4 @@
-import TutorInfo from "@/pages/tutor-info/page-view";
-import { use } from "react";
+import TutorInfo from "@/page-views/tutor-info/page-view";
 
 type TutorInfoPageProps = {
   params: Promise<{
