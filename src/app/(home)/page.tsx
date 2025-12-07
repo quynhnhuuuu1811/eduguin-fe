@@ -1,4 +1,4 @@
-import HomePageView from "@/pages/home/page-view";
+import HomePageView from "@/page-views/home/page-view";
 
 export default function HomePage() {
   return (

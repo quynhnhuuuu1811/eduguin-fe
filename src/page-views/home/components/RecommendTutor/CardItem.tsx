@@ -1,6 +1,5 @@
 import { Card, Icon, Typography } from "@mui/material";
 import React from "react";
-import LocationIcon from "@mui/icons-material/FmdGoodOutlined";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
 import Img from "../../../../assets/images/teacher.png";
 interface TutorProfile {
@@ -28,6 +27,9 @@ interface CardItemProps {
 }
 
 const CardItem = ({ tutor }: CardItemProps) => {
+  if (!tutor) {
+    return null;
+  }
   return (
     <Card
       className="w-[200px] h-[280px] shadow-md flex flex-col justify-center items-center py-2.5"
