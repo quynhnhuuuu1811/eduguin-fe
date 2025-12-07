@@ -16,7 +16,7 @@ export const UserApi = {
   updateTutorInfo(data: FormData): Promise<UserResponse> {
     return instance.patch(`/user/my-tutor`, data, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
   },

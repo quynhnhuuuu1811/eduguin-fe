@@ -4,6 +4,8 @@ export interface TutorProfile {
   introVideoUrl: string;
   rating: number;
   subject: string;
+  grade: number;
+  monthlyPrice: number;
 }
 
 export type Sex = "male" | "female" | "other";

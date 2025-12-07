@@ -1,11 +1,10 @@
-import React from 'react'
-import RegisterPageView from '../../pages/register/page-view'
+import RegisterPageView from "../../pages/register/page-view";
 const RegisterPage = () => {
   return (
     <div>
       <RegisterPageView />
     </div>
-  )
-}
+  );
+};
 
-export default RegisterPage
+export default RegisterPage;
