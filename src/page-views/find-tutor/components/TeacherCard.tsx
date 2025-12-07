@@ -1,14 +1,14 @@
 "use client";
-
 import { Box, Typography, IconButton } from "@mui/material";
 import React, { FC, useEffect, useRef, useState } from "react";
+import Img from "../../../assets/images/teacher.png";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import { CustomButton } from "@/components/Button";
 import { useRouter } from "next/navigation";
 import VideoImg from "../../../assets/images/VideoThumbnail.png";
 
-const TeacherCard: FC<{ teacher: any }> = ({ teacher }) => {
+const TeacherCard = ({ teacher }: { teacher: any }) => {
   const [hovering, setHovering] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<any>(null);
@@ -30,19 +30,19 @@ const TeacherCard: FC<{ teacher: any }> = ({ teacher }) => {
           "canPlayType" in video &&
           video.canPlayType("application/vnd.apple.mpegurl")
         ) {
-          video.src = videoUrl;
+          video.src = videoUrl!;
         } else {
           const { default: Hls } = await import("hls.js");
           if (cancelled || !video) return;
           if (Hls.isSupported()) {
             const hls = new Hls();
             hlsRef.current = hls;
-            hls.loadSource(videoUrl);
+            hls.loadSource(videoUrl!);
             hls.attachMedia(video);
           }
         }
       } else {
-        video.src = videoUrl;
+        video.src = videoUrl!;
       }
     }
 
@@ -79,10 +79,8 @@ const TeacherCard: FC<{ teacher: any }> = ({ teacher }) => {
   }, [hovering, videoUrl]);
 
   const handlePlayClick = () => {
-    const href = teacher?.tutorProfile?.introVideoUrl;
-    if (href) {
-      window.open(href);
-    }
+    const href = teacher.tutorProfile?.introVideoUrl;
+    window.open(href);
   };
 
   return (
@@ -91,134 +89,168 @@ const TeacherCard: FC<{ teacher: any }> = ({ teacher }) => {
       onMouseLeave={() => setHovering(false)}
       onDoubleClick={() => router.push(`/tutor-info/${teacher?.id}`)}>
       <div className="w-full mt-[10px] sm:mt-[30px] md:mt-[40px] lg:mt-[50px] grid grid-cols-12 gap-4">
-        {/* LEFT COLUMN: Info */}
         <div className="col-span-12 md:col-span-8">
           <Box
             sx={{
+              width: "100%",
+              p: { xs: "4px", sm: "4px", md: 2, lg: 2 },
+              height: { xs: "100px", sm: "150px", md: "200px", lg: "200px" },
+              border: "2px solid #CFE7FC",
+              borderRadius: "16px",
               display: "flex",
-              flexDirection: "column",
-              gap: { xs: "4px", sm: "6px", md: "8px", lg: "10px" },
-              width: { xs: "50%", sm: "50%", md: "50%", lg: "60%" },
+              gap: { xs: "5px", sm: "10px", md: "15px", lg: "20px" },
+              ":hover": { border: "2px solid #0F7FE5" },
             }}>
-            <Typography
+            {/* Avatar */}
+            <Box
               sx={{
-                fontFamily: "quicksand",
-                fontWeight: "bold",
-                fontSize: { xs: "10px", sm: "12px", md: "15px", lg: "17px" },
-              }}>
-              {teacher?.fullName}
-            </Typography>
-
-            <Typography
-              sx={{
-                fontFamily: "quicksand",
-                fontWeight: 600,
-                fontSize: { xs: "7px", sm: "9px", md: "13px", lg: "15px" },
+                flexShrink: 0,
+                width: { xs: 80, sm: 140, md: 180, lg: 200 },
+                aspectRatio: "1/1",
+                borderRadius: 2,
+                overflow: "hidden",
+                backgroundImage: `url(${Img.src})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
               }}
-              className="text-blue600">
-              Gia sư {teacher?.tutorProfile?.subject}
-            </Typography>
-
-            <Typography
+            />
+            {/* Info */}
+            <Box
               sx={{
-                fontFamily: "quicksand",
-                fontWeight: 500,
-                fontSize: { xs: "7px", sm: "9px", md: "13px", lg: "15px" },
+                display: "flex",
+                flexDirection: "column",
+                gap: { xs: "4px", sm: "6px", md: "8px", lg: "10px" },
+                width: { xs: "50%", sm: "50%", md: "50%", lg: "60%" },
               }}>
-              {teacher?.tutorProfile?.description || "Không có mô tả"}
-            </Typography>
-          </Box>
-
-          {/* Rating + Price */}
-          <Box
-            sx={{
-              display: "flex",
-              gap: "10px",
-              width: "40%",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              mt: 1,
-            }}>
-            <Box sx={{ display: "flex", width: "100%" }}>
-              <Box
+              <Typography
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  borderRight: "1px solid black",
-                  px: { xs: "2px", sm: "5px", md: "10px", lg: "10px" },
+                  fontFamily: "quicksand",
+                  fontWeight: "bold",
+                  fontSize: { xs: "10px", sm: "12px", md: "15px", lg: "17px" },
                 }}>
-                <Typography
+                {teacher?.fullName}
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "quicksand",
+                  fontWeight: 600,
+                  fontSize: { xs: "7px", sm: "9px", md: "13px", lg: "15px" },
+                }}
+                className="text-blue600">
+                Gia sư {teacher?.tutorProfile?.subject}
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "quicksand",
+                  fontWeight: 500,
+                  fontSize: { xs: "7px", sm: "9px", md: "13px", lg: "15px" },
+                }}>
+                {teacher?.tutorProfile?.description || "Không có mô tả"}
+              </Typography>
+            </Box>
+
+            {/* Rating + Buttons */}
+            <Box
+              sx={{
+                display: "flex",
+                gap: "10px",
+                width: "40%",
+                flexDirection: "column",
+                justifyContent: "space-between",
+              }}>
+              <Box sx={{ display: "flex", width: "100%" }}>
+                <Box
                   sx={{
-                    fontFamily: "quicksand",
-                    fontSize: {
-                      xs: "9px",
-                      sm: "9px",
-                      md: "11px",
-                      lg: "15px",
-                    },
-                    fontWeight: "bold",
                     display: "flex",
-                    alignItems: "center",
+                    flexDirection: "column",
+                    borderRight: "1px solid black",
+                    px: { xs: "2px", sm: "5px", md: "10px", lg: "10px" },
                   }}>
-                  {teacher?.rating !== 0 ? teacher?.rating : "-"}{" "}
-                  <StarRateRoundedIcon
+                  <Typography
                     sx={{
+                      fontFamily: "quicksand",
                       fontSize: {
-                        xs: "13px",
-                        sm: "15px",
-                        md: "22px",
-                        lg: "17px",
+                        xs: "9px",
+                        sm: "9px",
+                        md: "11px",
+                        lg: "15px",
                       },
-                      verticalAlign: "middle",
-                    }}
-                  />
-                </Typography>
-                <Typography
-                  fontFamily="quicksand"
+                      fontWeight: "bold",
+                      display: "flex",
+                      alignItems: "center",
+                    }}>
+                    {teacher?.rating == 0 ? teacher?.rating : "-"}{" "}
+                    <StarRateRoundedIcon
+                      sx={{
+                        fontSize: {
+                          xs: "13px",
+                          sm: "15px",
+                          md: "22px",
+                          lg: "17px",
+                        },
+                        verticalAlign: "middle",
+                      }}
+                    />
+                  </Typography>
+                  <Typography
+                    fontFamily="quicksand"
+                    sx={{
+                      fontSize: { xs: "7px", sm: "7px", md: "9px", lg: "11px" },
+                    }}>
+                    {teacher?.cmt} bình luận
+                  </Typography>
+                </Box>
+                <Box
                   sx={{
-                    fontSize: { xs: "7px", sm: "7px", md: "9px", lg: "11px" },
+                    display: "flex",
+                    px: { xs: "5px", sm: "5px", md: "10px", lg: "10px" },
+                    flexDirection: "column",
                   }}>
-                  {teacher?.cmt} bình luận
-                </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "quicksand",
+                      fontWeight: 600,
+                      fontSize: {
+                        xs: "9px",
+                        sm: "9px",
+                        md: "11px",
+                        lg: "15px",
+                      },
+                    }}>
+                    {teacher?.tutorProfile?.price} VND
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "quicksand",
+                      fontWeight: 500,
+                      fontSize: { xs: "7px", sm: "7px", md: "9px", lg: "11px" },
+                    }}>
+                    /tháng
+                  </Typography>
+                </Box>
               </Box>
 
               <Box
                 sx={{
                   display: "flex",
-                  px: { xs: "5px", sm: "5px", md: "10px", lg: "10px" },
                   flexDirection: "column",
+                  gap: { xs: "3px", sm: "5px", md: "10px", lg: "10px" },
                 }}>
-                <Typography
-                  sx={{
-                    fontFamily: "quicksand",
-                    fontWeight: 600,
-                    fontSize: {
-                      xs: "9px",
-                      sm: "9px",
-                      md: "11px",
-                      lg: "15px",
-                    },
-                  }}>
-                  {teacher?.tutorProfile?.price} VND
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "quicksand",
-                    fontWeight: 500,
-                    fontSize: { xs: "7px", sm: "7px", md: "9px", lg: "11px" },
-                  }}>
-                  /tháng
-                </Typography>
+                <CustomButton type="Secondary">Đăng kí ngay</CustomButton>
+                <CustomButton
+                  type="SecondaryOutlined"
+                  className="border-none"
+                  onClick={() => router.push(`/tutor-info/${teacher?.id}`)}>
+                  Xem chi tiết
+                </CustomButton>
               </Box>
             </Box>
           </Box>
         </div>
 
-        {/* RIGHT COLUMN: Video */}
         <div
-          className={`col-span-12 md:col-span-4 ${
-            hovering ? "flex" : "hidden"
-          }`}>
+          className={`col-span-12 md:col-span-4 ${hovering ? "flex" : "hidden"}`}>
           <Box
             sx={{
               width: "100%",
@@ -235,8 +267,11 @@ const TeacherCard: FC<{ teacher: any }> = ({ teacher }) => {
               playsInline
               loop
               preload="metadata"
-              poster={videoUrl ? undefined : VideoImg.src}
+              poster={
+                teacher?.tutorProfile?.introVideoUrl ? undefined : VideoImg.src
+              }
               onLoadedMetadata={(e) => {
+                // Seek to 0.5s to get a better thumbnail frame
                 const video = e.currentTarget;
                 if (video.duration > 0.5) {
                   video.currentTime = 0.5;
@@ -246,13 +281,11 @@ const TeacherCard: FC<{ teacher: any }> = ({ teacher }) => {
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                opacity: videoUrl ? 1 : 0.3,
+                opacity: teacher?.tutorProfile?.introVideoUrl ? 1 : 0.3,
                 transition: "filter .2s ease, opacity .2s ease",
                 filter: hovering ? "none" : "grayscale(0.2) brightness(0.85)",
               }}
             />
-
-            {/* Overlay gradient */}
             <Box
               sx={{
                 pointerEvents: "none",
@@ -263,8 +296,7 @@ const TeacherCard: FC<{ teacher: any }> = ({ teacher }) => {
               }}
             />
 
-            {/* Play button or fallback text */}
-            {videoUrl ? (
+            {teacher?.tutorProfile?.introVideoUrl ? (
               <IconButton
                 aria-label="Xem video giới thiệu"
                 onClick={handlePlayClick}
@@ -295,25 +327,6 @@ const TeacherCard: FC<{ teacher: any }> = ({ teacher }) => {
                 Hiện không có video giới thiệu
               </Typography>
             )}
-
-            {/* Buttons on video */}
-            <Box
-              sx={{
-                position: "absolute",
-                left: 10,
-                bottom: 10,
-                display: "flex",
-                flexDirection: "column",
-                gap: { xs: "3px", sm: "5px", md: "10px", lg: "10px" },
-              }}>
-              <CustomButton type="Secondary">Đăng kí ngay</CustomButton>
-              <CustomButton
-                type="SecondaryOutlined"
-                className="border-none"
-                onClick={() => router.push(`/tutor-info/${teacher?.id}`)}>
-                Xem chi tiết
-              </CustomButton>
-            </Box>
           </Box>
         </div>
       </div>
