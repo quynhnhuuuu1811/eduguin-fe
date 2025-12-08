@@ -59,7 +59,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
           video.pause();
           video.removeAttribute("src");
           video.load();
-        } catch {}
+        } catch { }
       }
     };
   }, [videoUrl]);
@@ -71,7 +71,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
       v.muted = true;
       v.playsInline = true;
       v.loop = true;
-      v.play().catch(() => {});
+      v.play().catch(() => { });
     } else {
       v.pause();
       v.currentTime = 0;
@@ -248,7 +248,8 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
         </div>
 
         <div
-          className={`col-span-12 md:col-span-4 ${hovering ? "flex" : "hidden"}`}>
+          className={`col-span-12 md:col-span-4 ${hovering ? "flex" : "hidden"
+            }`}>
           <Box
             sx={{
               width: "100%",

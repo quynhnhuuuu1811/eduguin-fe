@@ -72,8 +72,16 @@ export interface ClassSubscriptionResponse {
   data: {
     data: {
       message: string;
-      class?: Class;
+      className?: string;
+      studentName?: string;
+      requestedAt?: string;
+      status?: string;
     };
   };
 }
 
+export interface ListStudentSubscriptionsResponse {
+  data: {
+    data: ClassSubscriptionResponse[];
+  };
+}

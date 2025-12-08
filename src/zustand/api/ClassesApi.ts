@@ -8,12 +8,21 @@ import {
   SetScheduleRequest,
   ClassSubscriptionRequest,
   ClassSubscriptionResponse,
+  ListStudentSubscriptionsResponse,
 } from '../types/Classes';
 import instance from '@/lib/httpService';
 
 export const ClassesApi = {
   getTutorClasses(): Promise<ClassesResponse> {
     return instance.get('/class-schedule/tutor');
+  },
+
+  getStudentClasses(): Promise<ClassesResponse> {
+    return instance.get('/class-subscriptions/student');
+  },
+
+  getListStudentSubscriptions(): Promise<ListStudentSubscriptionsResponse> {
+    return instance.get('/class-subscriptions/tutor/pending');
   },
 
   createClass(request: CreateClassRequest): Promise<ClassResponse> {
@@ -29,9 +38,17 @@ export const ClassesApi = {
   },
 
   subscribeToClass(request: ClassSubscriptionRequest): Promise<ClassSubscriptionResponse> {
-    return instance.post('/class-subscription', request);
+    return instance.post('/class-subscriptions', request);
   },
   getClassesByTutorId(tutorId: string): Promise<ClassesResponse> {
     return instance.get(`/class-schedule/tutor/${tutorId}`);
+  },
+
+  approveClassSubscription(subscriptionId: string): Promise<ClassSubscriptionResponse> {
+    return instance.patch(`/class-subscriptions/approve/${subscriptionId}`);
+  },
+
+  rejectClassSubscription(subscriptionId: string): Promise<ClassSubscriptionResponse> {
+    return instance.patch(`/class-subscriptions/decline/${subscriptionId}`);
   },
 };

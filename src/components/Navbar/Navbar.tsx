@@ -25,15 +25,21 @@ export const Navbar = () => {
   const isTutor = userRole === "tutor";
 
   const navItems = [
-    { href: "/", label: "Trang chủ", requireAuth: false, hideForTutor: false },
-    { href: "/find-tutor", label: "Tìm gia sư", requireAuth: true, hideForTutor: true },
-    { href: "/my-classes", label: "Lớp học của tôi", requireAuth: true, hideForTutor: false },
-    { href: "/contact", label: "Liên hệ", requireAuth: true, hideForTutor: false },
+    { href: "/", label: "Trang chủ", requireAuth: false, hideForTutor: false, showOnlyForTutor: false },
+    { href: "/find-tutor", label: "Tìm gia sư", requireAuth: true, hideForTutor: true, showOnlyForTutor: false },
+    { href: "/my-classes", label: "Lớp học của tôi", requireAuth: true, hideForTutor: false, showOnlyForTutor: false },
+    { href: "/class-subcribtion", label: "Đăng kí lớp học", requireAuth: true, hideForTutor: false, showOnlyForTutor: true },
+    { href: "/contact", label: "Liên hệ", requireAuth: true, hideForTutor: false, showOnlyForTutor: false },
   ];
 
   // Filter nav items based on user role
   const filteredNavItems = navItems.filter((item) => {
+    // Ẩn với tutor nếu hideForTutor = true
     if (mounted && isTutor && item.hideForTutor) {
+      return false;
+    }
+    // Chỉ hiện cho tutor nếu showOnlyForTutor = true
+    if (mounted && item.showOnlyForTutor && !isTutor) {
       return false;
     }
     return true;

@@ -164,6 +164,9 @@ const CustomInput = ({
             alignItems: "center",
             paddingBottom: { xs: "8px", sm: "10px", md: "12px", lg: "14px" },
             paddingTop: { xs: "8px", sm: "10px", md: "12px", lg: "14px" },
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           },
           "& .MuiSelect-select": {
             fontWeight: 600,
@@ -172,16 +175,38 @@ const CustomInput = ({
             alignItems: "center",
             paddingTop: { xs: "14px", sm: "16px", md: "18px", lg: "20px" },
             paddingBottom: { xs: "4px", sm: "6px", md: "8px", lg: "10px" },
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          },
+          "& select": {
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          },
+          "& option": {
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
           },
         }}>
         <option value="" disabled style={{ color: "#B2BAC6", fontWeight: 400 }}>
           {label}
         </option>
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
+        {options.map((option) => {
+          const maxLength = 40;
+          const truncatedLabel = option.label.length > maxLength
+            ? option.label.substring(0, maxLength) + "..."
+            : option.label;
+          return (
+            <option
+              key={option.value}
+              value={option.value}
+            >
+              {truncatedLabel}
+            </option>
+          );
+        })}
       </TextField>
     );
   }

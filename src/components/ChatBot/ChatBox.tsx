@@ -14,6 +14,7 @@ const SOCKET_URL = "https://api.eduguin.mtri.online/chatbot";
 
 export default function ChatBox() {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -27,14 +28,21 @@ export default function ChatBox() {
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const socketRef = useRef<Socket | null>(null);
-
   const typingTimeoutsRef = useRef<number[]>([]);
-  const token = getTokenFromLocalStorage();
-  if (!token) {
-    console.log("❌ Không tìm thấy token, không thể kết nối socket.");
-    return;
-  }
+
+  // Đánh dấu đã mount trên client
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    const token = getTokenFromLocalStorage();
+    if (!token) {
+      console.log("❌ Không tìm thấy token, không thể kết nối socket.");
+      return;
+    }
     console.log("🚀 Đang khởi tạo socket...");
 
     const socket = io(SOCKET_URL, {
@@ -102,7 +110,7 @@ export default function ChatBox() {
       // clear tất cả timeout của typewriter
       typingTimeoutsRef.current.forEach((id) => clearTimeout(id));
     };
-  }, []);
+  }, [mounted]);
 
   // Auto scroll
   useEffect(() => {
@@ -147,6 +155,9 @@ export default function ChatBox() {
     }
   };
 
+  // Chỉ render sau khi mounted để tránh hydration mismatch
+  if (!mounted) return null;
+
   return (
     <>
       <button
@@ -188,16 +199,14 @@ export default function ChatBox() {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${
-                  msg.role === "user" ? "justify-end" : "justify-start"
-                }`}>
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"
+                  }`}>
                 <div
                   className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs shadow-sm
-                  ${
-                    msg.role === "user"
+                  ${msg.role === "user"
                       ? "bg-blue-600 text-white rounded-br-sm"
                       : "bg-white text-slate-800 border border-slate-200 rounded-bl-sm"
-                  }`}>
+                    }`}>
                   {msg.content}
                 </div>
               </div>

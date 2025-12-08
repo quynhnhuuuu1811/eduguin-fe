@@ -14,7 +14,8 @@ import InputComment from "./InputComment";
 import LoadingScreen from "@/components/LoadingScreen";
 import SubcribModal from "./SubcribModal";
 import { useClassStore } from "@/zustand/stores/ClassStore";
-import Table from "@/components/Table";
+import Table, { ColumnData } from "@/components/Table";
+import { Class } from "@/zustand/types/Classes";
 
 const Info = ({ id }: { id: string }) => {
   const [openModal, setOpenModal] = useState(false);
@@ -43,10 +44,14 @@ const Info = ({ id }: { id: string }) => {
   }, [id, getClassesByTutorId]);
 
   const classes = useClassStore((state) => state.classes);
+  const filteredClasses = Array.isArray(classes)
+    ? classes.filter((cls) => cls && cls.status === "pending")
+    : [];
 
   if (!id) {
     return <div>No tutor ID provided</div>;
   }
+
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -70,30 +75,34 @@ const Info = ({ id }: { id: string }) => {
       if (u.hostname === "youtu.be") {
         return `https://www.youtube.com/embed${u.pathname}`;
       }
-    } catch {}
+    } catch { }
     return null;
   };
   const embedUrl = introUrl ? getYoutubeEmbedUrl(introUrl) : null;
-  const columns = [
+  const columns: ColumnData<Class>[] = [
     {
       label: "Lớp học",
       dataKey: "className",
+      align: "left",
+      width: 300,
     },
     {
       label: "Ngày bắt đầu",
       dataKey: "startDate",
+      align: "left",
+      width: 180,
     },
     {
       label: "Ngày kết thúc",
       dataKey: "endDate",
-    },
-    {
-      label: "Trạng thái",
-      dataKey: "status",
+      align: "left",
+      width: 180,
     },
     {
       label: "Lịch học",
       dataKey: "schedules",
+      align: "left",
+      width: 200,
     },
   ];
   return (
@@ -141,7 +150,7 @@ const Info = ({ id }: { id: string }) => {
               Gia sư dạy {teacher.tutorProfile?.subject}
             </h6>
             <p className="text-[13px] text-black font-extrabold">
-              Có {classes.length} lớp học
+              Có {classes.length} lớp học đang mở
             </p>
           </div>
           <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
@@ -254,6 +263,19 @@ const Info = ({ id }: { id: string }) => {
           </p>
         </div>
       </div>
+      <div className="flex flex-col gap-5 text-black font-quicksand w-full">
+        <h3 className=" font-bold text-[15px] md:text-[20px] lg:text-[20px]">Danh sách lớp học</h3>
+        {
+          classes.length > 0 ? (
+            <Table columns={columns} data={classes} />
+          ) : (
+            <div className="flex flex-col justify-center items-center gap-2 ">
+              <img src="https://res.cloudinary.com/dh2uwapb8/image/upload/v1764778004/fe/fxvnauqnwitk0ixpkq2y.png" style={{ width: "70px", height: "70px" }} />
+              <h5 className=" text-gray-700 font-bold opacity-50">Có vẻ giáo viên hiện tại chưa có lớp học nào</h5>
+            </div>
+          )
+        }
+      </div>
       <hr className="my-5 border-t-2 border-[#737E91]" />
       <div className="flex flex-col gap-5 text-black font-quicksand">
         <h3 className=" font-bold">Đánh giá của học viên</h3>
@@ -280,12 +302,6 @@ const Info = ({ id }: { id: string }) => {
               </h5>
             </div>
           )}
-        </div>
-      </div>
-      <div className="flex flex-col gap-5 text-black font-quicksand w-full max-w-[90%] mx-auto">
-        <h3 className=" font-bold text-[15px] md:text-[20px] lg:text-[20px]">Danh sách lớp học</h3>
-        <div className="grid grid-cols-2 gap-3">
-          <Table columns={columns} data={classes} />
         </div>
       </div>
       <InputComment

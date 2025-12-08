@@ -11,20 +11,40 @@ const NavbarMobile = () => {
   const router = useRouter();
   const pathname = usePathname();
   const isAuthenticated = useAuthStore((state) => !!state.data.accessToken);
+  const userRole = useAuthStore((state) => state.data.user?.role);
+  const isTutor = userRole === "tutor";
 
-  const navItems = isAuthenticated ? [
-    { label: "Trang chủ", path: "/" },
-    { label: "Tìm gia sư", path: "/find-tutor" },
-    { label: "Lớp học của tôi", path: "/my-classes" },
-    { label: "Liên hệ", path: "/contact" },
-    { label: "Tài khoản", path: "/profile" },
-  ] : [
-    { label: "Trang chủ", path: "/" },
-    { label: "Tìm gia sư", path: "/find-tutor" },
-    { label: "Lớp học của tôi", path: "/my-classes" },
-    { label: "Liên hệ", path: "/contact" },
-    { label: "Đăng nhập", path: "/login" },
-  ];
+  const getNavItems = () => {
+    if (!isAuthenticated) {
+      return [
+        { label: "Trang chủ", path: "/" },
+        { label: "Tìm gia sư", path: "/find-tutor" },
+        { label: "Lớp học của tôi", path: "/my-classes" },
+        { label: "Liên hệ", path: "/contact" },
+        { label: "Đăng nhập", path: "/login" },
+      ];
+    }
+
+    if (isTutor) {
+      return [
+        { label: "Trang chủ", path: "/" },
+        { label: "Lớp học của tôi", path: "/my-classes" },
+        { label: "Đăng kí lớp học", path: "/class-subcribtion" },
+        { label: "Liên hệ", path: "/contact" },
+        { label: "Tài khoản", path: "/profile" },
+      ];
+    }
+
+    return [
+      { label: "Trang chủ", path: "/" },
+      { label: "Tìm gia sư", path: "/find-tutor" },
+      { label: "Lớp học của tôi", path: "/my-classes" },
+      { label: "Liên hệ", path: "/contact" },
+      { label: "Tài khoản", path: "/profile" },
+    ];
+  };
+
+  const navItems = getNavItems();
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };

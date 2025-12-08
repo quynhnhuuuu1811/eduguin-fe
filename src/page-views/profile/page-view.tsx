@@ -12,6 +12,7 @@ const ProfilePageView = () => {
   useEffect(() => {
     getMyInfo();
   }, [getMyInfo]);
+  console.log(111, authData);
 
   const userInfo = useMemo(() => {
     if (!authData?.user) return undefined;

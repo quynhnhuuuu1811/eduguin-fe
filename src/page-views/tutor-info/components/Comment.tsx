@@ -1,4 +1,5 @@
-import Img from "../../../assets/images/teacher.png";
+import IntialAvatar from "@/components/IntialAvatar";
+
 type CommentProps = {
   rating?: number;
   content?: string;
@@ -19,11 +20,15 @@ export default function Comment({
   return (
     <div className="flex flex-col gap-[10px]">
       <div className="flex items-center gap-3 ">
+        {avatar ? (
         <img
-          src={avatar || Img.src}
+            src={avatar}
           alt="Teacher"
           className="w-10 h-10 rounded-full"
         />
+        ) : (
+          <IntialAvatar name={name || ""} width={40} />
+        )}
         <div>
           <h5>{name}</h5>
           <p className="text-xs mt-1">{date}</p>

@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Table from '@/components/Table';
 import { ColumnData } from '@/components/Table';
-import { Typography } from '@mui/material';
+import { Typography, Tooltip } from '@mui/material';
 import dayjs from 'dayjs';
 import { useAuthStore } from '@/zustand/stores/AuthStore';
 import { CustomButton } from '@/components/Button';
@@ -11,6 +11,8 @@ import CreateModel from './components/CreateModel';
 import DeleteModel from './components/DeleteModel';
 import { useClassStore } from '@/zustand/stores/ClassStore';
 import LoadingScreen from '@/components/LoadingScreen';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { useRouter } from 'next/navigation';
 
 interface ScheduleItem {
   days: string;
@@ -31,23 +33,54 @@ interface ClassData {
   studentCount?: number;
   capacity?: number;
   onlineLink?: string;
+  linkMeeting?: string;
   [key: string]: unknown;
 }
 
 const MyClassesPageView = () => {
   const { data: authData } = useAuthStore();
-  const { fetchTutorClasses, classes, loading } = useClassStore();
+  const { fetchTutorClasses, classes, loading, fetchStudentClasses } = useClassStore();
   const isTutor = authData?.user?.role === 'tutor';
 
   useEffect(() => {
     if (isTutor) {
       fetchTutorClasses();
+    } else {
+      fetchStudentClasses();
     }
-  }, [isTutor, fetchTutorClasses]);
+  }, [isTutor, fetchTutorClasses, fetchStudentClasses]);
 
+
+  const router = useRouter();
+  // Transform data cho học sinh (subscription có nested class object)
   const classList = useMemo(() => {
-    return classes;
-  }, [classes]);
+    if (isTutor) {
+      return classes;
+    }
+
+    // Chỉ lấy những lớp đã được duyệt (approved)
+    return classes
+      .filter((subscription: any) => subscription.approvedAt !== null)
+      .map((subscription: any) => ({
+        approvedAt: subscription.approvedAt,
+        id: subscription.id,
+        classId: subscription.classId,
+        className: subscription.class?.name || subscription.class?.className || '',
+        teacherName: subscription.class?.tutorProfile?.user?.fullName || 'Chưa có thông tin',
+        subject: subscription.class?.subject || '',
+        startDate: subscription.class?.startTime || '',
+        endDate: subscription.class?.endTime || '',
+        status: subscription.status,
+        classStatus: subscription.class?.status,
+        schedules: subscription.class?.schedules || '',
+        capacity: subscription.class?.capacity,
+        linkMeeting: subscription.class?.linkMeeting,
+        requestedAt: subscription.requestedAt,
+        teacherId: subscription.class?.tutorId || subscription.class?.tutorProfile?.userId
+      }));
+  }, [classes, isTutor]);
+
+  console.log(classList);
 
   // Create Modal State
   const [openCreateModel, setOpenCreateModel] = useState(false);
@@ -94,6 +127,19 @@ const MyClassesPageView = () => {
           dataKey: 'teacherName',
           align: 'left',
           width: 180,
+          render: (value: unknown, row: ClassData) => {
+            return (
+              <span
+                className='text-blue-500 hover:text-blue-700 cursor-pointer font-semibold underline'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/tutor-info/${row.teacherId}`);
+                }}
+              >
+                {value ? value as string : '-'}
+              </span>
+            );
+          },
         });
       }
 
@@ -126,22 +172,27 @@ const MyClassesPageView = () => {
           dataKey: 'startDate',
           align: 'left',
           width: 120,
+          render: (value: unknown) => {
+            return <span>{value ? dayjs(value as string).format('DD/MM/YYYY') : '-'}</span>;
+          },
         },
         {
           label: 'Ngày kết thúc',
           dataKey: 'endDate',
           align: 'left',
           width: 120,
+          render: (value: unknown) => {
+            return <span>{value ? dayjs(value as string).format('DD/MM/YYYY') : '-'}</span>;
+          },
         },
         {
           label: 'Trạng thái',
-          dataKey: 'status',
+          dataKey: 'classStatus',
           align: 'left',
           width: 120,
           render: (value: unknown) => {
-            if (value === 'OPEN' && dayjs(value).isAfter(currentDate)) return <span className='text-yellow-500'>Sắp diễn ra</span>;
-            if (value === 'OPEN') return <span className='text-green-500'>Đang diễn ra</span>;
-            if (value === 'CLOSED') return <span className='text-red-500'>Đã kết thúc</span>;
+            if (value === 'OPEN') return <span className='text-green-500'>Đang mở</span>;
+            if (value === 'CLOSED') return <span className='text-red-500'>Đã đóng</span>;
             return <span className='text-gray-500'>-</span>;
           },
         },
@@ -166,6 +217,7 @@ const MyClassesPageView = () => {
         },
       );
 
+      // Nút xóa cho gia sư
       if (isTutor) {
         baseColumns.push({
           label: '',
@@ -174,16 +226,42 @@ const MyClassesPageView = () => {
           width: 50,
           render: (_value: unknown, row: ClassData) => {
             return (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpenDeleteModel(row);
-                }}
-                className="p-2 rounded-full hover:bg-red-100 transition-colors"
-                title="Xoá lớp học"
-              >
-                <DeleteOutlined sx={{ fontSize: 20, color: 'var(--color-red500, #ef4444)' }} />
-              </button>
+              <Tooltip title="Xoá lớp học" arrow placement="top">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenDeleteModel(row);
+                  }}
+                  className="p-2 rounded-full hover:bg-red-100 transition-colors"
+                >
+                  <DeleteOutlined sx={{ fontSize: 20, color: 'var(--color-red500, #ef4444)' }} />
+                </button>
+              </Tooltip>
+            );
+          },
+        });
+      }
+
+      // Nút vào lớp học cho học sinh
+      if (!isTutor) {
+        baseColumns.push({
+          label: '',
+          dataKey: 'action',
+          align: 'center',
+          width: 50,
+          render: (_value: unknown, row: ClassData) => {
+            return (
+              <Tooltip title="Vào lớp học" arrow placement="top">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    window.open(row.linkMeeting as string, '_blank');
+                  }}
+                  className="p-2 rounded-full hover:bg-blue-100 transition-colors"
+                >
+                  <OpenInNewIcon sx={{ fontSize: 20, color: 'var(--color-blue600)' }} />
+                </button>
+              </Tooltip>
             );
           },
         });
@@ -210,14 +288,16 @@ const MyClassesPageView = () => {
             textAlign: 'center',
           }}
         >
-          {isTutor ? 'Danh sách lớp học của bạn' : 'Danh sách lớp học đã đăng ký'}
+          {isTutor ? 'Danh sách lớp học của bạn' : 'Danh sách lớp học đã đăng ký thành công'}
         </Typography>
       </div>
-      <div className='flex justify-end pb-4 px-8'>
-        <CustomButton type="Secondary" className="bg-blue700! text-white! gap-1 flex" onClick={handleOpenCreateModel}>
-          <AddCircleOutline sx={{ fontSize: 20 }} /> Thêm lớp học
-        </CustomButton>
-      </div>
+      {isTutor && (
+        <div className='flex justify-end pb-4 px-8'>
+          <CustomButton type="Secondary" className="bg-blue700! text-white! gap-1 flex" onClick={handleOpenCreateModel}>
+            <AddCircleOutline sx={{ fontSize: 20 }} /> Thêm lớp học
+          </CustomButton>
+        </div>
+      )}
       <div className='flex justify-center items-center w-full max-w-[95%] mx-auto'>
         <Table<ClassData>
           columns={columns}

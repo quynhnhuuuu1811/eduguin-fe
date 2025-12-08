@@ -23,7 +23,7 @@ interface UserState {
 
   fetchTutorByID: (id: string) => Promise<void>;
   fetchAllTutors: (params?: FetchTutorParams) => Promise<void>;
-  updateStudentInfo: (id: string, data: FormData) => Promise<void>;
+  updateStudentInfo: (data: FormData) => Promise<void>;
   updateTutorInfo: (data: FormData) => Promise<void>;
   clearStudentInfo: () => void;
   recommendTutor: () => Promise<void>;
@@ -66,10 +66,10 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
   },
 
-  async updateStudentInfo(id: string, data: FormData) {
+  async updateStudentInfo( data: FormData) {
     set({ loading: true, error: null });
     try {
-      const res = await UserApi.updateStudentInfo(id, data);
+      const res = await UserApi.updateStudentInfo(data);
       set({
         userInfo: res.data.data,
         loading: false,

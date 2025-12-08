@@ -26,9 +26,9 @@ interface InfoProps {
 }
 
 const Info = ({ userInfo }: InfoProps) => {
-  const isTutor = userInfo.role === "tutor";
   const [isEditing, setIsEditing] = useState(false);
-
+  const isTutor = userInfo.role === "tutor";
+  console.log(222, isTutor);
   // Format dateOfBirth to YYYY-MM-DD for input type="date"
   const formatDateForInput = (date: string | undefined | null): string => {
     if (!date) return "";
@@ -58,7 +58,7 @@ const Info = ({ userInfo }: InfoProps) => {
   const [uploadImg, setUploadImg] = useState<File | null>(null);
   const [uploadVideo, setUploadVideo] = useState<File | null>(null);
 
-  const { updateTutorInfo } = useUserStore();
+  const { updateTutorInfo, updateStudentInfo } = useUserStore();
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -87,12 +87,12 @@ const Info = ({ userInfo }: InfoProps) => {
 
   const handleInputChange =
     (field: keyof typeof editedData) =>
-    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      setEditedData((prev) => ({
-        ...prev,
-        [field]: event.target.value,
-      }));
-    };
+      (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setEditedData((prev) => ({
+          ...prev,
+          [field]: event.target.value,
+        }));
+      };
 
   const introVideoUrl = userInfo.tutorProfile?.introVideoUrl;
   const router = useRouter();
@@ -188,7 +188,11 @@ const Info = ({ userInfo }: InfoProps) => {
         formData.append("sex", editedData.sex);
       }
 
-      await updateTutorInfo(formData);
+      if (isTutor) {
+        await updateTutorInfo(formData);
+      } else {
+        await updateStudentInfo(formData);
+      }
 
       // Clear preview and upload state after successful upload
       setPreviewImg(null);
@@ -208,7 +212,7 @@ const Info = ({ userInfo }: InfoProps) => {
       const errorMessage =
         error && typeof error === "object" && "response" in error
           ? (error as { response?: { data?: { message?: string } } }).response
-              ?.data?.message
+            ?.data?.message
           : undefined;
       alert(errorMessage || "Có lỗi xảy ra khi cập nhật thông tin");
       // Reset on error
@@ -317,7 +321,8 @@ const Info = ({ userInfo }: InfoProps) => {
                     {isTutor ? `Gia sư ${userInfo.tutorProfile?.subject} ${userInfo.tutorProfile?.grade}` : "Học sinh"}
                   </h6>
                 </div>
-                {
+                {/* Chỉ hiện description cho tutor */}
+                {isTutor && (
                   isEditing ? (
                     <CustomInput
                       label="Mô tả..."
@@ -327,17 +332,17 @@ const Info = ({ userInfo }: InfoProps) => {
                       name="description"
                     />
                   ) : (
-                    (
-                      userInfo?.description ? (
-                        <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
-                          {userInfo.description}
-                        </p>
-                      ) : (
-                        <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
-                          Chưa cập nhật
-                        </p>
-                      )
-                    ))}
+                    userInfo?.description || userInfo.tutorProfile?.bio ? (
+                      <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
+                        {userInfo.description || userInfo.tutorProfile?.bio}
+                      </p>
+                    ) : (
+                      <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
+                        Chưa cập nhật mô tả
+                      </p>
+                    )
+                  )
+                )}
               </div>
 
               {/* Video/Info Card */}
