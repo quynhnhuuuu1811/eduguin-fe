@@ -1,3 +1,4 @@
+import IntialAvatar from "@/components/IntialAvatar";
 import { useCommentStore } from "@/zustand/stores/CommentStore";
 import { useEffect, useState } from "react";
 
@@ -46,17 +47,21 @@ export default function InputComment({
 
     try {
       await createComment(idTutor, content.trim(), rating);
-    } catch {}
+    } catch { }
   };
 
   return (
     <div className="flex flex-col gap-3 mt-4 w-full text-black font-quicksand">
       <div className="flex items-center gap-3">
-        <img
-          src={user?.avatar}
-          alt="avatar"
-          className="w-10 h-10 rounded-full object-cover"
-        />
+        {user?.avatar ? (
+          <img
+            src={user?.avatar}
+            alt="avatar"
+            className="w-10 h-10 rounded-full object-cover"
+          />
+        ) : (
+          <IntialAvatar name={user?.name || ""} width={40} />
+        )}
         <h5>{user?.name || "Học sinh"}</h5>
       </div>
 

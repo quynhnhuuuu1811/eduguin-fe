@@ -6,6 +6,7 @@ import {
   JoinClassRequest,
   SetScheduleRequest,
   ClassSubscriptionRequest,
+  ClassSubscriptionResponse,
 } from "../types/Classes";
 import { ClassesApi } from "../api/ClassesApi";
 
@@ -15,7 +16,7 @@ interface ClassState {
   selectedClass: Class | null;
   loading: boolean;
   error: string | null;
-
+  studentSubscriptions: ClassSubscriptionResponse[];
   // Actions cho Gia sư
   fetchTutorClasses: () => Promise<void>;
   createClass: (request: CreateClassRequest) => Promise<Class>;
@@ -25,10 +26,15 @@ interface ClassState {
 
   // Actions cho Học sinh
   subscribeToClass: (request: ClassSubscriptionRequest) => Promise<void>;
+  fetchStudentClasses: () => Promise<void>;
+  getListStudentSubscriptions: () => Promise<void>;
+  approveClassSubscription: (subscriptionId: string) => Promise<void>;
+  rejectClassSubscription: (subscriptionId: string) => Promise<void>;   
 }
 
 export const useClassStore = create<ClassState>((set, get) => ({
   classes: [],
+  studentSubscriptions: [],
   selectedClass: null,
   loading: false,
   error: null,
@@ -136,6 +142,7 @@ export const useClassStore = create<ClassState>((set, get) => ({
         classes: res.data.data,
         loading: false,
       });
+      return res.data.data;
     } catch (error: unknown) {
       const errorMessage =
         error && typeof error === "object" && "response" in error
@@ -144,6 +151,71 @@ export const useClassStore = create<ClassState>((set, get) => ({
           : undefined;
       set({ loading: false, error: errorMessage || "Không thể tải danh sách lớp học" });
       throw error;
+    }
+  },
+
+  async fetchStudentClasses() {
+    set({ loading: true, error: null });
+    try {
+      const res = await ClassesApi.getStudentClasses();
+      set({ classes: res.data.data, loading: false });
+    }
+    catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      set({ loading: false, error: errorMessage || "Không thể tải danh sách lớp học" });
+      throw error;
+    }
+  },
+
+  async getListStudentSubscriptions() {
+    set({ loading: true, error: null });
+    try {
+      const res = await ClassesApi.getListStudentSubscriptions();
+      set({ studentSubscriptions: res.data.data, loading: false });
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      set({ loading: false, error: errorMessage || "Không thể tải danh sách yêu cầu" });
+      throw error;
+    }
+  },
+
+  async approveClassSubscription(subscriptionId: string) {
+    set({ loading: true, error: null });
+    try {
+      const res = await ClassesApi.approveClassSubscription(subscriptionId);
+    }
+    catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      set({ loading: false, error: errorMessage || "Không thể duyệt yêu cầu" });
+      throw error;
+    }
+  },
+
+  async rejectClassSubscription(subscriptionId: string) {
+    set({ loading: true, error: null });
+    try {
+      const res = await ClassesApi.rejectClassSubscription(subscriptionId);
+    }
+    catch (error: unknown) {
+    const errorMessage =
+      error && typeof error === "object" && "response" in error
+        ? (error as { response?: { data?: { message?: string } } }).response
+            ?.data?.message
+        : undefined;
+    set({ loading: false, error: errorMessage || "Không thể từ chối yêu cầu" });
+    throw error;
     }
   },
 }));
