@@ -1,5 +1,10 @@
 "use client";
-import { TextField, InputAdornment, IconButton, FormHelperText } from "@mui/material";
+import {
+  TextField,
+  InputAdornment,
+  IconButton,
+  FormHelperText,
+} from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import type { SxProps, Theme } from "@mui/material/styles";
 import React, { useState } from "react";
@@ -9,7 +14,9 @@ interface CustomInputProps {
   label: string;
   type?: "email" | "password" | "date" | "text" | "select";
   value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  onChange: (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => void;
   name: string;
   select?: boolean;
   options?: { value: string; label: string }[];
@@ -26,7 +33,7 @@ const CustomInput = ({
   select = false,
   options = [],
   error,
-  sx
+  sx,
 }: CustomInputProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -63,7 +70,7 @@ const CustomInput = ({
       fontFamily: "quicksand",
       fontSize: { xs: 8, sm: 10, md: 12, lg: 14 },
       lineHeight: "normal",
-      top: '4px',
+      top: "4px",
       "&.MuiInputLabel-shrink": {
         fontSize: { xs: 7, sm: 9, md: 11, lg: 13 },
         transform: "translate(11px, -6px) scale(0.85)",
@@ -73,7 +80,6 @@ const CustomInput = ({
     ...sx,
   };
 
-  // Password input với show/hide toggle
   if (type === "password") {
     return (
       <TextField
@@ -82,7 +88,9 @@ const CustomInput = ({
         size="small"
         type={showPassword ? "text" : "password"}
         value={value}
-        onChange={(e) => onChange(e as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>)}
+        onChange={(e) =>
+          onChange(e as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>)
+        }
         name={name}
         slotProps={{
           input: {
@@ -94,19 +102,28 @@ const CustomInput = ({
                   edge="end"
                   sx={{
                     padding: { xs: "4px", sm: "6px", md: "8px", lg: "10px" },
-                  }}
-                >
+                  }}>
                   {showPassword ? (
                     <VisibilityOff
                       sx={{
-                        fontSize: { xs: "16px", sm: "18px", md: "20px", lg: "22px" },
+                        fontSize: {
+                          xs: "16px",
+                          sm: "18px",
+                          md: "20px",
+                          lg: "22px",
+                        },
                         color: "#B2BAC6",
                       }}
                     />
                   ) : (
                     <Visibility
                       sx={{
-                        fontSize: { xs: "16px", sm: "18px", md: "20px", lg: "22px" },
+                        fontSize: {
+                          xs: "16px",
+                          sm: "18px",
+                          md: "20px",
+                          lg: "22px",
+                        },
                         color: "#B2BAC6",
                       }}
                     />
@@ -121,7 +138,6 @@ const CustomInput = ({
     );
   }
 
-  // Select input
   if (select || type === "select") {
     return (
       <TextField
@@ -130,7 +146,9 @@ const CustomInput = ({
         select
         SelectProps={{ native: true }}
         value={value}
-        onChange={(e) => onChange(e as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>)}
+        onChange={(e) =>
+          onChange(e as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>)
+        }
         name={name}
         slotProps={{
           input: {
@@ -155,8 +173,7 @@ const CustomInput = ({
             paddingTop: { xs: "14px", sm: "16px", md: "18px", lg: "20px" },
             paddingBottom: { xs: "4px", sm: "6px", md: "8px", lg: "10px" },
           },
-        }}
-      >
+        }}>
         <option value="" disabled style={{ color: "#B2BAC6", fontWeight: 400 }}>
           {label}
         </option>
@@ -177,7 +194,7 @@ const CustomInput = ({
         label={label}
         value={dateValue}
         onChange={(newValue: Dayjs | null) => {
-          const formattedValue = newValue ? newValue.format('YYYY-MM-DD') : '';
+          const formattedValue = newValue ? newValue.format("YYYY-MM-DD") : "";
           const syntheticEvent = {
             target: {
               name,
@@ -211,7 +228,6 @@ const CustomInput = ({
                 "&.Mui-focused": {
                   border: "1px solid #0C8CE9",
                   backgroundColor: "transparent !important",
-
                 },
                 "& .MuiFilledInput-input": {
                   display: "flex",
@@ -221,8 +237,18 @@ const CustomInput = ({
                   color: "#23262A",
                   lineHeight: 1.2,
                   paddingInline: "11px",
-                  paddingTop: { xs: "14px", sm: "16px", md: "18px", lg: "20px" },
-                  paddingBottom: { xs: "4px", sm: "6px", md: "8px", lg: "10px" },
+                  paddingTop: {
+                    xs: "14px",
+                    sm: "16px",
+                    md: "18px",
+                    lg: "20px",
+                  },
+                  paddingBottom: {
+                    xs: "4px",
+                    sm: "6px",
+                    md: "8px",
+                    lg: "10px",
+                  },
                   fontSize: { xs: 8, sm: 10, md: 12, lg: 14 },
                 },
               },
@@ -250,7 +276,12 @@ const CustomInput = ({
                 "& .MuiIconButton-root": {
                   padding: { xs: "4px", sm: "6px", md: "8px", lg: "10px" },
                   "& .MuiSvgIcon-root": {
-                    fontSize: { xs: "14px", sm: "16px", md: "18px", lg: "20px" },
+                    fontSize: {
+                      xs: "14px",
+                      sm: "16px",
+                      md: "18px",
+                      lg: "20px",
+                    },
                     color: "#B2BAC6",
                   },
                 },
@@ -270,15 +301,16 @@ const CustomInput = ({
       size="small"
       type={type}
       value={value}
-      onChange={(e) => onChange(e as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>)}
+      onChange={(e) =>
+        onChange(e as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>)
+      }
       name={name}
       slotProps={{
         input: {
           disableUnderline: true,
         },
       }}
-      sx={commonSx}
-    >
+      sx={commonSx}>
       {error && <FormHelperText error>{error}</FormHelperText>}
     </TextField>
   );

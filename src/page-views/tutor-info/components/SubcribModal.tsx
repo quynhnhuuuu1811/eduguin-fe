@@ -1,7 +1,6 @@
 import CustomInput from "@/components/Input";
 import { useClassStore } from "@/zustand/stores/ClassStore";
-import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface SubcribModalProps {
   open: boolean;
@@ -22,20 +21,30 @@ export default function SubcribModal({
   teacherSubject,
   teacherGrade,
   teacherPrice,
+  teacherId,
 }: SubcribModalProps) {
-  const { classes, subscribeToClass, fetchTutorClasses } = useClassStore();
+  const {
+    classes,
+    getClassesByTutorId,
+    fetchTutorClasses,
+    // subscribeToClass, // nếu dùng sau thì mở ra
+  } = useClassStore();
 
-  export default function SubcribModal({ open, onClose, teacherName, teacherAvatar, teacherSubject, teacherGrade, teacherPrice, teacherId }: SubcribModalProps) {
-    const { getClassesByTutorId, classes } = useClassStore();
-    useEffect(() => {
+  const [selectedClassId, setSelectedClassId] = useState("");
+
+  // Lấy toàn bộ lớp (nếu bạn cần)
+  useEffect(() => {
+    if (fetchTutorClasses) {
       fetchTutorClasses();
-    }, []);
-    if (open) {
-      if (teacherId) {
-        getClassesByTutorId(teacherId);
-      }
     }
-  }, [open, getClassesByTutorId, teacherId]);
+  }, [fetchTutorClasses]);
+
+  // Mỗi khi mở modal và có teacherId thì fetch lớp của giáo viên đó
+  useEffect(() => {
+    if (open && teacherId && getClassesByTutorId) {
+      getClassesByTutorId(teacherId);
+    }
+  }, [open, teacherId, getClassesByTutorId]);
 
   if (!open) return null;
 
@@ -53,7 +62,9 @@ export default function SubcribModal({
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold">
           ✕
         </button>
+
         <h4 className="text-xl font-bold mb-4">Đăng kí học</h4>
+
         <div>
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
@@ -64,20 +75,30 @@ export default function SubcribModal({
               />
               <h5>{teacherName}</h5>
             </div>
-            <span className="text-gray-600">{`Giáo viên ${teacherSubject} - lớp ${teacherGrade}`}</span>
+            <span className="text-gray-600">
+              {`Giáo viên ${teacherSubject} - lớp ${teacherGrade}`}
+            </span>
+            <span className="text-primary500 font-semibold">
+              {`Học phí: ${teacherPrice.toLocaleString("vi-VN")}đ`}
+            </span>
           </div>
+
           <div className="flex flex-col gap-2 mt-4">
             <span className="text-sm text-gray-500">Chọn lịch học</span>
             <CustomInput
               label="Lịch học"
               select
-              options={Array.isArray(classes) ? classes.map((item) => ({
-                label: `${item.className} - ${item.startDate} - ${item.endDate}`,
-                value: item.id,
-              })) : []}
+              options={
+                Array.isArray(classes)
+                  ? classes.map((item) => ({
+                      label: `${item.className} - ${item.startDate} - ${item.endDate}`,
+                      value: item.id,
+                    }))
+                  : []
+              }
               name="classId"
-              value={""}
-              onChange={() => { }}
+              value={selectedClassId}
+              onChange={() => {}}
             />
           </div>
         </div>

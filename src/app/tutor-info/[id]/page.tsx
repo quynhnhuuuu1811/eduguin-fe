@@ -1,14 +1,12 @@
 import TutorInfo from "@/page-views/tutor-info/page-view";
 
 type TutorInfoPageProps = {
-  params: Promise<{
+  params: {
     id: string;
-  }>;
+  };
 };
 
-export default function TutorInfoPage({ params }: TutorInfoPageProps) {
-  const { id } = use(params);
-
+export default function TutorInfoPage({ params: { id } }: TutorInfoPageProps) {
   return (
     <div>
       <TutorInfo id={id} />

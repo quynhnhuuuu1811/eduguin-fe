@@ -101,7 +101,6 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
               gap: { xs: "5px", sm: "10px", md: "15px", lg: "20px" },
               ":hover": { border: "2px solid #0F7FE5" },
             }}>
-            {/* Avatar */}
             <Box
               sx={{
                 flexShrink: 0,
@@ -109,13 +108,12 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                 aspectRatio: "1/1",
                 borderRadius: 2,
                 overflow: "hidden",
-                backgroundImage: `url(${Img.src})`,
+                backgroundImage: `url(${teacher?.avatarUrl || Img.src})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
               }}
             />
-            {/* Info */}
             <Box
               sx={{
                 display: "flex",

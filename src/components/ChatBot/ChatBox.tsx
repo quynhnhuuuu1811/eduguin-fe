@@ -23,17 +23,18 @@ export default function ChatBox() {
   ]);
   const [input, setInput] = useState("");
 
-  // NEW: trạng thái bot đang suy nghĩ
   const [isBotThinking, setIsBotThinking] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const socketRef = useRef<Socket | null>(null);
 
-  // NEW: lưu các timeout của hiệu ứng typewriter để clear khi unmount
   const typingTimeoutsRef = useRef<number[]>([]);
-
+  const token = getTokenFromLocalStorage();
+  if (!token) {
+    console.log("❌ Không tìm thấy token, không thể kết nối socket.");
+    return;
+  }
   useEffect(() => {
-    const token = getTokenFromLocalStorage();
     console.log("🚀 Đang khởi tạo socket...");
 
     const socket = io(SOCKET_URL, {
