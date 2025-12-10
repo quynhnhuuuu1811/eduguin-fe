@@ -6,7 +6,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
 type Message = {
-  id: number;
+  id: number | string;
   role: "user" | "bot";
   content: string;
 };
@@ -16,6 +16,7 @@ const SOCKET_URL = "https://api.eduguin.mtri.online/chatbot";
 export default function ChatBox() {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -33,30 +34,24 @@ export default function ChatBox() {
   const { chatData, getHistoryChat, loading, error, clearError } =
     useChatStore();
 
-  const token = getTokenFromLocalStorage();
-  if (!token) {
-    console.log("❌ Không tìm thấy token, không thể kết nối socket.");
-    return null;
-  }
-
-  // Đánh dấu đã mount trên client
+  // Mounted + lấy token từ localStorage (chỉ chạy ở client)
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined") {
+      const storedToken = getTokenFromLocalStorage();
+      setToken(storedToken);
+    }
   }, []);
 
+  // Khởi tạo socket khi đã mounted & có token
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !token) return;
 
-    const token = getTokenFromLocalStorage();
-    if (!token) {
-      console.log("❌ Không tìm thấy token, không thể kết nối socket.");
-      return;
-    }
     console.log("🚀 Đang khởi tạo socket...");
 
     const socket = io(SOCKET_URL, {
       transports: ["websocket"],
-      auth: { token: `${token}` },
+      auth: { token },
     });
     socketRef.current = socket;
 
@@ -110,15 +105,16 @@ export default function ChatBox() {
         console.log("🔌 Ngắt kết nối socket...");
         socket.disconnect();
       }
-      typingTimeoutsRef.current.forEach((id) => clearTimeout(id));
+      typingTimeoutsRef.current.forEach((id) => window.clearTimeout(id));
+      typingTimeoutsRef.current = [];
     };
-  }, [token]);
+  }, [mounted, token]);
 
   const handleToggleOpen = () => {
     setIsOpen((prev) => {
       const next = !prev;
       if (next) {
-        // mở chat
+        // mở chat -> load lịch sử
         getHistoryChat();
       } else {
         if (error) clearError();
@@ -127,14 +123,29 @@ export default function ChatBox() {
     });
   };
 
+  // Map history chat từ store vào messages
+  // Mỗi sessionId là 1 cuộc hội thoại -> lấy session mới nhất
   useEffect(() => {
     if (!chatData) return;
 
-    const historyMessages: Message[] = chatData.map(
+    // chatData có thể là array hoặc { data: [...] }
+    const rows: any[] = Array.isArray(chatData)
+      ? chatData
+      : (chatData.data ?? []);
+
+    if (!Array.isArray(rows) || rows.length === 0) return;
+
+    // Lấy sessionId của cuộc hội thoại mới nhất
+    const latestSessionId = rows[rows.length - 1]?.sessionId;
+    const sessionRows = latestSessionId
+      ? rows.filter((r) => r.sessionId === latestSessionId)
+      : rows;
+
+    const historyMessages: Message[] = sessionRows.map(
       (item: any, index: number) => ({
-        id: item.id ?? index,
-        role: item.role === "assistant" ? "bot" : "user", // map role server -> client
-        content: item.content,
+        id: item.id ?? `${item.sessionId}-${index}`,
+        role: item.message?.type === "ai" ? "bot" : "user", // human -> user, ai -> bot
+        content: item.message?.content ?? "",
       })
     );
 
@@ -148,10 +159,10 @@ export default function ChatBox() {
     });
   }, [chatData]);
 
+  // Auto scroll xuống cuối khi có message mới
   useEffect(() => {
-    if (isOpen) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+    if (!isOpen) return;
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isOpen]);
 
   const handleSubmit = (e: FormEvent) => {
@@ -190,6 +201,12 @@ export default function ChatBox() {
 
   // Chỉ render sau khi mounted để tránh hydration mismatch
   if (!mounted) return null;
+
+  // Nếu không có token thì ẩn luôn chatbox (hoặc thay bằng UI khác tuỳ bạn)
+  if (!token) {
+    console.log("❌ Không tìm thấy token, không thể kết nối socket.");
+    return null;
+  }
 
   return (
     <>
@@ -242,14 +259,16 @@ export default function ChatBox() {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"
-                  }`}>
+                className={`flex ${
+                  msg.role === "user" ? "justify-end" : "justify-start"
+                }`}>
                 <div
                   className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs shadow-sm
-                  ${msg.role === "user"
+                  ${
+                    msg.role === "user"
                       ? "bg-blue-600 text-white rounded-br-sm"
                       : "bg-white text-slate-800 border border-slate-200 rounded-bl-sm"
-                    }`}>
+                  }`}>
                   {msg.content}
                 </div>
               </div>

@@ -66,7 +66,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     }
   },
 
-  async updateStudentInfo( data: FormData) {
+  async updateStudentInfo(data: FormData) {
     set({ loading: true, error: null });
     try {
       const res = await UserApi.updateStudentInfo(data);
@@ -93,6 +93,7 @@ export const useUserStore = create<UserState>((set, get) => ({
         loading: false,
         error: error?.response?.data?.message || "Failed to recommend tutors",
       });
+      throw error;
     }
   },
 

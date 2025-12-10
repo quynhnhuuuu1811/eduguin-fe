@@ -2,48 +2,35 @@
 import React, { useEffect } from "react";
 import bkg from "../../../../assets/images/rcmTutor.png";
 import { Box, Typography } from "@mui/material";
-import Img from "../../../../assets/images/teacher.png";
 import CardItem from "./CardItem";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css/pagination";
 import "swiper/css";
 import { useUserStore } from "@/zustand/stores/UserStore";
+
 const RecommendTutor = () => {
-  const rcmTutors = [
-    {
-      name: "Nguyễn Văn A",
-      subject: "Toán học",
-      rating: 4.9,
-      img: Img,
-      location: "Hà Nội",
-    },
-    {
-      name: "Trần Thị B",
-      subject: "Vật lý",
-      rating: 4.8,
-      img: Img,
-      location: "TP. Hồ Chí Minh",
-    },
-    {
-      name: "Lê Văn C",
-      subject: "Hóa học",
-      rating: 4.7,
-      img: Img,
-      location: "Đà Nẵng",
-    },
-    {
-      name: "Phạm Thị D",
-      subject: "Sinh học",
-      rating: 4.9,
-      img: Img,
-      location: "Cần Thơ",
-    },
-  ];
-  const { tutorList, recommendTutor } = useUserStore();
+  const { tutorList, users, recommendTutor, fetchAllTutors } = useUserStore();
+
   useEffect(() => {
-    recommendTutor();
-  }, []);
+    const fetchData = async () => {
+      try {
+        await recommendTutor();
+      } catch (error) {
+        console.error(
+          "Recommend tutor lỗi, fallback sang fetchAllTutors: ",
+          error
+        );
+        await fetchAllTutors();
+      }
+    };
+
+    fetchData();
+  }, [recommendTutor, fetchAllTutors]);
+
+  const displayTutors =
+    (tutorList && tutorList.length > 0 ? tutorList : users) || [];
+
   return (
     <Box
       sx={{
@@ -81,6 +68,7 @@ const RecommendTutor = () => {
         }}>
         Đề xuất cho bạn...
       </Typography>
+
       <Box className="w-full flex justify-center items-center !bg-transparent">
         <Swiper
           style={{ width: "100%", paddingBottom: "50px" }}
@@ -91,7 +79,7 @@ const RecommendTutor = () => {
             900: { slidesPerView: 3 },
             1200: { slidesPerView: 4 },
           }}
-          loop={true}
+          loop
           pagination={{
             clickable: true,
             dynamicBullets: true,
@@ -102,7 +90,7 @@ const RecommendTutor = () => {
             disableOnInteraction: false,
           }}
           className="recommend-tutor-swiper">
-          {tutorList.map((tutor, index) => (
+          {displayTutors.map((tutor, index) => (
             <SwiperSlide
               key={index}
               style={{
