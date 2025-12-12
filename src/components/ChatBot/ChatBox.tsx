@@ -1,12 +1,13 @@
 "use client";
 
 import { getTokenFromLocalStorage } from "@/utils/storage";
+import { useChatStore } from "@/zustand/stores/ChatStore";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { usePathname } from "next/navigation";
 
 type Message = {
-  id: number;
+  id: number | string;
   role: "user" | "bot";
   content: string;
 };
@@ -17,6 +18,7 @@ export default function ChatBox() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -25,31 +27,33 @@ export default function ChatBox() {
     },
   ]);
   const [input, setInput] = useState("");
-
   const [isBotThinking, setIsBotThinking] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const socketRef = useRef<Socket | null>(null);
   const typingTimeoutsRef = useRef<number[]>([]);
 
-  // Đánh dấu đã mount trên client
+  const { chatData, getHistoryChat, loading, error, clearError } =
+    useChatStore();
+
+  // Mounted + lấy token từ localStorage (chỉ chạy ở client)
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined") {
+      const storedToken = getTokenFromLocalStorage();
+      setToken(storedToken);
+    }
   }, []);
 
+  // Khởi tạo socket khi đã mounted & có token
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !token) return;
 
-    const token = getTokenFromLocalStorage();
-    if (!token) {
-      console.log("❌ Không tìm thấy token, không thể kết nối socket.");
-      return;
-    }
     console.log("🚀 Đang khởi tạo socket...");
 
     const socket = io(SOCKET_URL, {
       transports: ["websocket"],
-      auth: { token: `${token}` },
+      auth: { token },
     });
     socketRef.current = socket;
 
@@ -76,14 +80,9 @@ export default function ChatBox() {
 
       setMessages((prev) => [
         ...prev,
-        {
-          id: messageId,
-          role: "bot",
-          content: "",
-        },
+        { id: messageId, role: "bot", content: "" },
       ]);
 
-      // 2. Hiệu ứng gõ chữ dần dần
       const typeWriter = (index: number) => {
         if (index > fullText.length) return;
 
@@ -95,7 +94,7 @@ export default function ChatBox() {
 
         const timeoutId = window.setTimeout(() => {
           typeWriter(index + 1);
-        }, 20); // tốc độ gõ (ms / ký tự)
+        }, 20);
 
         typingTimeoutsRef.current.push(timeoutId);
       };
@@ -103,25 +102,71 @@ export default function ChatBox() {
       typeWriter(1);
     });
 
-    // Cleanup khi component unmount
     return () => {
       if (socket.connected) {
         console.log("🔌 Ngắt kết nối socket...");
         socket.disconnect();
       }
-      // clear tất cả timeout của typewriter
-      typingTimeoutsRef.current.forEach((id) => clearTimeout(id));
+      typingTimeoutsRef.current.forEach((id) => window.clearTimeout(id));
+      typingTimeoutsRef.current = [];
     };
-  }, [mounted]);
+  }, [mounted, token]);
 
-  // Auto scroll
+  const handleToggleOpen = () => {
+    setIsOpen((prev) => {
+      const next = !prev;
+      if (next) {
+        // mở chat -> load lịch sử
+        getHistoryChat();
+      } else {
+        if (error) clearError();
+      }
+      return next;
+    });
+  };
+
+  // Map history chat từ store vào messages
+  // Mỗi sessionId là 1 cuộc hội thoại -> lấy session mới nhất
   useEffect(() => {
-    if (isOpen) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+    if (!chatData) return;
+
+    // chatData có thể là array hoặc { data: [...] }
+    const rows: any[] = Array.isArray(chatData)
+      ? chatData
+      : (chatData.data ?? []);
+
+    if (!Array.isArray(rows) || rows.length === 0) return;
+
+    // Lấy sessionId của cuộc hội thoại mới nhất
+    const latestSessionId = rows[rows.length - 1]?.sessionId;
+    const sessionRows = latestSessionId
+      ? rows.filter((r) => r.sessionId === latestSessionId)
+      : rows;
+
+    const historyMessages: Message[] = sessionRows.map(
+      (item: any, index: number) => ({
+        id: item.id ?? `${item.sessionId}-${index}`,
+        role: item.message?.type === "ai" ? "bot" : "user", // human -> user, ai -> bot
+        content: item.message?.content ?? "",
+      })
+    );
+
+    setMessages((prev) => {
+      const existingIds = new Set(prev.map((m) => m.id));
+      const merged = [
+        ...prev,
+        ...historyMessages.filter((m) => !existingIds.has(m.id)),
+      ];
+      return merged;
+    });
+  }, [chatData]);
+
+  // Auto scroll xuống cuối khi có message mới
+  useEffect(() => {
+    if (!isOpen) return;
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isOpen]);
 
-  // Gửi tin nhắn
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const trimmed = input.trim();
@@ -137,7 +182,6 @@ export default function ChatBox() {
     setInput("");
 
     if (socketRef.current?.connected) {
-      // Hiển thị trạng thái "đang suy nghĩ"
       setIsBotThinking(true);
 
       socketRef.current.emit("send", {
@@ -160,13 +204,16 @@ export default function ChatBox() {
   // Chỉ render sau khi mounted để tránh hydration mismatch
   if (!mounted) return null;
 
-  // Ẩn chatbox trên trang admin
-  if (pathname?.startsWith("/admin")) return null;
+  // Nếu không có token thì ẩn luôn chatbox (hoặc thay bằng UI khác tuỳ bạn)
+  if (!token) {
+    console.log("❌ Không tìm thấy token, không thể kết nối socket.");
+    return null;
+  }
 
   return (
     <>
       <button
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={handleToggleOpen}
         className="fixed bottom-4 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-blue-400/40 hover:bg-blue-700 active:scale-95 transition">
         {isOpen ? (
           <span className="text-xl font-bold">×</span>
@@ -177,7 +224,6 @@ export default function ChatBox() {
 
       {isOpen && (
         <div className="fixed bottom-20 right-4 z-50 flex h-[420px] w-[320px] flex-col overflow-hidden rounded-2xl bg-white shadow-xl border border-slate-200">
-          {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-200 px-3 py-2 bg-slate-50">
             <div className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white text-sm font-semibold">
@@ -199,8 +245,19 @@ export default function ChatBox() {
             </button>
           </div>
 
-          {/* Messages Area */}
           <div className="flex-1 space-y-3 overflow-y-auto px-3 py-2 bg-slate-50">
+            {loading && (
+              <div className="text-[11px] text-slate-400 text-center">
+                Đang tải lịch sử chat...
+              </div>
+            )}
+
+            {error && (
+              <div className="text-[11px] text-red-500 text-center">
+                {error}
+              </div>
+            )}
+
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -217,7 +274,6 @@ export default function ChatBox() {
               </div>
             ))}
 
-            {/* NEW: hiệu ứng "bot đang suy nghĩ..." */}
             {isBotThinking && (
               <div className="flex justify-start">
                 <div className="inline-flex items-center gap-2 max-w-[80%] rounded-2xl px-3 py-2 text-xs shadow-sm bg-white text-slate-500 border border-slate-200 rounded-bl-sm">
@@ -238,7 +294,6 @@ export default function ChatBox() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Area */}
           <form
             onSubmit={handleSubmit}
             className="border-t border-slate-200 bg-white px-2 py-2">

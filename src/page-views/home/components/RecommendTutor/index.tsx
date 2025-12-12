@@ -55,6 +55,7 @@ const RecommendTutor = () => {
         }}>
         {t.home.recommendTutor.title}
       </Typography>
+
       <Box className="w-full flex justify-center items-center !bg-transparent">
         <Swiper
           style={{ width: "100%", paddingBottom: "50px" }}
@@ -65,7 +66,7 @@ const RecommendTutor = () => {
             900: { slidesPerView: 3 },
             1200: { slidesPerView: 4 },
           }}
-          loop={true}
+          loop
           pagination={{
             clickable: true,
             dynamicBullets: true,
@@ -76,7 +77,7 @@ const RecommendTutor = () => {
             disableOnInteraction: false,
           }}
           className="recommend-tutor-swiper">
-          {tutorList.map((tutor, index) => (
+          {displayTutors.map((tutor, index) => (
             <SwiperSlide
               key={index}
               style={{

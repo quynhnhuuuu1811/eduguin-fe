@@ -1,8 +1,26 @@
+"use client";
 import { Box, Grid, Typography } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import Info from "./components/Info";
 
 const TutorInfo = ({ id }: { id: string }) => {
+  useEffect(() => {
+    const track = async () => {
+      console.log("Tracking view_tutor for tutorId:", id);
+      try {
+        await fetch("/api/track-view-tutor", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          body: JSON.stringify({ tutorId: id }),
+        });
+      } catch (e) {}
+    };
+
+    track();
+  }, [id]);
   return (
     <div>
       <Typography
