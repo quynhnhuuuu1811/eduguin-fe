@@ -32,6 +32,7 @@ export interface AuthUser {
   phoneNumber?: string;
   phone?: string;
   address?: string;
+  balance?: number;
   tutorProfile?: {
     userId: string;
     bio?: string;

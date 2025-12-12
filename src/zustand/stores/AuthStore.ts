@@ -163,6 +163,7 @@ export const useAuthStore = create<AuthState>((set) => ({
           meetingTool: userData.tutorProfile.meetingTool,
         } : undefined,
         studentProfile: userData.studentProfile ?? undefined,
+        balance: userData.balance ?? undefined,
       };
       set((state) => ({
         data: {

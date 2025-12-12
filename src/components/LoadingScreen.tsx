@@ -1,3 +1,5 @@
+"use client";
+
 export default function LoadingScreen() {
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-white/90 backdrop-blur-sm z-[99999]">

@@ -22,6 +22,8 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useUserStore } from "@/zustand/stores/UserStore";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "@/i18n";
+import LocalAtmIcon from '@mui/icons-material/LocalAtm';
+import DepositModal from "./DepositModal";
 
 interface InfoProps {
   userInfo: AuthUser;
@@ -29,8 +31,10 @@ interface InfoProps {
 
 const Info = ({ userInfo }: InfoProps) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
   const isTutor = userInfo.role === "tutor";
   const { t } = useTranslation();
+  const isEnglish = t.common.loading === "Loading...";
   console.log(222, isTutor);
   // Format dateOfBirth to YYYY-MM-DD for input type="date"
   const formatDateForInput = (date: string | undefined | null): string => {
@@ -92,12 +96,12 @@ const Info = ({ userInfo }: InfoProps) => {
 
   const handleInputChange =
     (field: keyof typeof editedData) =>
-    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      setEditedData((prev) => ({
-        ...prev,
-        [field]: event.target.value,
-      }));
-    };
+      (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setEditedData((prev) => ({
+          ...prev,
+          [field]: event.target.value,
+        }));
+      };
 
   const introVideoUrl = userInfo.tutorProfile?.introVideoUrl;
   const router = useRouter();
@@ -107,6 +111,10 @@ const Info = ({ userInfo }: InfoProps) => {
     localStorage.removeItem("user");
 
     router.push("/login");
+  };
+
+  const handleDeposit = () => {
+    setIsDepositModalOpen(true);
   };
 
   const handleUploadAvatar = () => {
@@ -218,7 +226,7 @@ const Info = ({ userInfo }: InfoProps) => {
       const errorMessage =
         error && typeof error === "object" && "response" in error
           ? (error as { response?: { data?: { message?: string } } }).response
-              ?.data?.message
+            ?.data?.message
           : undefined;
       alert(errorMessage || "Có lỗi xảy ra khi cập nhật thông tin");
       // Reset on error
@@ -445,8 +453,8 @@ const Info = ({ userInfo }: InfoProps) => {
                     <span className="font-normal">
                       {userInfo.dateOfBirth || userInfo.birthDate
                         ? dayjs(
-                            userInfo.dateOfBirth || userInfo.birthDate
-                          ).format("DD/MM/YYYY")
+                          userInfo.dateOfBirth || userInfo.birthDate
+                        ).format("DD/MM/YYYY")
                         : "-"}
                     </span>
                   </p>
@@ -464,20 +472,20 @@ const Info = ({ userInfo }: InfoProps) => {
                           : "-"}
                     </span>
                   </p>
-                  {(userInfo.phone || userInfo.phoneNumber) && (
+                  <div className="flex items-center gap-2">
                     <p className="font-bold">
-                      {t.profile.phone}{" "}
-                      <span className="font-normal">
-                        {userInfo.phone || userInfo.phoneNumber}
-                      </span>
+                      {isEnglish ? "Balance:" : "Số dư tài khoản:"}
+                      <span className="font-normal"> {new Intl.NumberFormat("vi-VN").format(userInfo.balance || 0)} VND</span>
                     </p>
-                  )}
-                  {userInfo.address && (
-                    <p className="font-bold col-span-2">
-                      {t.profile.address}{" "}
-                      <span className="font-normal">{userInfo.address}</span>
-                    </p>
-                  )}
+                    <CustomButton
+                      type="Secondary"
+                      className="flex items-center gap-2 !bg-blue100 !text-blue700 !px-2 !py-1"
+                      onClick={handleDeposit}
+                    >
+                      <LocalAtmIcon sx={{ fontSize: "18px" }} />
+                      {isEnglish ? "Deposit" : "Nạp tiền"}
+                    </CustomButton>
+                  </div>
                 </>
               )}
             </div>
@@ -534,6 +542,12 @@ const Info = ({ userInfo }: InfoProps) => {
           </div>
         </>
       )}
+
+      {/* Deposit Modal */}
+      <DepositModal
+        open={isDepositModalOpen}
+        onClose={() => setIsDepositModalOpen(false)}
+      />
     </>
   );
 };
