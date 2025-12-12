@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import bkg from "../../../../assets/images/rcmTutor.png";
 import { Box, Typography } from "@mui/material";
 import CardItem from "./CardItem";
@@ -12,12 +12,46 @@ import { useTranslation } from "@/i18n";
 import { Tutor } from "@/types/tutor.type";
 
 const RecommendTutor = () => {
-  const { tutorList, recommendTutor } = useUserStore();
+  const { users, tutorList, recommendTutor, fetchAllTutors } = useUserStore();
   const { t } = useTranslation();
 
+  const [displayTutors, setDisplayTutors] = useState<Tutor[]>(tutorList || []);
+  const [usedFallback, setUsedFallback] = useState(false);
+
   useEffect(() => {
-    recommendTutor();
-  }, []);
+    let mounted = true;
+
+    const load = async () => {
+      try {
+        await recommendTutor();
+        if (mounted) setUsedFallback(false);
+      } catch (error) {
+        if (mounted) await fetchAllTutors({ page: 1, limit:4 });
+        if (mounted) setUsedFallback(true);
+      }
+    };
+
+    load();
+
+    return () => {
+      mounted = false;
+    };
+  }, [recommendTutor, fetchAllTutors]);
+
+  // Keep displayTutors in sync: prefer tutorList when available, otherwise use users.
+  useEffect(() => {
+    if (usedFallback) {
+      // store.users may be typed as User[]; assert to Tutor[] when using as fallback
+      setDisplayTutors((users ?? []) as unknown as Tutor[]);
+      return;
+    }
+
+    if (Array.isArray(tutorList) && tutorList.length > 0) {
+      setDisplayTutors(tutorList);
+    } else {
+      setDisplayTutors((users ?? []) as unknown as Tutor[]);
+    }
+  }, [tutorList, users, usedFallback]);
 
   return (
     <Box
@@ -78,7 +112,7 @@ const RecommendTutor = () => {
             disableOnInteraction: false,
           }}
           className="recommend-tutor-swiper">
-          {tutorList.map((tutor: Tutor, index: number) => (
+          {displayTutors.map((tutor: Tutor, index: number) => (
             <SwiperSlide
               key={index}
               style={{

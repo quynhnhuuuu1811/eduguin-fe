@@ -6,11 +6,11 @@ import Img from "../../../assets/images/FindTutor.jpg";
 import TeacherImg from "../../../assets/images/teacher.png";
 import Banner from "../../../assets/images/VideoThumbnail.png";
 import { CustomButton } from "@/components/Button";
-import EditIcon from '@mui/icons-material/Edit';
-import LogoutIcon from '@mui/icons-material/Logout';
-import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Save';
-import CancelIcon from '@mui/icons-material/Cancel';
+import EditIcon from "@mui/icons-material/Edit";
+import LogoutIcon from "@mui/icons-material/Logout";
+import DeleteIcon from "@mui/icons-material/Delete";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Cancel";
 import { Typography, TextField } from "@mui/material";
 import dayjs from "dayjs";
 import CustomInput from "@/components/Input";
@@ -70,7 +70,9 @@ const Info = ({ userInfo }: InfoProps) => {
   const handleCancel = () => {
     setEditedData({
       description: userInfo.description || userInfo.tutorProfile?.bio || "",
-      dateOfBirth: formatDateForInput(userInfo.dateOfBirth || userInfo.birthDate),
+      dateOfBirth: formatDateForInput(
+        userInfo.dateOfBirth || userInfo.birthDate
+      ),
       email: userInfo.email || "",
       sex: normalizeSex(userInfo.sex),
     });
@@ -90,18 +92,20 @@ const Info = ({ userInfo }: InfoProps) => {
 
   const handleInputChange =
     (field: keyof typeof editedData) =>
-      (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setEditedData((prev) => ({
-          ...prev,
-          [field]: event.target.value,
-        }));
-      };
+    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setEditedData((prev) => ({
+        ...prev,
+        [field]: event.target.value,
+      }));
+    };
 
   const introVideoUrl = userInfo.tutorProfile?.introVideoUrl;
   const router = useRouter();
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
+
     router.push("/login");
   };
 
@@ -167,7 +171,6 @@ const Info = ({ userInfo }: InfoProps) => {
     fileInput.click();
   };
 
-
   const handleUpdate = async () => {
     setIsUploading(true);
     try {
@@ -215,7 +218,7 @@ const Info = ({ userInfo }: InfoProps) => {
       const errorMessage =
         error && typeof error === "object" && "response" in error
           ? (error as { response?: { data?: { message?: string } } }).response
-            ?.data?.message
+              ?.data?.message
           : undefined;
       alert(errorMessage || "Có lỗi xảy ra khi cập nhật thông tin");
       // Reset on error
@@ -232,7 +235,9 @@ const Info = ({ userInfo }: InfoProps) => {
   };
   return (
     <>
-      {isUploading ? <LoadingScreen /> : (
+      {isUploading ? (
+        <LoadingScreen />
+      ) : (
         <>
           <div className="font-quicksand w-full max-w-[90%] mt-5 flex items-center flex-col justify-center mx-auto">
             <Typography
@@ -262,8 +267,7 @@ const Info = ({ userInfo }: InfoProps) => {
                   md: "50px",
                   lg: "50px",
                 },
-              }}
-            >
+              }}>
               {t.profile.title}
             </Typography>
 
@@ -299,7 +303,9 @@ const Info = ({ userInfo }: InfoProps) => {
                   )}
                   {isUploading && (
                     <div className="absolute top-0 left-0 w-full aspect-square flex items-center justify-center bg-black bg-opacity-50 rounded-xl z-10">
-                      <Typography className="text-white">Đang tải...</Typography>
+                      <Typography className="text-white">
+                        Đang tải...
+                      </Typography>
                     </div>
                   )}
                   {isEditing && (
@@ -321,12 +327,14 @@ const Info = ({ userInfo }: InfoProps) => {
                     {userInfo.fullName || userInfo.name || "-"}
                   </h2>
                   <h6 className="text-blue600 font-semibold text-[15px]">
-                    {isTutor ? `${t.home.roleOptions.tutorTitle} ${userInfo.tutorProfile?.subject} ${userInfo.tutorProfile?.grade}` : t.home.roleOptions.studentTitle}
+                    {isTutor
+                      ? `${t.home.roleOptions.tutorTitle} ${userInfo.tutorProfile?.subject} ${userInfo.tutorProfile?.grade}`
+                      : t.home.roleOptions.studentTitle}
                   </h6>
                 </div>
                 {/* Chỉ hiện description cho tutor */}
-                {isTutor && (
-                  isEditing ? (
+                {isTutor &&
+                  (isEditing ? (
                     <CustomInput
                       label={t.auth.tutorRegister.description}
                       type="text"
@@ -334,18 +342,15 @@ const Info = ({ userInfo }: InfoProps) => {
                       onChange={handleInputChange("description")}
                       name="description"
                     />
+                  ) : userInfo?.description || userInfo.tutorProfile?.bio ? (
+                    <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
+                      {userInfo.description || userInfo.tutorProfile?.bio}
+                    </p>
                   ) : (
-                    userInfo?.description || userInfo.tutorProfile?.bio ? (
-                      <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
-                        {userInfo.description || userInfo.tutorProfile?.bio}
-                      </p>
-                    ) : (
-                      <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
-                        -
-                      </p>
-                    )
-                  )
-                )}
+                    <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
+                      -
+                    </p>
+                  ))}
               </div>
 
               {/* Video/Info Card */}
@@ -354,9 +359,17 @@ const Info = ({ userInfo }: InfoProps) => {
                   {isTutor && (
                     <div className="h-48 md:h-[250px] relative border-[#0C65B6] border-[3px] rounded-xl overflow-hidden bg-black group">
                       {previewVideo ? (
-                        <video src={previewVideo} controls className="w-full h-full object-cover" />
+                        <video
+                          src={previewVideo}
+                          controls
+                          className="w-full h-full object-cover"
+                        />
                       ) : introVideoUrl ? (
-                        <video src={introVideoUrl} controls className="w-full h-full object-cover" />
+                        <video
+                          src={introVideoUrl}
+                          controls
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gray900 text-white">
                           Không có video giới thiệu
@@ -364,7 +377,9 @@ const Info = ({ userInfo }: InfoProps) => {
                       )}
                       {isUploading && (
                         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 rounded-xl z-10">
-                          <Typography className="text-white">Đang tải...</Typography>
+                          <Typography className="text-white">
+                            Đang tải...
+                          </Typography>
                         </div>
                       )}
                       {isEditing && (
@@ -428,13 +443,16 @@ const Info = ({ userInfo }: InfoProps) => {
                   <p className="font-bold">
                     {t.profile.dateOfBirth}{" "}
                     <span className="font-normal">
-                      {(userInfo.dateOfBirth || userInfo.birthDate)
-                        ? dayjs(userInfo.dateOfBirth || userInfo.birthDate).format("DD/MM/YYYY")
+                      {userInfo.dateOfBirth || userInfo.birthDate
+                        ? dayjs(
+                            userInfo.dateOfBirth || userInfo.birthDate
+                          ).format("DD/MM/YYYY")
                         : "-"}
                     </span>
                   </p>
                   <p className="font-bold">
-                    {t.profile.email} <span className="font-normal">{userInfo.email || "-"}</span>
+                    {t.profile.email}{" "}
+                    <span className="font-normal">{userInfo.email || "-"}</span>
                   </p>
                   <p className="font-bold">
                     {t.profile.gender}{" "}
@@ -448,12 +466,16 @@ const Info = ({ userInfo }: InfoProps) => {
                   </p>
                   {(userInfo.phone || userInfo.phoneNumber) && (
                     <p className="font-bold">
-                      {t.profile.phone} <span className="font-normal">{userInfo.phone || userInfo.phoneNumber}</span>
+                      {t.profile.phone}{" "}
+                      <span className="font-normal">
+                        {userInfo.phone || userInfo.phoneNumber}
+                      </span>
                     </p>
                   )}
                   {userInfo.address && (
                     <p className="font-bold col-span-2">
-                      {t.profile.address} <span className="font-normal">{userInfo.address}</span>
+                      {t.profile.address}{" "}
+                      <span className="font-normal">{userInfo.address}</span>
                     </p>
                   )}
                 </>
@@ -479,16 +501,14 @@ const Info = ({ userInfo }: InfoProps) => {
                 <CustomButton
                   type="Secondary"
                   className="flex items-center gap-2 !bg-gray-500 !text-white hover:!bg-gray-600"
-                  onClick={handleCancel}
-                >
+                  onClick={handleCancel}>
                   <CancelIcon sx={{ fontSize: "18px" }} />
                   {t.common.cancel}
                 </CustomButton>
                 <CustomButton
                   type="Secondary"
                   className="flex items-center gap-2 !bg-green-500 !text-white hover:!bg-green-600"
-                  onClick={handleSave}
-                >
+                  onClick={handleSave}>
                   <SaveIcon sx={{ fontSize: "18px" }} />
                   {t.common.save}
                 </CustomButton>
@@ -498,12 +518,14 @@ const Info = ({ userInfo }: InfoProps) => {
                 <CustomButton
                   type="Secondary"
                   className="flex items-center gap-2 !bg-blue100 !text-blue700"
-                  onClick={handleEdit}
-                >
+                  onClick={handleEdit}>
                   <EditIcon sx={{ fontSize: "18px" }} />
                   {t.common.edit}
                 </CustomButton>
-                <CustomButton type="Secondary" className="flex items-center gap-2 !bg-yellow100 !text-yellow500" onClick={handleLogout}>
+                <CustomButton
+                  type="Secondary"
+                  className="flex items-center gap-2 !bg-yellow100 !text-yellow500"
+                  onClick={handleLogout}>
                   <LogoutIcon sx={{ fontSize: "18px" }} />
                   {t.common.logout}
                 </CustomButton>

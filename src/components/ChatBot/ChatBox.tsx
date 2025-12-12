@@ -116,7 +116,6 @@ export default function ChatBox() {
     setIsOpen((prev) => {
       const next = !prev;
       if (next) {
-        // mở chat -> load lịch sử
         getHistoryChat();
       } else {
         if (error) clearError();
@@ -125,19 +124,15 @@ export default function ChatBox() {
     });
   };
 
-  // Map history chat từ store vào messages
-  // Mỗi sessionId là 1 cuộc hội thoại -> lấy session mới nhất
   useEffect(() => {
     if (!chatData) return;
 
-    // chatData có thể là array hoặc { data: [...] }
     const rows: any[] = Array.isArray(chatData)
       ? chatData
       : (chatData.data ?? []);
 
     if (!Array.isArray(rows) || rows.length === 0) return;
 
-    // Lấy sessionId của cuộc hội thoại mới nhất
     const latestSessionId = rows[rows.length - 1]?.sessionId;
     const sessionRows = latestSessionId
       ? rows.filter((r) => r.sessionId === latestSessionId)
@@ -161,7 +156,6 @@ export default function ChatBox() {
     });
   }, [chatData]);
 
-  // Auto scroll xuống cuối khi có message mới
   useEffect(() => {
     if (!isOpen) return;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -201,10 +195,8 @@ export default function ChatBox() {
     }
   };
 
-  // Chỉ render sau khi mounted để tránh hydration mismatch
   if (!mounted) return null;
 
-  // Nếu không có token thì ẩn luôn chatbox (hoặc thay bằng UI khác tuỳ bạn)
   if (!token) {
     console.log("❌ Không tìm thấy token, không thể kết nối socket.");
     return null;
@@ -261,14 +253,16 @@ export default function ChatBox() {
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"
-                  }`}>
+                className={`flex ${
+                  msg.role === "user" ? "justify-end" : "justify-start"
+                }`}>
                 <div
                   className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs shadow-sm
-                  ${msg.role === "user"
+                  ${
+                    msg.role === "user"
                       ? "bg-blue-600 text-white rounded-br-sm"
                       : "bg-white text-slate-800 border border-slate-200 rounded-bl-sm"
-                    }`}>
+                  }`}>
                   {msg.content}
                 </div>
               </div>
