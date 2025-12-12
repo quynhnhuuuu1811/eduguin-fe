@@ -26,7 +26,7 @@ const RecommendTutor = () => {
         await recommendTutor();
         if (mounted) setUsedFallback(false);
       } catch (error) {
-        if (mounted) await fetchAllTutors({ page: 1, limit:4 });
+        if (mounted) await fetchAllTutors({ page: 1, limit: 4 });
         if (mounted) setUsedFallback(true);
       }
     };
@@ -101,17 +101,11 @@ const RecommendTutor = () => {
             900: { slidesPerView: 3 },
             1200: { slidesPerView: 4 },
           }}
-          loop
-          pagination={{
-            clickable: true,
-            dynamicBullets: true,
-          }}
+          loop={displayTutors.length > 4}
+          centerInsufficientSlides={true}
+          pagination={{ clickable: true, dynamicBullets: true }}
           modules={[Pagination, Autoplay]}
-          autoplay={{
-            delay: 2500,
-            disableOnInteraction: false,
-          }}
-          className="recommend-tutor-swiper">
+          autoplay={{ delay: 2500, disableOnInteraction: false }}>
           {displayTutors.map((tutor: Tutor, index: number) => (
             <SwiperSlide
               key={index}
