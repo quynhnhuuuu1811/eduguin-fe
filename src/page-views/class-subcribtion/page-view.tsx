@@ -10,6 +10,7 @@ import dayjs from 'dayjs';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import Snackbar from '@mui/material/Snackbar';
+import { useTranslation } from '@/i18n';
 
 interface SubscriptionData {
   id: string;
@@ -25,6 +26,7 @@ interface SubscriptionData {
 
 const ClassSubcribtionPageView = () => {
   const { studentSubscriptions, getListStudentSubscriptions, loading, approveClassSubscription, rejectClassSubscription } = useClassStore();
+  const { t } = useTranslation();
 
   // Snackbar states
   const [snackbar, setSnackbar] = useState<{
@@ -93,19 +95,19 @@ const ClassSubcribtionPageView = () => {
 
   const columns: ColumnData<SubscriptionData>[] = [
     {
-      label: 'Tên lớp',
+      label: t.classSubscription.class,
       dataKey: 'className',
       align: 'left',
       width: 180,
     },
     {
-      label: 'Tên học sinh',
+      label: t.classSubscription.student,
       dataKey: 'studentName',
       align: 'left',
       width: 150,
     },
     {
-      label: 'Ngày yêu cầu',
+      label: t.classSubscription.requestDate,
       dataKey: 'requestedAt',
       align: 'left',
       width: 120,
@@ -115,25 +117,25 @@ const ClassSubcribtionPageView = () => {
       },
     },
     {
-      label: 'Trạng thái',
+      label: t.classSubscription.status,
       dataKey: 'status',
       align: 'center',
       width: 100,
       render: (value: unknown) => {
-        if (value === 'pending') return <span className="text-yellow-500 font-medium">Chờ duyệt</span>;
-        if (value === 'approved') return <span className="text-green-500 font-medium">Đã duyệt</span>;
-        if (value === 'rejected') return <span className="text-red-500 font-medium">Từ chối</span>;
+        if (value === 'pending') return <span className="text-yellow-500 font-medium">{t.myClasses.pending}</span>;
+        if (value === 'approved') return <span className="text-green-500 font-medium">{t.classSubscription.approved}</span>;
+        if (value === 'rejected') return <span className="text-red-500 font-medium">{t.classSubscription.rejected}</span>;
         return <span className="text-gray-500">-</span>;
       },
     },
     {
-      label: 'Hành động',
+      label: t.myClasses.actions,
       dataKey: 'action',
       align: 'center',
       width: 150,
       render: (_value: unknown, row: SubscriptionData) => {
         if (row.status !== 'pending') {
-          return <span className="text-gray-400 text-sm">Đã xử lý</span>;
+          return <span className="text-gray-400 text-sm">{t.classSubscription.title === 'Class Requests' ? 'Processed' : 'Đã xử lý'}</span>;
         }
         return (
           <div className="flex gap-2 justify-center">
@@ -143,7 +145,7 @@ const ClassSubcribtionPageView = () => {
                 handleApprove(row.id);
               }}
               className="p-2 rounded-full hover:bg-green-100 transition-colors"
-              title="Duyệt"
+              title={t.classSubscription.approve}
             >
               <CheckCircleIcon sx={{ fontSize: 22, color: '#22c55e' }} />
             </button>
@@ -153,7 +155,7 @@ const ClassSubcribtionPageView = () => {
                 handleReject(row.id);
               }}
               className="p-2 rounded-full hover:bg-red-100 transition-colors"
-              title="Từ chối"
+              title={t.classSubscription.reject}
             >
               <CancelIcon sx={{ fontSize: 22, color: '#ef4444' }} />
             </button>
@@ -180,7 +182,7 @@ const ClassSubcribtionPageView = () => {
             mb: 4,
           }}
         >
-          Danh sách yêu cầu vào lớp học
+          {t.classSubscription.title}
         </Typography>
 
         <div className="flex justify-center items-center w-full">
@@ -190,7 +192,7 @@ const ClassSubcribtionPageView = () => {
             autoHeight
             getRowId={(row, index) => row.id || index.toString()}
             onRowClick={(row) => console.log('Row clicked:', row)}
-            emptyMessage="Chưa có yêu cầu nào"
+            emptyMessage={t.classSubscription.noRequests}
           />
         </div>
       </div>

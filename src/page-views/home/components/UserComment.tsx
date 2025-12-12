@@ -4,8 +4,12 @@ import React from "react";
 import commentImg from "../../../assets/images/userComments.png";
 import { CustomButton } from "@/components/Button";
 import Image from "next/image";
+import { useTranslation } from "@/i18n";
 
 const UserComment = () => {
+  const { t } = useTranslation();
+  const isEnglish = t.common.loading === 'Loading...';
+
   return (
     <Box
       className="w-full bg-[#F5FAFE] flex flex-col justify-center items-center"
@@ -51,7 +55,7 @@ const UserComment = () => {
           fontWeight: 700,
         }}
       >
-        Người dùng
+        {isEnglish ? 'What do users' : 'Người dùng'}
         <Typography
           component="span"
           fontFamily="sugar"
@@ -68,9 +72,9 @@ const UserComment = () => {
           }}
         >
           {" "}
-          nhận xét{" "}
+          {isEnglish ? 'say' : 'nhận xét'}{" "}
         </Typography>
-        gì về EduGuin?
+        {isEnglish ? 'about EduGuin?' : 'gì về EduGuin?'}
       </Typography>
 
       <Box
@@ -121,13 +125,13 @@ const UserComment = () => {
               fontWeight: 500,
             }}
           >
-            Bạn muốn gửi thêm nhận xét cho chúng tôi?
+            {isEnglish ? 'Want to send us your feedback?' : 'Bạn muốn gửi thêm nhận xét cho chúng tôi?'}
           </Typography>
           <CustomButton
             type="Secondary"
             className="!bg-[#CEF8D5] !text-[#02A959] w-fit pb-2"
           >
-            Đóng góp ý kiến
+            {isEnglish ? 'Leave Feedback' : 'Đóng góp ý kiến'}
           </CustomButton>
         </Box>
 

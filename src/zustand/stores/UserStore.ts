@@ -15,6 +15,8 @@ interface FetchTutorParams {
 
 interface UserState {
   users: User[];
+  totalUsers: number;
+  students: any[];
   selectedUser: Tutor | null;
   userInfo: UserResponse | null;
   tutorList: Tutor[];
@@ -27,10 +29,13 @@ interface UserState {
   updateTutorInfo: (data: FormData) => Promise<void>;
   clearStudentInfo: () => void;
   recommendTutor: () => Promise<void>;
+  getStudents: (params: any) => Promise<void>;
 }
 
 export const useUserStore = create<UserState>((set, get) => ({
   users: [],
+  totalUsers: 0,
+  students: [],
   selectedUser: null,
   userInfo: null,
   loading: false,
@@ -57,7 +62,8 @@ export const useUserStore = create<UserState>((set, get) => ({
     try {
       const res: any = await UserApi.getAllTutors(params);
       const tutor = res.data.data;
-      set({ users: tutor, loading: false });
+      const total = res.data.meta?.total || res.data.total || tutor?.length || 0;
+      set({ users: tutor, totalUsers: total, loading: false });
     } catch (error: any) {
       set({
         loading: false,
@@ -110,6 +116,15 @@ export const useUserStore = create<UserState>((set, get) => ({
         error: error?.response?.data?.message || "Failed to update user info",
       });
       throw error;
+    }
+  },
+  async getStudents(params: any) {
+    set({ loading: true, error: null });
+    try {
+      const res: any = await UserApi.getStudents(params);
+      set({ students: res.data.data, loading: false });
+    } catch (error: any) {
+      set({ loading: false, error: error?.response?.data?.message || "Failed to get students" });
     }
   },
 

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/zustand/stores/AuthStore";
+import { useTranslation } from "@/i18n";
 
 const NavbarMobile = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -13,34 +14,35 @@ const NavbarMobile = () => {
   const isAuthenticated = useAuthStore((state) => !!state.data.accessToken);
   const userRole = useAuthStore((state) => state.data.user?.role);
   const isTutor = userRole === "tutor";
+  const { t } = useTranslation();
 
   const getNavItems = () => {
     if (!isAuthenticated) {
       return [
-        { label: "Trang chủ", path: "/" },
-        { label: "Tìm gia sư", path: "/find-tutor" },
-        { label: "Lớp học của tôi", path: "/my-classes" },
-        { label: "Liên hệ", path: "/contact" },
-        { label: "Đăng nhập", path: "/login" },
+        { label: t.navbar.home, path: "/" },
+        { label: t.navbar.findTutor, path: "/find-tutor" },
+        { label: t.navbar.myClasses, path: "/my-classes" },
+        { label: t.navbar.contact, path: "/contact" },
+        { label: t.common.login, path: "/login" },
       ];
     }
 
     if (isTutor) {
       return [
-        { label: "Trang chủ", path: "/" },
-        { label: "Lớp học của tôi", path: "/my-classes" },
-        { label: "Đăng kí lớp học", path: "/class-subcribtion" },
-        { label: "Liên hệ", path: "/contact" },
-        { label: "Tài khoản", path: "/profile" },
+        { label: t.navbar.home, path: "/" },
+        { label: t.navbar.myClasses, path: "/my-classes" },
+        { label: t.navbar.classRequests, path: "/class-subcribtion" },
+        { label: t.navbar.contact, path: "/contact" },
+        { label: t.navbar.profile, path: "/profile" },
       ];
     }
 
     return [
-      { label: "Trang chủ", path: "/" },
-      { label: "Tìm gia sư", path: "/find-tutor" },
-      { label: "Lớp học của tôi", path: "/my-classes" },
-      { label: "Liên hệ", path: "/contact" },
-      { label: "Tài khoản", path: "/profile" },
+      { label: t.navbar.home, path: "/" },
+      { label: t.navbar.findTutor, path: "/find-tutor" },
+      { label: t.navbar.myClasses, path: "/my-classes" },
+      { label: t.navbar.contact, path: "/contact" },
+      { label: t.navbar.profile, path: "/profile" },
     ];
   };
 

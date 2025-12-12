@@ -17,6 +17,7 @@ interface ClassState {
   loading: boolean;
   error: string | null;
   studentSubscriptions: ClassSubscriptionResponse[];
+  tutorApplyList: any[];
   // Actions cho Gia sư
   fetchTutorClasses: () => Promise<void>;
   createClass: (request: CreateClassRequest) => Promise<Class>;
@@ -29,7 +30,11 @@ interface ClassState {
   fetchStudentClasses: () => Promise<void>;
   getListStudentSubscriptions: () => Promise<void>;
   approveClassSubscription: (subscriptionId: string) => Promise<void>;
-  rejectClassSubscription: (subscriptionId: string) => Promise<void>;   
+  rejectClassSubscription: (subscriptionId: string) => Promise<void>;
+  getListStudentofClass: (classId: string) => Promise<any[]>;
+  getTutorApplyList: () => Promise<any[]>;
+  approveTutorApplication: (id: string) => Promise<void>;
+  rejectTutorApplication: (id: string) => Promise<void>;
 }
 
 export const useClassStore = create<ClassState>((set, get) => ({
@@ -38,7 +43,7 @@ export const useClassStore = create<ClassState>((set, get) => ({
   selectedClass: null,
   loading: false,
   error: null,
-
+  tutorApplyList: [],
   async fetchTutorClasses() {
     set({ loading: true, error: null });
     try {
@@ -216,6 +221,70 @@ export const useClassStore = create<ClassState>((set, get) => ({
         : undefined;
     set({ loading: false, error: errorMessage || "Không thể từ chối yêu cầu" });
     throw error;
+    }
+  },
+
+  async getListStudentofClass(classId: string) {
+    try {
+      const res = await ClassesApi.getListStudentofClass(classId);
+      return (res as any).data?.data || [];
+    } catch (error: unknown) {
+      console.error("Không thể lấy danh sách học sinh:", error);
+      return [];
+    }
+  },
+
+  async getTutorApplyList(): Promise<any[]> {
+    set({ loading: true, error: null });
+    try {
+      const res = await ClassesApi.getTutorApplyList();
+      const data = res.data?.data || [];
+      set({ tutorApplyList: data, loading: false });
+      return data;
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      set({ loading: false, error: errorMessage || "Không thể lấy danh sách ứng tuyển" });
+      return [];
+    }
+  },
+
+  async approveTutorApplication(id: string): Promise<void> {
+    set({ loading: true, error: null });
+    try {
+      await ClassesApi.approveTutorApplication(id);
+      // Refresh list after approval
+      const res = await ClassesApi.getTutorApplyList();
+      set({ tutorApplyList: res.data?.data || [], loading: false });
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      set({ loading: false, error: errorMessage || "Không thể duyệt giáo viên" });
+      throw error;
+    }
+  },
+
+  async rejectTutorApplication(id: string): Promise<void> {
+    set({ loading: true, error: null });
+    try {
+      await ClassesApi.rejectTutorApplication(id);
+      // Refresh list after rejection
+      const res = await ClassesApi.getTutorApplyList();
+      set({ tutorApplyList: res.data?.data || [], loading: false });
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      set({ loading: false, error: errorMessage || "Không thể từ chối giáo viên" });
+      throw error;
     }
   },
 }));

@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { RegisterRequest } from '@/zustand/types/Auth';
 import LoadingScreen from '@/components/LoadingScreen';
 import { useSubjectStore } from '@/zustand/stores/SubjectStore';
+import { useTranslation } from '@/i18n';
 
 interface RegisterFormData {
   email: string;
@@ -29,6 +30,7 @@ const RegisterPageView = () => {
   const { register: registerUser, loading } = useAuthStore();
   const { subjects, fetchAllSubjects } = useSubjectStore();
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
 
   const router = useRouter();
   const {
@@ -66,14 +68,14 @@ const RegisterPageView = () => {
   }
 
   const genderOptions = [
-    { value: 'male', label: 'Nam' },
-    { value: 'female', label: 'Nữ' },
-    { value: 'other', label: 'Khác' },
+    { value: 'male', label: t.profile.male },
+    { value: 'female', label: t.profile.female },
+    { value: 'other', label: t.profile.other },
   ];
 
   const lookingForOptions = [
-    { value: 'student', label: 'Học sinh' },
-    { value: 'tutor', label: 'Gia sư' },
+    { value: 'student', label: t.home.roleOptions.studentTitle },
+    { value: 'tutor', label: t.home.roleOptions.tutorTitle },
   ];
 
   const gradeOptions = [
@@ -157,7 +159,7 @@ const RegisterPageView = () => {
         onClose={() => setOpen(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert severity="success">Đăng ký thành công! Vui lòng đăng nhập để tiếp tục</Alert>
+        <Alert severity="success">{t.auth.register.registerSuccess}</Alert>
       </Snackbar>
       <div className='flex flex-row h-screen overflow-hidden relative'
         style={{
@@ -216,7 +218,7 @@ const RegisterPageView = () => {
                   textAlign: 'center',
                 }}
               >
-                Trở thành bạn mới của tớ nhé!
+                {t.auth.register.title}
               </Typography>
             </div>
 
@@ -457,113 +459,12 @@ const RegisterPageView = () => {
                       </div>
                     )}
                   />
-
-                  <Controller
-                    name="lookingFor"
-                    control={control}
-                    rules={{ required: 'Vui lòng chọn vai trò' }}
-                    render={({ field }) => (
-                      <div>
-                        <CustomInput
-                          label='Bạn đang tìm kiếm'
-                          type="select"
-                          value={field.value || ''}
-                          onChange={field.onChange}
-                          name="lookingFor"
-                          options={lookingForOptions}
-                        />
-                        {errors.lookingFor && (
-                          <Typography
-                            sx={{
-                              color: 'error.main',
-                              fontSize: { xs: '10px', sm: '12px' },
-                              mt: 0.5,
-                              ml: 1,
-                              fontFamily: 'Quicksand',
-                            }}
-                          >
-                            {errors.lookingFor.message}
-                          </Typography>
-                        )}
-                      </div>
-                    )}
-                  />
                 </div>
               </div>
 
-              {/* Tutor-specific fields - Show when user selects "Học sinh" (they are a tutor) */}
-              {isTutor && (
-                <div className='w-full flex flex-row justify-center items-start' style={{ gap: '20px' }}>
-                  <div className='w-full md:w-1/2'>
-                    <Controller
-                      name="subjectId"
-                      control={control}
-                      rules={{ required: isTutor ? 'Vui lòng chọn môn dạy' : false }}
-                      render={({ field }) => (
-                        <div>
-                          <CustomInput
-                            label='Môn dạy'
-                            type="select"
-                            value={field.value || ''}
-                            onChange={field.onChange}
-                            name="subjectId"
-                            options={subjectOptions}
-                          />
-                          {errors.subjectId && (
-                            <Typography
-                              sx={{
-                                color: 'error.main',
-                                fontSize: { xs: '10px', sm: '12px' },
-                                mt: 0.5,
-                                ml: 1,
-                                fontFamily: 'Quicksand',
-                              }}
-                            >
-                              {errors.subjectId.message}
-                            </Typography>
-                          )}
-                        </div>
-                      )}
-                    />
-                  </div>
-                  <div className='w-full md:w-1/2'>
-                    <Controller
-                      name="grade"
-                      control={control}
-                      rules={{ required: isTutor ? 'Vui lòng chọn khối dạy' : false }}
-                      render={({ field }) => (
-                        <div>
-                          <CustomInput
-                            label='Khối dạy'
-                            type="select"
-                            value={field.value || ''}
-                            onChange={field.onChange}
-                            name="grade"
-                            options={gradeOptions}
-                          />
-                          {errors.grade && (
-                            <Typography
-                              sx={{
-                                color: 'error.main',
-                                fontSize: { xs: '10px', sm: '12px' },
-                                mt: 0.5,
-                                ml: 1,
-                                fontFamily: 'Quicksand',
-                              }}
-                            >
-                              {errors.grade.message}
-                            </Typography>
-                          )}
-                        </div>
-                      )}
-                    />
-                  </div>
-                </div>
-              )}
-
               <div className='w-full flex flex-row justify-center gap-5 items-center' style={{ gap: '10px' }}>
                 <CustomButton type='Primary' onClick={handleSubmit(onSubmit)} className='w-1/2'>
-                  Đăng ký
+                  {t.common.register}
                 </CustomButton>
               </div>
             </form>
@@ -579,7 +480,7 @@ const RegisterPageView = () => {
                   fontFamily: 'Quicksand',
                 }}
               >
-                Bạn đã có tài khoản? <Link href="/login" sx={{ fontWeight: 700 }}>Đăng nhập ngay</Link>
+                {t.auth.register.hasAccount} <Link href="/login" sx={{ fontWeight: 700 }}>{t.auth.register.loginNow}</Link>
               </Typography>
             </div>
           </Box>

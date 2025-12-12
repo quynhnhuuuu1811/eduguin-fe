@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { AuthUser, LoginRequest, RegisterRequest, RegisterResponse } from "../types/Auth";
+import { AuthUser, LoginRequest, RegisterRequest, RegisterResponse, TutorApplyRequest, AdminLoginRequest } from "../types/Auth";
 import { AuthApi } from "../api/AuthApi";
 
 interface AuthState {
@@ -11,10 +11,13 @@ interface AuthState {
   error: string | null;
 
   login: (credentials: LoginRequest) => Promise<void>;
+  adminLogin: (credentials: AdminLoginRequest) => Promise<void>;
   register: (credentials: RegisterRequest) => Promise<RegisterResponse>;
+  tutorApply: (data: TutorApplyRequest) => Promise<RegisterResponse>;
   logout: () => void;
   clearError: () => void;
   getMyInfo: () => Promise<void>;
+  banUser: (id: string) => Promise<void>;
 }
 
 const getInitialState = (): Pick<AuthState, 'data' | 'loading' | 'error'> => {
@@ -64,6 +67,31 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
+  async adminLogin(credentials: AdminLoginRequest) {
+    set({ loading: true, error: null });
+    try {
+      const res = await AuthApi.adminLogin(credentials);
+      const user = res.data?.data?.user;
+      const accessToken = res.data?.data?.access_token;
+
+      if (typeof window !== "undefined" && accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+
+      set({
+        data: { user, accessToken },
+        loading: false,
+      });
+    } catch {
+      set({
+        loading: false,
+        error: "Đăng nhập admin thất bại",
+      });
+      throw new Error("Đăng nhập admin thất bại");
+    }
+  },
+
   logout() {
     if (typeof window !== "undefined") {
       localStorage.removeItem("accessToken");
@@ -86,6 +114,18 @@ export const useAuthStore = create<AuthState>((set) => ({
       return res;
     } catch (error) {
       set({ loading: false, error: "Đăng ký thất bại" });
+      throw error;
+    }
+  },
+
+  async tutorApply(data: TutorApplyRequest) {
+    set({ loading: true, error: null });
+    try {
+      const res = await AuthApi.tutorApply(data);
+      set({ loading: false });
+      return res;
+    } catch (error) {
+      set({ loading: false, error: "Gửi đơn ứng tuyển thất bại" });
       throw error;
     }
   },
@@ -133,6 +173,18 @@ export const useAuthStore = create<AuthState>((set) => ({
       }));
     } catch (error) {
       set({ loading: false, error: "Không thể tải thông tin người dùng" });
+    }
+  },
+
+  async banUser(id: string) {
+    set({ loading: true, error: null });
+    try {
+      const res = await AuthApi.banUser(id);
+      set({ loading: false });
+      return res;
+    } catch (error) {
+      set({ loading: false, error: "Khóa người dùng thất bại" });
+      throw error;
     }
   },
 }));

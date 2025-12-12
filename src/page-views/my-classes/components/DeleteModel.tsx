@@ -13,9 +13,10 @@ interface DeleteModelProps {
   open: boolean;
   onClose: () => void;
   classData: ClassData | null;
+  onSuccess?: () => void;
 }
 
-export default function DeleteModel({ open, onClose, classData }: DeleteModelProps) {
+export default function DeleteModel({ open, onClose, classData, onSuccess }: DeleteModelProps) {
   const { deleteClass, fetchTutorClasses } = useClassStore();
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +30,7 @@ export default function DeleteModel({ open, onClose, classData }: DeleteModelPro
       await deleteClass(classData.id);
       onClose();
       fetchTutorClasses();
+      onSuccess?.();
     } catch {
       setError("Có lỗi xảy ra khi xoá lớp học");
     } finally {

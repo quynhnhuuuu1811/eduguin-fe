@@ -1,8 +1,11 @@
+"use client";
 import { Box, Typography } from "@mui/material";
 import React from "react";
 import bkg from "../../../assets/images/FindTutor.jpg";
+import { useTranslation } from "../../../i18n/LanguageContext";
 
 const Banner = () => {
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -52,32 +55,18 @@ const Banner = () => {
           sx={{
             position: "relative",
             zIndex: 1,
-            fontFamily: "quicksand",
+            fontFamily: "sugar",
             fontSize: {
-              xs: "15px",
+              xs: "20px",
               sm: "20px",
-              md: "25px",
-              lg: "30px",
+              md: "30px",
+              lg: "40px",
             },
           }}
           component={"span"}
           className="text-blue100"
         >
-          Cùng EduGuin{" "}
-          <Typography
-            component={"span"}
-            fontFamily={"sugar"}
-            fontSize={{
-              xs: "20px",
-              sm: "35px",
-              md: "40px",
-              lg: "45px",
-            }}
-            className="text-primary200"
-          >
-            tìm gia sư
-          </Typography>{" "}
-          phù hợp với bạn
+          {t.findTutor.banner.title}
         </Typography>
       </Box>
     </Box>

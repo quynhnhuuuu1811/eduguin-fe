@@ -6,11 +6,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/zustand/stores/AuthStore";
 import { useEffect, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import { useTranslation } from "@/i18n";
 
 export const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const [hasMounted, setHasMounted] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setHasMounted(true);
@@ -25,11 +27,11 @@ export const Navbar = () => {
   const isTutor = userRole === "tutor";
 
   const navItems = [
-    { href: "/", label: "Trang chủ", requireAuth: false, hideForTutor: false, showOnlyForTutor: false },
-    { href: "/find-tutor", label: "Tìm gia sư", requireAuth: true, hideForTutor: true, showOnlyForTutor: false },
-    { href: "/my-classes", label: "Lớp học của tôi", requireAuth: true, hideForTutor: false, showOnlyForTutor: false },
-    { href: "/class-subcribtion", label: "Đăng kí lớp học", requireAuth: true, hideForTutor: false, showOnlyForTutor: true },
-    { href: "/contact", label: "Liên hệ", requireAuth: true, hideForTutor: false, showOnlyForTutor: false },
+    { href: "/", label: t.navbar.home, requireAuth: false, hideForTutor: false, showOnlyForTutor: false },
+    { href: "/find-tutor", label: t.navbar.findTutor, requireAuth: true, hideForTutor: true, showOnlyForTutor: false },
+    { href: "/my-classes", label: t.navbar.myClasses, requireAuth: true, hideForTutor: false, showOnlyForTutor: false },
+    { href: "/class-subcribtion", label: t.navbar.classRequests, requireAuth: true, hideForTutor: false, showOnlyForTutor: true },
+    { href: "/contact", label: t.navbar.contact, requireAuth: true, hideForTutor: false, showOnlyForTutor: false },
   ];
 
   // Filter nav items based on user role
@@ -149,7 +151,7 @@ export const Navbar = () => {
                 router.push("/profile");
               }}
             >
-              Tài khoản
+              {t.navbar.profile}
             </button>
           ) : (
             <button
@@ -158,7 +160,7 @@ export const Navbar = () => {
                 router.push("/login");
               }}
             >
-              Đăng nhập
+              {t.common.login}
             </button>
           )}
         </div>
@@ -177,11 +179,11 @@ export const Navbar = () => {
         }}
       >
         <DialogTitle className="text-center font-quicksand font-bold text-blue700">
-          Bạn chưa đăng nhập
+          {t.auth.login.noAccount?.replace('?', '') || 'Bạn chưa đăng nhập'}
         </DialogTitle>
         <DialogContent>
           <p className="text-center text-gray-600 font-quicksand">
-            Vui lòng đăng nhập để truy cập trang này.
+            {t.auth.login.loginFailed ? 'Vui lòng đăng nhập để truy cập trang này.' : 'Vui lòng đăng nhập để truy cập trang này.'}
           </p>
         </DialogContent>
         <DialogActions className="justify-center gap-2 pb-4">
@@ -191,7 +193,7 @@ export const Navbar = () => {
             color="inherit"
             sx={{ borderRadius: '20px', px: 3 }}
           >
-            Hủy
+            {t.common.cancel}
           </Button>
           <Button
             onClick={handleGoToLogin}
@@ -205,7 +207,7 @@ export const Navbar = () => {
               }
             }}
           >
-            Đăng nhập
+            {t.common.login}
           </Button>
         </DialogActions>
       </Dialog>

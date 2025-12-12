@@ -6,11 +6,20 @@ import NavbarMobile from "./NavbarMobile";
 export const ConditionalNavbar = () => {
   const pathname = usePathname();
 
+  // Ẩn navbar trên trang admin
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   if (pathname === "/login") {
     return null;
   }
 
   if (pathname === "/register") {
+    return null;
+  }
+
+  if (pathname === "/tutor-register") {
     return null;
   }
 

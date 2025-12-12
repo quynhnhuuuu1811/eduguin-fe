@@ -3,6 +3,11 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface AdminLoginRequest {
+  email: string;
+  password: string;
+}
+
 export interface LoginResponse {
   data: {
     data: {
@@ -50,9 +55,20 @@ export interface RegisterRequest {
   password: string;
   confirmPassword: string;
   role: string;
+}
+
+export interface TutorApplyRequest {
+  email: string;
+  fullName: string;
+  dateOfBirth: string;
+  displayName: string;
+  sex: string;
+  password: string;
+  confirmPassword: string;
   // Tutor-specific fields
-  subjectId?: string;
-  grade?: number;
+  subjectId: string;
+  grade: number;
+  description?: string;
 }
 
 export interface RegisterResponse {

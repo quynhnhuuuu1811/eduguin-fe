@@ -6,6 +6,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TablePagination from '@mui/material/TablePagination';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
@@ -18,6 +19,15 @@ export interface ColumnData<T = Record<string, unknown>> {
   width?: number;
   align?: 'left' | 'right' | 'center';
   render?: (value: unknown, row: T, index: number) => React.ReactNode;
+}
+
+export interface PaginationProps {
+  page: number;
+  rowsPerPage: number;
+  totalCount: number;
+  onPageChange: (newPage: number) => void;
+  onRowsPerPageChange?: (newRowsPerPage: number) => void;
+  rowsPerPageOptions?: number[];
 }
 
 export interface VirtualizedTableProps<T = Record<string, unknown>> {
@@ -34,6 +44,8 @@ export interface VirtualizedTableProps<T = Record<string, unknown>> {
   stickyHeader?: boolean;
   autoHeight?: boolean;
   maxHeight?: number | string;
+  // Pagination props
+  pagination?: PaginationProps;
 }
 
 function VirtualizedTable<T extends Record<string, unknown>>({
@@ -50,7 +62,17 @@ function VirtualizedTable<T extends Record<string, unknown>>({
   stickyHeader = true,
   autoHeight = false,
   maxHeight,
+  pagination,
 }: VirtualizedTableProps<T>) {
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    pagination?.onPageChange(newPage + 1); // API usually uses 1-based page
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    pagination?.onRowsPerPageChange?.(parseInt(event.target.value, 10));
+    pagination?.onPageChange(1); // Reset to first page
+  };
   // Empty state
   if (data.length === 0) {
     return (
@@ -65,69 +87,91 @@ function VirtualizedTable<T extends Record<string, unknown>>({
   // Auto height mode - use regular MUI Table
   if (autoHeight) {
     return (
-      <TableContainer
-        component={Paper}
-        sx={{
-          width,
-          maxHeight: maxHeight || 'none',
-          ...sx
-        }}
-      >
-        <Table stickyHeader={stickyHeader} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }}>
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={String(column.dataKey)}
-                  align={column.align || (column.numeric ? 'right' : 'left')}
-                  style={{
-                    width: column.width,
-                    backgroundColor: 'var(--color-blue100)',
-                  }}
-                  sx={{
-                    fontWeight: 600,
-                    fontFamily: 'Quicksand',
-                    ...headerSx,
-                  }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((row, index) => (
-              <TableRow
-                key={getRowId ? String(getRowId(row, index)) : index}
-                hover
-                onClick={() => onRowClick && onRowClick(row, index)}
-                sx={{ cursor: onRowClick ? 'pointer' : 'default' }}
-              >
-                {columns.map((column) => {
-                  const value = row[column.dataKey as keyof T] as unknown;
-                  const cellContent = column.render
-                    ? column.render(value, row, index)
-                    : (value as React.ReactNode);
-
-                  return (
-                    <TableCell
-                      key={String(column.dataKey)}
-                      align={column.align || (column.numeric ? 'right' : 'left')}
-                      sx={{
-                        fontFamily: 'Quicksand',
-                        fontWeight: 500,
-                        ...cellSx,
-                      }}
-                    >
-                      {cellContent}
-                    </TableCell>
-                  );
-                })}
+      <Paper sx={{ width, ...sx }}>
+        <TableContainer
+          sx={{
+            maxHeight: maxHeight || 'none',
+          }}
+        >
+          <Table stickyHeader={stickyHeader} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }}>
+            <TableHead>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableCell
+                    key={String(column.dataKey)}
+                    align={column.align || (column.numeric ? 'right' : 'left')}
+                    style={{
+                      width: column.width,
+                      backgroundColor: 'var(--color-blue100)',
+                    }}
+                    sx={{
+                      fontWeight: 600,
+                      fontFamily: 'Quicksand',
+                      ...headerSx,
+                    }}
+                  >
+                    {column.label}
+                  </TableCell>
+                ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {data.map((row, index) => (
+                <TableRow
+                  key={getRowId ? String(getRowId(row, index)) : index}
+                  hover
+                  onClick={() => onRowClick && onRowClick(row, index)}
+                  sx={{ cursor: onRowClick ? 'pointer' : 'default' }}
+                >
+                  {columns.map((column) => {
+                    const value = row[column.dataKey as keyof T] as unknown;
+                    const cellContent = column.render
+                      ? column.render(value, row, index)
+                      : (value as React.ReactNode);
+
+                    return (
+                      <TableCell
+                        key={String(column.dataKey)}
+                        align={column.align || (column.numeric ? 'right' : 'left')}
+                        sx={{
+                          fontFamily: 'Quicksand',
+                          fontWeight: 500,
+                          ...cellSx,
+                        }}
+                      >
+                        {cellContent}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        {/* Pagination */}
+        {pagination && (
+          <TablePagination
+            component="div"
+            count={pagination.totalCount}
+            page={pagination.page - 1} // MUI uses 0-based page
+            rowsPerPage={pagination.rowsPerPage}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={pagination.rowsPerPageOptions || [5, 10, 25, 50]}
+            labelRowsPerPage="Số hàng mỗi trang:"
+            labelDisplayedRows={({ from, to, count }) =>
+              `${from}-${to} của ${count !== -1 ? count : `hơn ${to}`}`
+            }
+            sx={{
+              fontFamily: 'Quicksand',
+              '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+                fontFamily: 'Quicksand',
+              },
+            }}
+          />
+        )}
+      </Paper>
     );
   }
 

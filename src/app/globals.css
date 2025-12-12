@@ -20,7 +20,6 @@
     font-size: 15px; /* nhớ có đơn vị */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    padding: 10px; /* đừng để trong dấu " " */
   }
 
   h1 {
@@ -125,10 +124,9 @@ body {
   color: var(--foreground);
   background: #ffffff;
   font-family: "Quicksand", Arial, Helvetica, sans-serif;
-  font-size: 15;
+  font-size: 15px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  padding: "10px !important";
 }
 
 .recommend-tutor-swiper .swiper-pagination {

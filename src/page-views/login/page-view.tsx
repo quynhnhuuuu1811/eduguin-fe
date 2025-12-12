@@ -8,8 +8,10 @@ import { useRouter } from 'next/navigation';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import LoadingScreen from '@/components/LoadingScreen';
+import { useTranslation } from '@/i18n';
 
 const LoginPageView = () => {
+  const { t } = useTranslation();
   const imageUrl = 'https://res.cloudinary.com/dh2uwapb8/image/upload/v1763998645/fe/yjifhjaytvbt3fmxvdig.png';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,7 +61,7 @@ const LoginPageView = () => {
             '& .MuiAlert-icon': { color: 'white' },
           }}
         >
-          {error || 'Đăng nhập thất bại! Vui lòng kiểm tra lại email và mật khẩu'}
+          {error || t.auth.login.loginFailed}
         </Alert>
       </Snackbar>
       <Box
@@ -152,7 +154,7 @@ const LoginPageView = () => {
                 lineHeight: 'normal',
               }}
             >
-              Chào mừng bạn quay trở lại
+              {t.auth.login.title}
             </Typography>
           </div>
           <div className='w-full flex flex-col justify-center'
@@ -161,14 +163,14 @@ const LoginPageView = () => {
             }}
           >
             <CustomInput
-              label='Email'
+              label={t.auth.login.email}
               type="email"
               value={email}
               onChange={handleInputChange('email')}
               name="email"
             />
             <CustomInput
-              label='Mật khẩu'
+              label={t.auth.login.password}
               type="password"
               value={password}
               onChange={handleInputChange('password')}
@@ -179,7 +181,7 @@ const LoginPageView = () => {
               onClick={handleLogin}
               disabled={loading}
             >
-              {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+              {loading ? t.common.loading : t.common.login}
             </CustomButton>
           </div>
           <div>
@@ -191,7 +193,7 @@ const LoginPageView = () => {
                 fontFamily: 'Quicksand',
               }}
             >
-              Chưa có tài khoản? <Link href="/register">Đăng ký</Link>
+              {t.auth.login.noAccount} <Link href="/register">{t.auth.login.registerNow}</Link>
             </Typography>
           </div>
         </Box>

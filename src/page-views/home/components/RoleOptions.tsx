@@ -6,9 +6,11 @@ import teacherImg from "../../../assets/images/teacher.png";
 import { Grid, Typography } from "@mui/material";
 import { CustomButton } from "../../../components/Button";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/i18n";
 
 const RoleOptions = () => {
   const router = useRouter();
+  const { t } = useTranslation();
   return (
     <Grid
       className=" w-full
@@ -38,7 +40,7 @@ const RoleOptions = () => {
               },
             }}
             color="#414853">
-            "Chúng tôi tự hào"
+            {t.home.roleOptions.studentTitle === 'Student' ? '"We are proud"' : '"Chúng tôi tự hào"'}
           </Typography>
           <Typography
             sx={{
@@ -51,7 +53,9 @@ const RoleOptions = () => {
               },
             }}
             color="#414853">
-            khi là cầu nối vững chắc cho học sinh và gia sư
+            {t.home.roleOptions.studentTitle === 'Student'
+              ? 'to be a solid bridge for students and tutors'
+              : 'khi là cầu nối vững chắc cho học sinh và gia sư'}
           </Typography>
         </div>
         <img
@@ -94,7 +98,7 @@ const RoleOptions = () => {
                 marginBottom: "8px",
                 color: "#000000",
               }}>
-              Cần tìm gia sư?
+              {t.home.roleOptions.studentTitle === 'Student' ? 'Looking for a tutor?' : 'Cần tìm gia sư?'}
             </Typography>
             <Typography
               className="pb-3"
@@ -108,14 +112,13 @@ const RoleOptions = () => {
                 },
                 color: "#000000",
               }}>
-              Với bộ lọc cá nhân hóa, bạn sẽ dễ dàng dàng tìm được người bạn
-              đồng hành trên chặng đường tìm kiếm tri thức.
+              {t.home.roleOptions.studentDesc}
             </Typography>
             <CustomButton
               type="SecondaryOutlined"
               className="!border-blue700 !text-blue700"
               onClick={() => router.push("/find-tutor")}>
-              Tìm gia sư ngay!
+              {t.home.banner.findTutor}
             </CustomButton>
           </div>
         </div>
@@ -144,7 +147,7 @@ const RoleOptions = () => {
                 marginBottom: "8px",
                 color: "#000000",
               }}>
-              Cần tìm kiếm công việc gia sư?{" "}
+              {t.home.roleOptions.studentTitle === 'Student' ? 'Looking for a tutoring job?' : 'Cần tìm kiếm công việc gia sư?'}
             </Typography>
             <Typography
               className="pb-3"
@@ -158,14 +161,13 @@ const RoleOptions = () => {
                 },
                 color: "#000000",
               }}>
-              Cùng tạo ra những CV đặc sắc, tìm công việc gia sư một cách dễ
-              dàng, không còn phải mất nhiều công sức và thời gian!
+              {t.home.roleOptions.tutorDesc}
             </Typography>
             <CustomButton
               type="SecondaryOutlined"
               className="!border-blue700 !text-blue700"
-              onClick={() => router.push("/find-tutor")}>
-              Tạo CV ngay!
+              onClick={() => router.push("/tutor-register")}>
+              {t.home.banner.createCV}
             </CustomButton>
           </div>
         </div>

@@ -2,48 +2,22 @@
 import React, { useEffect } from "react";
 import bkg from "../../../../assets/images/rcmTutor.png";
 import { Box, Typography } from "@mui/material";
-import Img from "../../../../assets/images/teacher.png";
 import CardItem from "./CardItem";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css/pagination";
 import "swiper/css";
 import { useUserStore } from "@/zustand/stores/UserStore";
+import { useTranslation } from "@/i18n";
+
 const RecommendTutor = () => {
-  const rcmTutors = [
-    {
-      name: "Nguyễn Văn A",
-      subject: "Toán học",
-      rating: 4.9,
-      img: Img,
-      location: "Hà Nội",
-    },
-    {
-      name: "Trần Thị B",
-      subject: "Vật lý",
-      rating: 4.8,
-      img: Img,
-      location: "TP. Hồ Chí Minh",
-    },
-    {
-      name: "Lê Văn C",
-      subject: "Hóa học",
-      rating: 4.7,
-      img: Img,
-      location: "Đà Nẵng",
-    },
-    {
-      name: "Phạm Thị D",
-      subject: "Sinh học",
-      rating: 4.9,
-      img: Img,
-      location: "Cần Thơ",
-    },
-  ];
   const { tutorList, recommendTutor } = useUserStore();
+  const { t } = useTranslation();
+
   useEffect(() => {
     recommendTutor();
   }, []);
+
   return (
     <Box
       sx={{
@@ -79,7 +53,7 @@ const RecommendTutor = () => {
           marginBottom: 4,
           color: "#000000",
         }}>
-        Đề xuất cho bạn...
+        {t.home.recommendTutor.title}
       </Typography>
       <Box className="w-full flex justify-center items-center !bg-transparent">
         <Swiper

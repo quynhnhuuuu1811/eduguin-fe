@@ -7,6 +7,7 @@ import StarRateRoundedIcon from '@mui/icons-material/StarRateRounded';
 import { useCommentStore } from "@/zustand/stores/CommentStore";
 import { useEffect, useMemo } from "react";
 import Image from "next/image";
+import { useTranslation } from "@/i18n";
 
 interface CommentData {
   id: string;
@@ -27,12 +28,14 @@ interface CommentListProps {
 
 const CommentList = ({ tutorId }: CommentListProps) => {
   const { getListCmtByTutorID, comments } = useCommentStore();
+  const { t } = useTranslation();
+  const isEnglish = t.common.loading === 'Loading...';
 
   const commentList = useMemo(() => comments as CommentData[], [comments]);
 
   const commentColumns: ColumnData<CommentData>[] = [
     {
-      label: "Học sinh",
+      label: t.home.roleOptions.studentTitle,
       dataKey: "student",
       align: "left",
       width: 150,
@@ -53,13 +56,13 @@ const CommentList = ({ tutorId }: CommentListProps) => {
                 {student?.name?.charAt(0)?.toUpperCase() || "?"}
               </div>
             )}
-            <span className="font-medium">{student?.name || "Ẩn danh"}</span>
+            <span className="font-medium">{student?.name || (isEnglish ? "Anonymous" : "Ẩn danh")}</span>
           </div>
         );
       },
     },
     {
-      label: "Đánh giá",
+      label: t.tutorInfo.rating,
       dataKey: "rating",
       align: "center",
       width: 120,
@@ -71,7 +74,7 @@ const CommentList = ({ tutorId }: CommentListProps) => {
       ),
     },
     {
-      label: "Nội dung",
+      label: isEnglish ? "Content" : "Nội dung",
       dataKey: "content",
       align: "left",
       width: 300,
@@ -80,7 +83,7 @@ const CommentList = ({ tutorId }: CommentListProps) => {
       ),
     },
     {
-      label: "Ngày đăng",
+      label: isEnglish ? "Date" : "Ngày đăng",
       dataKey: "createdAt",
       align: "center",
       width: 120,
@@ -99,7 +102,7 @@ const CommentList = ({ tutorId }: CommentListProps) => {
   return (
     <div className="flex flex-col gap-5 text-black font-quicksand mt-10 w-full max-w-[90%] mx-auto">
       <h3 className="font-bold text-[15px] md:text-[20px] lg:text-[20px]">
-        Danh sách bình luận ({commentList.length})
+        {isEnglish ? `Comments (${commentList.length})` : `Danh sách bình luận (${commentList.length})`}
       </h3>
       {commentList.length > 0 ? (
         <div className="w-full">
@@ -119,7 +122,7 @@ const CommentList = ({ tutorId }: CommentListProps) => {
             alt="No comments"
           />
           <h5 className="text-gray-700 font-bold opacity-50">
-            Có vẻ không có bình luận nào ở đây...
+            {isEnglish ? "It seems there are no comments here..." : "Có vẻ không có bình luận nào ở đây..."}
           </h5>
         </div>
       )}

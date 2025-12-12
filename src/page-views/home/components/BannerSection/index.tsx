@@ -1,11 +1,16 @@
+"use client";
 import React from "react";
 import TextBanner from "./TextBanner";
 import OverallRating from "./OverallRating";
 import Message from "./Message";
 import LikeIcon from "@mui/icons-material/ThumbUpOutlined";
 import Banner from "../../../../assets/images/homepage.png";
+import { useTranslation } from "@/i18n";
 
 const HeroBanner = () => {
+  const { t } = useTranslation();
+  const isEnglish = t.common.loading === 'Loading...';
+
   return (
     <div
       style={{
@@ -33,9 +38,9 @@ const HeroBanner = () => {
         </div>
         <div className="flex gap-5 px-[20px] mt-4 md:px-0 sm:px-0 lg:px-0">
           <Message>
-            Dù bạn cần ôn luyện thi cử, củng cố kiến thức nền hay hỗ trợ học tập
-            tại nhà – chúng tôi kết nối bạn với những gia sư chất lượng, được
-            tuyển chọn kỹ lưỡng.
+            {isEnglish
+              ? 'Whether you need exam prep, foundational knowledge, or home tutoring support – we connect you with quality tutors, carefully selected.'
+              : 'Dù bạn cần ôn luyện thi cử, củng cố kiến thức nền hay hỗ trợ học tập tại nhà – chúng tôi kết nối bạn với những gia sư chất lượng, được tuyển chọn kỹ lưỡng.'}
           </Message>
           <Message
             icon={
@@ -50,9 +55,9 @@ const HeroBanner = () => {
               </div>
             }
           >
-            Tìm gia sư phù hợp dễ dàng chỉ trong vài bước – đội ngũ giáo viên
-            giỏi, tận tâm, sẵn sàng đồng hành cùng học sinh trên hành trình
-            chinh phục kiến thức.
+            {isEnglish
+              ? 'Find the right tutor easily in just a few steps – a team of skilled, dedicated teachers ready to accompany students on their journey of knowledge.'
+              : 'Tìm gia sư phù hợp dễ dàng chỉ trong vài bước – đội ngũ giáo viên giỏi, tận tâm, sẵn sàng đồng hành cùng học sinh trên hành trình chinh phục kiến thức.'}
           </Message>
         </div>
       </div>

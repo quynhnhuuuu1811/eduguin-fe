@@ -8,9 +8,11 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import { Box, Typography } from "@mui/material";
+import { useTranslation } from "@/i18n";
 
 const Footer = () => {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   if (pathname === "/login" || pathname === "/register") {
     return null;
@@ -138,7 +140,7 @@ const Footer = () => {
             },
           }}
         >
-          Copyright © 2025 EduGuin
+          {t.footer.copyright}
         </Typography>
         <Typography
           className="text-blue700 font-500"
@@ -152,7 +154,7 @@ const Footer = () => {
             },
           }}
         >
-          All Rights Reserved. Developed By Qnhu
+          {t.footer.allRights}
         </Typography>
       </div>
     </Box>

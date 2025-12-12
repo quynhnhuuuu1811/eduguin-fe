@@ -1,7 +1,12 @@
+"use client";
 import React from "react";
 import ButtonGroup from "./ButtonGroup";
+import { useTranslation } from "@/i18n";
 
 const TextBanner = () => {
+  const { t } = useTranslation();
+  const isEnglish = t.common.loading === 'Loading...';
+
   return (
     <div
       className="
@@ -13,16 +18,16 @@ const TextBanner = () => {
       "
     >
       <div className="w-full">
-        Tìm người{" "}
+        {isEnglish ? 'Find your' : 'Tìm người'}{" "}
         <span
           className="!font-sugar font-bold !text-[27px]
           lg:!text-[60px] md:!text-[40px] sm:!text-[35px] 
           px-2 text-blue100"
         >
-          bạn đồng hành
+          {isEnglish ? 'learning partner' : 'bạn đồng hành'}
         </span>
         <br />
-        trên con đường học tập
+        {isEnglish ? 'on your learning journey' : 'trên con đường học tập'}
       </div>
       <div className="w-full flex-start">
         <ButtonGroup />

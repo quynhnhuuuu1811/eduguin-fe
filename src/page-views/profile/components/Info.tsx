@@ -20,6 +20,8 @@ import { useAuthStore } from "@/zustand/stores/AuthStore";
 import { AuthUser } from "@/zustand/types/Auth";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useUserStore } from "@/zustand/stores/UserStore";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useTranslation } from "@/i18n";
 
 interface InfoProps {
   userInfo: AuthUser;
@@ -28,6 +30,7 @@ interface InfoProps {
 const Info = ({ userInfo }: InfoProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const isTutor = userInfo.role === "tutor";
+  const { t } = useTranslation();
   console.log(222, isTutor);
   // Format dateOfBirth to YYYY-MM-DD for input type="date"
   const formatDateForInput = (date: string | undefined | null): string => {
@@ -261,7 +264,7 @@ const Info = ({ userInfo }: InfoProps) => {
                 },
               }}
             >
-              Thông tin cá nhân
+              {t.profile.title}
             </Typography>
 
             {/* Profile Section */}
@@ -315,17 +318,17 @@ const Info = ({ userInfo }: InfoProps) => {
               <div className="flex flex-col col-span-12 md:col-span-5 gap-3">
                 <div className="flex flex-col gap-[10px]">
                   <h2 className="text-black text-[28px] font-bold">
-                    {userInfo.fullName || userInfo.name || "Chưa cập nhật"}
+                    {userInfo.fullName || userInfo.name || "-"}
                   </h2>
                   <h6 className="text-blue600 font-semibold text-[15px]">
-                    {isTutor ? `Gia sư ${userInfo.tutorProfile?.subject} ${userInfo.tutorProfile?.grade}` : "Học sinh"}
+                    {isTutor ? `${t.home.roleOptions.tutorTitle} ${userInfo.tutorProfile?.subject} ${userInfo.tutorProfile?.grade}` : t.home.roleOptions.studentTitle}
                   </h6>
                 </div>
                 {/* Chỉ hiện description cho tutor */}
                 {isTutor && (
                   isEditing ? (
                     <CustomInput
-                      label="Mô tả..."
+                      label={t.auth.tutorRegister.description}
                       type="text"
                       value={editedData.description}
                       onChange={handleInputChange("description")}
@@ -338,7 +341,7 @@ const Info = ({ userInfo }: InfoProps) => {
                       </p>
                     ) : (
                       <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
-                        Chưa cập nhật mô tả
+                        -
                       </p>
                     )
                   )
@@ -383,14 +386,14 @@ const Info = ({ userInfo }: InfoProps) => {
           {/* Basic Information */}
           <div className="flex flex-col gap-5 text-black font-quicksand mt-10 w-full max-w-[90%] mx-auto">
             <h3 className="font-bold text-[15px] md:text-[20px] lg:text-[20px]">
-              Thông tin cơ bản
+              {t.profile.personalInfo}
             </h3>
             <div className="grid grid-cols-2 gap-3">
               {isEditing ? (
                 <>
                   <div>
                     <CustomInput
-                      label="Ngày sinh"
+                      label={t.profile.dateOfBirth}
                       type="date"
                       value={editedData.dateOfBirth}
                       onChange={handleInputChange("dateOfBirth")}
@@ -399,7 +402,7 @@ const Info = ({ userInfo }: InfoProps) => {
                   </div>
                   <div>
                     <CustomInput
-                      label="Email"
+                      label={t.profile.email}
                       type="email"
                       value={editedData.email}
                       onChange={handleInputChange("email")}
@@ -408,14 +411,14 @@ const Info = ({ userInfo }: InfoProps) => {
                   </div>
                   <div>
                     <CustomInput
-                      label="Giới tính"
+                      label={t.profile.gender}
                       type="select"
                       value={editedData.sex}
                       onChange={handleInputChange("sex")}
                       name="sex"
                       options={[
-                        { value: "male", label: "Nam" },
-                        { value: "female", label: "Nữ" },
+                        { value: "male", label: t.profile.male },
+                        { value: "female", label: t.profile.female },
                       ]}
                     />
                   </div>
@@ -423,38 +426,49 @@ const Info = ({ userInfo }: InfoProps) => {
               ) : (
                 <>
                   <p className="font-bold">
-                    Ngày sinh{" "}
+                    {t.profile.dateOfBirth}{" "}
                     <span className="font-normal">
                       {(userInfo.dateOfBirth || userInfo.birthDate)
                         ? dayjs(userInfo.dateOfBirth || userInfo.birthDate).format("DD/MM/YYYY")
-                        : "Chưa cập nhật"}
+                        : "-"}
                     </span>
                   </p>
                   <p className="font-bold">
-                    Email <span className="font-normal">{userInfo.email || "Chưa cập nhật"}</span>
+                    {t.profile.email} <span className="font-normal">{userInfo.email || "-"}</span>
                   </p>
                   <p className="font-bold">
-                    Giới tính{" "}
+                    {t.profile.gender}{" "}
                     <span className="font-normal">
                       {userInfo.sex === "male"
-                        ? "Nam"
+                        ? t.profile.male
                         : userInfo.sex === "female"
-                          ? "Nữ"
-                          : "Chưa cập nhật"}
+                          ? t.profile.female
+                          : "-"}
                     </span>
                   </p>
                   {(userInfo.phone || userInfo.phoneNumber) && (
                     <p className="font-bold">
-                      Số điện thoại <span className="font-normal">{userInfo.phone || userInfo.phoneNumber}</span>
+                      {t.profile.phone} <span className="font-normal">{userInfo.phone || userInfo.phoneNumber}</span>
                     </p>
                   )}
                   {userInfo.address && (
                     <p className="font-bold col-span-2">
-                      Địa chỉ <span className="font-normal">{userInfo.address}</span>
+                      {t.profile.address} <span className="font-normal">{userInfo.address}</span>
                     </p>
                   )}
                 </>
               )}
+            </div>
+          </div>
+
+          {/* Settings - Language */}
+          <div className="flex flex-col gap-5 text-black font-quicksand mt-10 w-full max-w-[90%] mx-auto">
+            <h3 className="font-bold text-[15px] md:text-[20px] lg:text-[20px]">
+              {t.profile.settings}
+            </h3>
+            <div className="flex items-center gap-4">
+              <span className="font-medium">{t.profile.language}:</span>
+              <LanguageSwitcher size="small" />
             </div>
           </div>
 
@@ -468,7 +482,7 @@ const Info = ({ userInfo }: InfoProps) => {
                   onClick={handleCancel}
                 >
                   <CancelIcon sx={{ fontSize: "18px" }} />
-                  Hủy
+                  {t.common.cancel}
                 </CustomButton>
                 <CustomButton
                   type="Secondary"
@@ -476,7 +490,7 @@ const Info = ({ userInfo }: InfoProps) => {
                   onClick={handleSave}
                 >
                   <SaveIcon sx={{ fontSize: "18px" }} />
-                  Lưu
+                  {t.common.save}
                 </CustomButton>
               </>
             ) : (
@@ -487,11 +501,11 @@ const Info = ({ userInfo }: InfoProps) => {
                   onClick={handleEdit}
                 >
                   <EditIcon sx={{ fontSize: "18px" }} />
-                  Chỉnh sửa
+                  {t.common.edit}
                 </CustomButton>
                 <CustomButton type="Secondary" className="flex items-center gap-2 !bg-yellow100 !text-yellow500" onClick={handleLogout}>
                   <LogoutIcon sx={{ fontSize: "18px" }} />
-                  Đăng xuất
+                  {t.common.logout}
                 </CustomButton>
               </>
             )}

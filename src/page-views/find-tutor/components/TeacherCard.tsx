@@ -7,8 +7,10 @@ import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
 import { CustomButton } from "@/components/Button";
 import { useRouter } from "next/navigation";
 import VideoImg from "../../../assets/images/VideoThumbnail.png";
+import { useTranslation } from "@/i18n";
 
 const TeacherCard = ({ teacher }: { teacher: any }) => {
+  const { t } = useTranslation();
   const [hovering, setHovering] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hlsRef = useRef<any>(null);
@@ -136,7 +138,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                   fontSize: { xs: "7px", sm: "9px", md: "13px", lg: "15px" },
                 }}
                 className="text-blue600">
-                Gia sư {teacher?.tutorProfile?.subject}
+                {t.home.roleOptions.tutorTitle} {teacher?.tutorProfile?.subject}
               </Typography>
               <Typography
                 sx={{
@@ -144,7 +146,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                   fontWeight: 500,
                   fontSize: { xs: "7px", sm: "9px", md: "13px", lg: "15px" },
                 }}>
-                {teacher?.tutorProfile?.description || "Không có mô tả"}
+                {teacher?.tutorProfile?.description || (t.findTutor.noResults === 'No tutors found' ? 'No description' : 'Không có mô tả')}
               </Typography>
             </Box>
 
@@ -196,7 +198,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                     sx={{
                       fontSize: { xs: "7px", sm: "7px", md: "9px", lg: "11px" },
                     }}>
-                    {teacher?.cmt} bình luận
+                    {teacher?.cmt} {t.tutorInfo.reviews.toLowerCase()}
                   </Typography>
                 </Box>
                 <Box
@@ -224,7 +226,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                       fontWeight: 500,
                       fontSize: { xs: "7px", sm: "7px", md: "9px", lg: "11px" },
                     }}>
-                    /tháng
+                    {t.findTutor.perMonth}
                   </Typography>
                 </Box>
               </Box>
@@ -235,12 +237,12 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                   flexDirection: "column",
                   gap: { xs: "3px", sm: "5px", md: "10px", lg: "10px" },
                 }}>
-                <CustomButton type="Secondary">Đăng kí ngay</CustomButton>
+                <CustomButton type="Secondary">{t.tutorInfo.subscribe}</CustomButton>
                 <CustomButton
                   type="SecondaryOutlined"
                   className="border-none"
                   onClick={() => router.push(`/tutor-info/${teacher?.id}`)}>
-                  Xem chi tiết
+                  {t.common.seeMore}
                 </CustomButton>
               </Box>
             </Box>
@@ -297,7 +299,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
 
             {teacher?.tutorProfile?.introVideoUrl ? (
               <IconButton
-                aria-label="Xem video giới thiệu"
+                aria-label={t.tutorInfo.about}
                 onClick={handlePlayClick}
                 sx={{
                   position: "absolute",
@@ -323,7 +325,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                   textAlign: "center",
                   px: 2,
                 }}>
-                Hiện không có video giới thiệu
+                {t.findTutor.noResults === 'No tutors found' ? 'No intro video available' : 'Hiện không có video giới thiệu'}
               </Typography>
             )}
           </Box>

@@ -3,6 +3,7 @@
 import { getTokenFromLocalStorage } from "@/utils/storage";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
+import { usePathname } from "next/navigation";
 
 type Message = {
   id: number;
@@ -13,6 +14,7 @@ type Message = {
 const SOCKET_URL = "https://api.eduguin.mtri.online/chatbot";
 
 export default function ChatBox() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -157,6 +159,9 @@ export default function ChatBox() {
 
   // Chỉ render sau khi mounted để tránh hydration mismatch
   if (!mounted) return null;
+
+  // Ẩn chatbox trên trang admin
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
     <>

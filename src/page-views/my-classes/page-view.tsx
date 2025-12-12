@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Table from '@/components/Table';
 import { ColumnData } from '@/components/Table';
-import { Typography, Tooltip } from '@mui/material';
+import { Typography, Tooltip, Modal, Dialog, Snackbar, Alert } from '@mui/material';
 import dayjs from 'dayjs';
 import { useAuthStore } from '@/zustand/stores/AuthStore';
 import { CustomButton } from '@/components/Button';
@@ -13,6 +13,8 @@ import { useClassStore } from '@/zustand/stores/ClassStore';
 import LoadingScreen from '@/components/LoadingScreen';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useRouter } from 'next/navigation';
+import StudentListTable from './components/StudentListTable';
+import { useTranslation } from '@/i18n';
 
 interface ScheduleItem {
   days: string;
@@ -41,6 +43,7 @@ const MyClassesPageView = () => {
   const { data: authData } = useAuthStore();
   const { fetchTutorClasses, classes, loading, fetchStudentClasses } = useClassStore();
   const isTutor = authData?.user?.role === 'tutor';
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isTutor) {
@@ -68,10 +71,10 @@ const MyClassesPageView = () => {
         className: subscription.class?.name || subscription.class?.className || '',
         teacherName: subscription.class?.tutorProfile?.user?.fullName || 'Chưa có thông tin',
         subject: subscription.class?.subject || '',
-        startDate: subscription.class?.startTime || '',
-        endDate: subscription.class?.endTime || '',
-        status: subscription.status,
-        classStatus: subscription.class?.status,
+        startDate: dayjs(subscription.class?.startTime).format('DD/MM/YYYY') || '',
+        endDate: dayjs(subscription.class?.endTime).format('DD/MM/YYYY') || '',
+        subscriptionStatus: subscription.status,
+        status: subscription.class?.status,
         schedules: subscription.class?.schedules || '',
         capacity: subscription.class?.capacity,
         linkMeeting: subscription.class?.linkMeeting,
@@ -84,7 +87,8 @@ const MyClassesPageView = () => {
 
   // Create Modal State
   const [openCreateModel, setOpenCreateModel] = useState(false);
-
+  const [openListModal, setOpenListModal] = useState(false);
+  const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const handleOpenCreateModel = () => {
     setOpenCreateModel(true);
   };
@@ -97,7 +101,29 @@ const MyClassesPageView = () => {
   const [openDeleteModel, setOpenDeleteModel] = useState(false);
   const [selectedClass, setSelectedClass] = useState<ClassData | null>(null);
 
-  const handleOpenDeleteModel = (classData: ClassData) => {
+  // Snackbar for delete validation
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const { getListStudentofClass } = useClassStore();
+
+  const handleOpenDeleteModel = async (classData: ClassData) => {
+    const today = dayjs();
+    const classStartDate = classData.startDate ? dayjs(classData.startDate) : null;
+
+    // Kiểm tra lớp học đã bắt đầu chưa
+    if (classStartDate && classStartDate.isBefore(today, 'day') || classStartDate?.isSame(today, 'day')) {
+      // Kiểm tra có học sinh không
+      try {
+        const students = await getListStudentofClass(classData.id || '');
+        if (students && students.length > 0) {
+          setDeleteError('Lớp học đã diễn ra và có học sinh đăng ký, không thể xoá!');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking students:', error);
+      }
+    }
+
     setSelectedClass(classData);
     setOpenDeleteModel(true);
   };
@@ -113,7 +139,7 @@ const MyClassesPageView = () => {
     () => {
       const baseColumns: ColumnData<ClassData>[] = [
         {
-          label: 'Tên lớp',
+          label: t.myClasses.className,
           dataKey: 'className',
           align: 'left',
           width: 180,
@@ -123,7 +149,7 @@ const MyClassesPageView = () => {
       // Nếu là học sinh thì hiện cột tên giáo viên
       if (!isTutor) {
         baseColumns.push({
-          label: 'Tên giáo viên',
+          label: t.home.roleOptions.tutorTitle,
           dataKey: 'teacherName',
           align: 'left',
           width: 180,
@@ -146,15 +172,24 @@ const MyClassesPageView = () => {
       // Nếu là gia sư thì hiện cột sĩ số
       if (isTutor) {
         baseColumns.push({
-          label: 'Sĩ số',
+          label: t.myClasses.students,
           dataKey: 'capacity',
           align: 'left',
-          width: 100,
-          render: (value: unknown) => {
+          width: 120,
+          render: (value: unknown, row: ClassData) => {
             return (
-              <span>
-                {value ? `${value} học sinh` : '0 học sinh'}
-              </span>
+              <Tooltip arrow placement="top" title={t.myClasses.students}>
+                <span
+                  className='underline cursor-pointer hover:text-blue-600 text-blue-500'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedClassId(row.id || null);
+                    setOpenListModal(true);
+                  }}
+                >
+                  {value ? `${value} ${t.myClasses.students.toLowerCase()}` : `0 ${t.myClasses.students.toLowerCase()}`}
+                </span>
+              </Tooltip>
             );
           },
         });
@@ -162,42 +197,36 @@ const MyClassesPageView = () => {
 
       baseColumns.push(
         {
-          label: 'Môn học',
+          label: t.myClasses.subject,
           dataKey: 'subject',
           align: 'left',
           width: 100,
         },
         {
-          label: 'Ngày bắt đầu',
+          label: t.myClasses.className === 'Class Name' ? 'Start Date' : 'Ngày bắt đầu',
           dataKey: 'startDate',
           align: 'left',
           width: 120,
-          render: (value: unknown) => {
-            return <span>{value ? dayjs(value as string).format('DD/MM/YYYY') : '-'}</span>;
-          },
         },
         {
-          label: 'Ngày kết thúc',
+          label: t.myClasses.className === 'Class Name' ? 'End Date' : 'Ngày kết thúc',
           dataKey: 'endDate',
           align: 'left',
           width: 120,
-          render: (value: unknown) => {
-            return <span>{value ? dayjs(value as string).format('DD/MM/YYYY') : '-'}</span>;
-          },
         },
         {
-          label: 'Trạng thái',
-          dataKey: 'classStatus',
+          label: t.myClasses.status,
+          dataKey: 'status',
           align: 'left',
           width: 120,
           render: (value: unknown) => {
-            if (value === 'OPEN') return <span className='text-green-500'>Đang mở</span>;
-            if (value === 'CLOSED') return <span className='text-red-500'>Đã đóng</span>;
+            if (value === 'OPEN') return <span className='text-green-500'>{t.myClasses.active}</span>;
+            if (value === 'CLOSED') return <span className='text-red-500'>{t.myClasses.inactive}</span>;
             return <span className='text-gray-500'>-</span>;
           },
         },
         {
-          label: 'Lịch học',
+          label: t.myClasses.schedule,
           dataKey: 'schedules',
           align: 'left',
           width: 150,
@@ -226,7 +255,7 @@ const MyClassesPageView = () => {
           width: 50,
           render: (_value: unknown, row: ClassData) => {
             return (
-              <Tooltip title="Xoá lớp học" arrow placement="top">
+              <Tooltip title={t.common.delete} arrow placement="top">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -251,7 +280,7 @@ const MyClassesPageView = () => {
           width: 50,
           render: (_value: unknown, row: ClassData) => {
             return (
-              <Tooltip title="Vào lớp học" arrow placement="top">
+              <Tooltip title={t.myClasses.className === 'Class Name' ? 'Join Class' : 'Vào lớp học'} arrow placement="top">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -269,7 +298,7 @@ const MyClassesPageView = () => {
 
       return baseColumns;
     },
-    [isTutor, currentDate]
+    [isTutor, currentDate, t]
   );
 
   if (loading) {
@@ -278,6 +307,7 @@ const MyClassesPageView = () => {
 
   return (
     <div style={{ padding: '20px' }} className='flex flex-col mt-20'>
+      <StudentListTable open={openListModal} onClose={() => setOpenListModal(false)} classId={selectedClassId || ''} />
       <div className='flex justify-between items-center w-full mb-10'>
         <Typography
           variant="h4"
@@ -288,13 +318,13 @@ const MyClassesPageView = () => {
             textAlign: 'center',
           }}
         >
-          {isTutor ? 'Danh sách lớp học của bạn' : 'Danh sách lớp học đã đăng ký thành công'}
+          {t.myClasses.title}
         </Typography>
       </div>
       {isTutor && (
         <div className='flex justify-end pb-4 px-8'>
           <CustomButton type="Secondary" className="bg-blue700! text-white! gap-1 flex" onClick={handleOpenCreateModel}>
-            <AddCircleOutline sx={{ fontSize: 20 }} /> Thêm lớp học
+            <AddCircleOutline sx={{ fontSize: 20 }} /> {t.myClasses.createClass}
           </CustomButton>
         </div>
       )}
@@ -305,7 +335,7 @@ const MyClassesPageView = () => {
           autoHeight
           getRowId={(row, index) => row.id || index.toString()}
           onRowClick={(row) => console.log('Row clicked:', row)}
-          emptyMessage="Chưa có lớp học nào"
+          emptyMessage={t.myClasses.noClasses}
         />
       </div>
 
@@ -317,7 +347,42 @@ const MyClassesPageView = () => {
         open={openDeleteModel}
         onClose={handleCloseDeleteModel}
         classData={selectedClass}
+        onSuccess={() => setDeleteSuccess(true)}
       />
+
+      {/* Snackbar for delete validation error */}
+      <Snackbar
+        open={!!deleteError}
+        autoHideDuration={4000}
+        onClose={() => setDeleteError(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setDeleteError(null)}
+          severity="error"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {deleteError}
+        </Alert>
+      </Snackbar>
+
+      {/* Snackbar for delete success */}
+      <Snackbar
+        open={deleteSuccess}
+        autoHideDuration={2000}
+        onClose={() => setDeleteSuccess(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setDeleteSuccess(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {t.common.success}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

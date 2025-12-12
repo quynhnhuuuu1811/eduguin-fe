@@ -27,4 +27,7 @@ export const UserApi = {
   recommendTutor() {
     return instance.get(`/student-event/recommendations`);
   },
+  getStudents(params?: Record<string, unknown>): Promise<any> {
+    return instance.get(`/user/students`, { params });
+  },
 };

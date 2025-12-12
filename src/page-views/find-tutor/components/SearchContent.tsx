@@ -9,8 +9,10 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useSubjectStore } from "@/zustand/stores/SubjectStore";
 import { Subject } from "@/zustand/types/Subject";
 import { CustomButton } from "@/components/Button";
+import { useTranslation } from "@/i18n";
 
 const SearchContent = () => {
+  const { t } = useTranslation();
   const { fetchAllTutors, users, loading } = useUserStore();
 
   const {
@@ -33,23 +35,23 @@ const SearchContent = () => {
 
   const subjectOptions = useMemo(
     () => [
-      { value: "", label: "Tất cả" },
+      { value: "", label: t.findTutor.filters.subject === 'Subject' ? 'All' : 'Tất cả' },
       ...subjects.map((subject: Subject) => ({
         value: subject.id,
         label: subject.name,
       })),
     ],
-    [subjects]
+    [subjects, t]
   );
 
   const handleFilterChange =
     (name: string) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      setFilters((prev) => ({
-        ...prev,
-        [name]: e.target.value,
-      }));
-    };
+      (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setFilters((prev) => ({
+          ...prev,
+          [name]: e.target.value,
+        }));
+      };
 
   const handleFilter = () => {
     fetchAllTutors({
@@ -88,34 +90,36 @@ const SearchContent = () => {
     return <LoadingScreen />;
   }
 
+  const allLabel = t.findTutor.filters.subject === 'Subject' ? 'All' : 'Tất cả';
+
   const GradeOptions = [
-    { value: "", label: "Tất cả" },
-    { value: "1", label: "Lớp 1" },
-    { value: "2", label: "Lớp 2" },
-    { value: "3", label: "Lớp 3" },
-    { value: "4", label: "Lớp 4" },
-    { value: "5", label: "Lớp 5" },
-    { value: "6", label: "Lớp 6" },
-    { value: "7", label: "Lớp 7" },
-    { value: "8", label: "Lớp 8" },
-    { value: "9", label: "Lớp 9" },
-    { value: "10", label: "Lớp 10" },
-    { value: "11", label: "Lớp 11" },
-    { value: "12", label: "Lớp 12" },
+    { value: "", label: allLabel },
+    { value: "1", label: t.findTutor.filters.grade === 'Grade' ? "Grade 1" : "Lớp 1" },
+    { value: "2", label: t.findTutor.filters.grade === 'Grade' ? "Grade 2" : "Lớp 2" },
+    { value: "3", label: t.findTutor.filters.grade === 'Grade' ? "Grade 3" : "Lớp 3" },
+    { value: "4", label: t.findTutor.filters.grade === 'Grade' ? "Grade 4" : "Lớp 4" },
+    { value: "5", label: t.findTutor.filters.grade === 'Grade' ? "Grade 5" : "Lớp 5" },
+    { value: "6", label: t.findTutor.filters.grade === 'Grade' ? "Grade 6" : "Lớp 6" },
+    { value: "7", label: t.findTutor.filters.grade === 'Grade' ? "Grade 7" : "Lớp 7" },
+    { value: "8", label: t.findTutor.filters.grade === 'Grade' ? "Grade 8" : "Lớp 8" },
+    { value: "9", label: t.findTutor.filters.grade === 'Grade' ? "Grade 9" : "Lớp 9" },
+    { value: "10", label: t.findTutor.filters.grade === 'Grade' ? "Grade 10" : "Lớp 10" },
+    { value: "11", label: t.findTutor.filters.grade === 'Grade' ? "Grade 11" : "Lớp 11" },
+    { value: "12", label: t.findTutor.filters.grade === 'Grade' ? "Grade 12" : "Lớp 12" },
   ];
 
   const genderOptions = [
-    { value: "", label: "Tất cả" },
-    { value: "male", label: "Nam" },
-    { value: "female", label: "Nữ" },
+    { value: "", label: allLabel },
+    { value: "male", label: t.profile.male },
+    { value: "female", label: t.profile.female },
   ];
 
   const ratingOptions = [
-    { value: "", label: "Tất cả" },
-    { value: "4", label: "4 sao trở lên" },
-    { value: "3", label: "3 sao trở lên" },
-    { value: "2", label: "2 sao trở lên" },
-    { value: "1", label: "1 sao trở lên" },
+    { value: "", label: allLabel },
+    { value: "4", label: t.findTutor.filters.rating === 'Rating' ? "4 stars & up" : "4 sao trở lên" },
+    { value: "3", label: t.findTutor.filters.rating === 'Rating' ? "3 stars & up" : "3 sao trở lên" },
+    { value: "2", label: t.findTutor.filters.rating === 'Rating' ? "2 stars & up" : "2 sao trở lên" },
+    { value: "1", label: t.findTutor.filters.rating === 'Rating' ? "1 star & up" : "1 sao trở lên" },
   ];
 
   return (
@@ -142,12 +146,14 @@ const SearchContent = () => {
           fontWeight: 600,
         }}>
         {teachers.length > 0
-          ? `${teachers.length} giáo viên đang chờ để được giúp bạn`
-          : "Không có kết quả"}
+          ? t.findTutor.filters.subject === 'Subject'
+            ? `${teachers.length} tutors are waiting to help you`
+            : `${teachers.length} giáo viên đang chờ để được giúp bạn`
+          : t.findTutor.noResults}
       </Typography>
       <div className="grid grid-cols-2 md:grid-cols-6 gap-2 md:gap-4 mt-4">
         <CustomInput
-          label="Môn học"
+          label={t.findTutor.filters.subject}
           type="select"
           name="subject"
           value={filters.subject}
@@ -155,7 +161,7 @@ const SearchContent = () => {
           options={subjectOptions}
         />
         <CustomInput
-          label="Lớp"
+          label={t.findTutor.filters.grade}
           type="select"
           name="grade"
           value={filters.grade}
@@ -163,7 +169,7 @@ const SearchContent = () => {
           options={GradeOptions}
         />
         <CustomInput
-          label="Giới tính"
+          label={t.profile.gender}
           type="select"
           name="gender"
           value={filters.gender}
@@ -171,7 +177,7 @@ const SearchContent = () => {
           options={genderOptions}
         />
         <CustomInput
-          label="Được đánh giá"
+          label={t.findTutor.filters.rating}
           type="select"
           name="rating"
           value={filters.rating}
@@ -182,13 +188,13 @@ const SearchContent = () => {
           type="Secondary"
           className="w-full! text-[14px]! md:text-[14px]! lg:text-[16px]!"
           onClick={() => handleFilter()}>
-          Lọc
+          {t.common.search}
         </CustomButton>
         <CustomButton
           type="SecondaryOutlined"
           className="w-full! text-[14px]! md:text-[14px]! lg:text-[16px]!"
           onClick={handleClearFilter}>
-          Xoá lọc
+          {t.findTutor.filters.subject === 'Subject' ? 'Clear' : 'Xoá lọc'}
         </CustomButton>
       </div>
       {teachers.map((item, index) => (

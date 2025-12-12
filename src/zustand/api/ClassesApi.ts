@@ -11,6 +11,7 @@ import {
   ListStudentSubscriptionsResponse,
 } from '../types/Classes';
 import instance from '@/lib/httpService';
+import { StudentResponse } from '../types/User';
 
 export const ClassesApi = {
   getTutorClasses(): Promise<ClassesResponse> {
@@ -51,4 +52,21 @@ export const ClassesApi = {
   rejectClassSubscription(subscriptionId: string): Promise<ClassSubscriptionResponse> {
     return instance.patch(`/class-subscriptions/decline/${subscriptionId}`);
   },
+
+  getListStudentofClass(classId: string): Promise<StudentResponse> {
+    return instance.get(`/class-subscriptions/tutor/class/${classId}/students`);
+  },
+
+  getTutorApplyList(): Promise<any> {
+    return instance.get('/user/tutor-applications');
+  },
+
+  approveTutorApplication(id: string): Promise<any> {
+    return instance.patch(`/user/tutor-applications/${id}/approve`);
+  },
+
+  rejectTutorApplication(id: string): Promise<any> {
+    return instance.patch(`/user/tutor-applications/${id}/reject`);
+  },
+
 };
