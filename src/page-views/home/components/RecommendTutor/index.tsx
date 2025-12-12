@@ -9,6 +9,7 @@ import "swiper/css/pagination";
 import "swiper/css";
 import { useUserStore } from "@/zustand/stores/UserStore";
 import { useTranslation } from "@/i18n";
+import { Tutor } from "@/types/tutor.type";
 
 const RecommendTutor = () => {
   const { tutorList, recommendTutor } = useUserStore();
@@ -77,7 +78,7 @@ const RecommendTutor = () => {
             disableOnInteraction: false,
           }}
           className="recommend-tutor-swiper">
-          {displayTutors.map((tutor, index) => (
+          {tutorList.map((tutor: Tutor, index: number) => (
             <SwiperSlide
               key={index}
               style={{
