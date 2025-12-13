@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { AuthUser, LoginRequest, RegisterRequest, RegisterResponse, TutorApplyRequest, AdminLoginRequest } from "../types/Auth";
 import { AuthApi } from "../api/AuthApi";
+import { setAuthCookies, clearAuthCookies } from "@/utils/cookies";
 
 interface AuthState {
   data: {
@@ -53,6 +54,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (typeof window !== "undefined" && accessToken) {
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("user", JSON.stringify(user));
+        // Set cookies for middleware
+        setAuthCookies(accessToken, user);
       }
 
       set({
@@ -76,11 +79,13 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       if (typeof window !== "undefined" && accessToken) {
         localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("user", JSON.stringify({ ...user, role: "admin" }));
+        // Set cookies for middleware
+        setAuthCookies(accessToken, { ...user, role: "admin" });
       }
 
       set({
-        data: { user, accessToken },
+        data: { user: { ...user, role: "admin" }, accessToken },
         loading: false,
       });
     } catch {
@@ -96,6 +101,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     if (typeof window !== "undefined") {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("user");
+      // Clear cookies for middleware
+      clearAuthCookies();
     }
     set({
       data: {
@@ -165,6 +172,15 @@ export const useAuthStore = create<AuthState>((set) => ({
         studentProfile: userData.studentProfile ?? undefined,
         balance: userData.balance ?? undefined,
       };
+      // Update localStorage and cookies with new user info
+      if (typeof window !== "undefined") {
+        localStorage.setItem("user", JSON.stringify(user));
+        const accessToken = localStorage.getItem("accessToken");
+        if (accessToken) {
+          setAuthCookies(accessToken, user);
+        }
+      }
+
       set((state) => ({
         data: {
           user,

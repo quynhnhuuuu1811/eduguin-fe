@@ -7,6 +7,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import SchoolIcon from '@mui/icons-material/School';
 import PersonIcon from '@mui/icons-material/Person';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import ArticleIcon from '@mui/icons-material/Article';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LanguageIcon from '@mui/icons-material/Language';
 import { useAuthStore } from '@/zustand/stores/AuthStore';
@@ -16,14 +17,21 @@ import LanguageSwitcher from '@/components/LanguageSwitcher';
 const AdminSidebar = () => {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
-  const user = useAuthStore((state) => state.data.user);
+  const { data: { user }, logout } = useAuthStore();
   const { t } = useTranslation();
+
+  const isEnglish = t.common.loading === "Loading...";
 
   const navItems = [
     {
       label: t.admin.sidebar.tutorApproval,
       href: '/admin/tutor-apply',
       icon: <SupervisorAccountIcon />,
+    },
+    {
+      label: isEnglish ? 'Blog Approval' : 'Kiểm duyệt blog',
+      href: '/admin/blogs',
+      icon: <ArticleIcon />,
     },
     {
       label: t.admin.sidebar.teacherManagement,
@@ -42,7 +50,7 @@ const AdminSidebar = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_token');
+    logout();
     window.location.href = '/admin/login';
   };
 

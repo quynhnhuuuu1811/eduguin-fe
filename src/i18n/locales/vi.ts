@@ -30,6 +30,7 @@ export const vi = {
     profile: "Hồ sơ",
     myClasses: "Lớp học của tôi",
     classRequests: "Yêu cầu vào lớp",
+    blog: "Blog",
   },
 
   // Home page

@@ -22,6 +22,7 @@ const NavbarMobile = () => {
         { label: t.navbar.home, path: "/" },
         { label: t.navbar.findTutor, path: "/find-tutor" },
         { label: t.navbar.myClasses, path: "/my-classes" },
+        { label: t.navbar.blog, path: "/blog" },
         { label: t.navbar.contact, path: "/contact" },
         { label: t.common.login, path: "/login" },
       ];
@@ -32,6 +33,7 @@ const NavbarMobile = () => {
         { label: t.navbar.home, path: "/" },
         { label: t.navbar.myClasses, path: "/my-classes" },
         { label: t.navbar.classRequests, path: "/class-subcribtion" },
+        { label: t.navbar.blog, path: "/blog" },
         { label: t.navbar.contact, path: "/contact" },
         { label: t.navbar.profile, path: "/profile" },
       ];
@@ -41,6 +43,7 @@ const NavbarMobile = () => {
       { label: t.navbar.home, path: "/" },
       { label: t.navbar.findTutor, path: "/find-tutor" },
       { label: t.navbar.myClasses, path: "/my-classes" },
+      { label: t.navbar.blog, path: "/blog" },
       { label: t.navbar.contact, path: "/contact" },
       { label: t.navbar.profile, path: "/profile" },
     ];

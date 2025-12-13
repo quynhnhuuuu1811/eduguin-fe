@@ -32,6 +32,7 @@ export const en: TranslationKeys = {
     profile: 'Profile',
     myClasses: 'My Classes',
     classRequests: 'Class Requests',
+    blog: 'Blog',
   },
 
   // Home page

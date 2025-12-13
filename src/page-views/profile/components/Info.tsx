@@ -106,10 +106,10 @@ const Info = ({ userInfo }: InfoProps) => {
   const introVideoUrl = userInfo.tutorProfile?.introVideoUrl;
   const router = useRouter();
 
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
+  const { logout } = useAuthStore();
 
+  const handleLogout = () => {
+    logout();
     router.push("/login");
   };
 

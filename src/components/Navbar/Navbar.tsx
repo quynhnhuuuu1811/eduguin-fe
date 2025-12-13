@@ -31,6 +31,7 @@ export const Navbar = () => {
     { href: "/find-tutor", label: t.navbar.findTutor, requireAuth: true, hideForTutor: true, showOnlyForTutor: false },
     { href: "/my-classes", label: t.navbar.myClasses, requireAuth: true, hideForTutor: false, showOnlyForTutor: false },
     { href: "/class-subcribtion", label: t.navbar.classRequests, requireAuth: true, hideForTutor: false, showOnlyForTutor: true },
+    { href: "/blog", label: t.navbar.blog, requireAuth: false, hideForTutor: false, showOnlyForTutor: false },
     { href: "/contact", label: t.navbar.contact, requireAuth: true, hideForTutor: false, showOnlyForTutor: false },
   ];
 
