@@ -13,12 +13,14 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "@/i18n";
-import { useRouter } from "next/navigation";
+import { usePaymentStore } from "@/zustand/stores/PaymentStore";
 
 interface DepositModalProps {
   open: boolean;
   onClose: () => void;
 }
+
+const MIN_AMOUNT = 20000;
 
 const SUGGESTED_AMOUNTS = [
   { label: "100K", value: 100000 },
@@ -29,8 +31,8 @@ const SUGGESTED_AMOUNTS = [
 
 const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
   const { t } = useTranslation();
-  const router = useRouter();
   const isEnglish = t.common.loading === "Loading...";
+  const { createPayment } = usePaymentStore();
 
   const [amount, setAmount] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -39,8 +41,12 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
     return new Intl.NumberFormat("vi-VN").format(value);
   };
 
+  // Check if amount is valid (>= 20,000)
+  const amountValue = amount ? parseInt(amount) : 0;
+  const isAmountTooLow = amountValue > 0 && amountValue < MIN_AMOUNT;
+  const isValidAmount = amountValue >= MIN_AMOUNT;
+
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only allow numbers
     const value = e.target.value.replace(/[^0-9]/g, "");
     setAmount(value);
   };
@@ -50,27 +56,19 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
   };
 
   const handleDeposit = async () => {
-    if (!amount || parseInt(amount) <= 0) return;
+    if (!isValidAmount) return;
 
     setIsLoading(true);
     try {
-      // TODO: Call API to create payment
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Redirect to payment result page
-      // In real implementation, this would redirect to a payment gateway
-      // and then callback to payment-result page
-      const success = Math.random() > 0.3; // Simulate 70% success rate
-      router.push(`/payment-result?status=${success ? "success" : "failed"}&amount=${amount}`);
-      onClose();
+      const res = await createPayment(amountValue);
+      // createPayment returns res.data from API, so access order_url directly
+      window.open(res?.order_url, "_blank");
     } catch (error) {
       console.error("Deposit error:", error);
-      router.push(`/payment-result?status=failed&amount=${amount}`);
-      onClose();
     } finally {
       setIsLoading(false);
     }
+    onClose();
   };
 
   const handleClose = () => {
@@ -84,6 +82,9 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
+      sx={{
+        zIndex: 10000,
+      }}
       PaperProps={{
         sx: {
           borderRadius: "16px",
@@ -100,6 +101,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
           fontWeight: "bold",
           color: "#0C65B6",
           fontSize: "20px",
+          marginBottom: "20px",
         }}
       >
         {isEnglish ? "Deposit" : "Nạp tiền"}
@@ -116,12 +118,23 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
           value={amount ? formatCurrency(parseInt(amount)) : ""}
           onChange={handleAmountChange}
           placeholder="0"
+          error={isAmountTooLow}
+          helperText={
+            isAmountTooLow
+              ? isEnglish
+                ? `Minimum amount is ${formatCurrency(MIN_AMOUNT)} VND`
+                : `Số tiền tối thiểu là ${formatCurrency(MIN_AMOUNT)} VND`
+              : ""
+          }
           InputProps={{
             endAdornment: <InputAdornment position="end">VND</InputAdornment>,
             sx: { fontFamily: "Quicksand" },
           }}
           InputLabelProps={{
             sx: { fontFamily: "Quicksand" },
+          }}
+          FormHelperTextProps={{
+            sx: { fontFamily: "Quicksand", fontSize: "13px" },
           }}
           sx={{
             mb: 3,
@@ -142,7 +155,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
           {SUGGESTED_AMOUNTS.map((item) => (
             <Button
               key={item.value}
-              variant={parseInt(amount) === item.value ? "contained" : "outlined"}
+              variant={amountValue === item.value ? "contained" : "outlined"}
               onClick={() => handleSuggestedAmount(item.value)}
               sx={{
                 borderRadius: "10px",
@@ -151,10 +164,10 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
                 textTransform: "none",
                 py: 1.5,
                 borderColor: "#0C65B6",
-                color: parseInt(amount) === item.value ? "white" : "#0C65B6",
-                backgroundColor: parseInt(amount) === item.value ? "#0C65B6" : "transparent",
+                color: amountValue === item.value ? "white" : "#0C65B6",
+                backgroundColor: amountValue === item.value ? "#0C65B6" : "transparent",
                 "&:hover": {
-                  backgroundColor: parseInt(amount) === item.value ? "#0a5299" : "rgba(12, 101, 182, 0.1)",
+                  backgroundColor: amountValue === item.value ? "#0a5299" : "rgba(12, 101, 182, 0.1)",
                   borderColor: "#0C65B6",
                 },
               }}
@@ -165,7 +178,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
         </div>
 
         {/* Display selected amount */}
-        {amount && parseInt(amount) > 0 && (
+        {isValidAmount && (
           <div className="mt-4 p-3 bg-blue-50 rounded-xl">
             <p className="text-center font-quicksand">
               <span className="text-gray-600">
@@ -173,7 +186,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
               </span>
               <br />
               <span className="text-2xl font-bold text-blue-600">
-                {formatCurrency(parseInt(amount))} VND
+                {formatCurrency(amountValue)} VND
               </span>
             </p>
           </div>
@@ -196,7 +209,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
         <Button
           onClick={handleDeposit}
           variant="contained"
-          disabled={!amount || parseInt(amount) <= 0 || isLoading}
+          disabled={!isValidAmount || isLoading}
           sx={{
             borderRadius: "10px",
             fontFamily: "Quicksand",

@@ -2,29 +2,27 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { useSearchParams, useRouter } from "next/navigation";
-import { Typography, Button } from "@mui/material";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Typography } from "@mui/material";
 import { useTranslation } from "@/i18n";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import HomeIcon from "@mui/icons-material/Home";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import PaymentSuccessImg from "@/assets/images/payment-success.png";
 import PaymentFailedImg from "@/assets/images/payment-failed.png";
 import { CustomButton } from "@/components/Button";
 
 const PaymentResultPageView = () => {
-  const searchParams = useSearchParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { t } = useTranslation();
   const isEnglish = t.common.loading === "Loading...";
 
   const [mounted, setMounted] = useState(false);
 
+  // Get params from URL
   const status = searchParams?.get("status");
   const amount = searchParams?.get("amount");
 
-  const isSuccess = status === "success";
+  // status=1 means success, anything else is failed
+  const isSuccess = status === "1";
 
   useEffect(() => {
     setMounted(true);
@@ -110,29 +108,13 @@ const PaymentResultPageView = () => {
 
         {/* Buttons */}
         <div className="flex flex-col gap-3">
-          <CustomButton
-            type="Secondary"
-            onClick={handleBackToProfile}
-          >
+          <CustomButton type="Secondary" onClick={handleBackToProfile}>
             {isEnglish ? "Back to Profile" : "Quay lại hồ sơ"}
           </CustomButton>
 
-          <CustomButton
-            type="SecondaryOutlined"
-            onClick={handleBackToHome}
-          >
+          <CustomButton type="SecondaryOutlined" onClick={handleBackToHome}>
             {isEnglish ? "Back to Home" : "Về trang chủ"}
           </CustomButton>
-
-          {!isSuccess && (
-            <CustomButton
-              type="Secondary"
-              onClick={() => router.back()}
-
-            >
-              {isEnglish ? "Try Again" : "Thử lại"}
-            </CustomButton>
-          )}
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ export interface Class {
   subject?: string;
   startDate?: string;
   endDate?: string;
-  status?: 'pending' | 'completed';
+  status?: 'pending' | 'completed' | 'OPEN' | 'CLOSED' | 'DRAFT';
   createdAt?: string;
   updatedAt?: string;
   [key: string]: unknown;
@@ -21,6 +21,7 @@ export interface CreateClassRequest {
   endTime?: string;
   capacity?: number;
   linkMeeting?: string;
+  price?: number;
 }
 
 export interface SetScheduleRequest {

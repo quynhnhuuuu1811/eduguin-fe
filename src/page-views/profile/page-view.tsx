@@ -1,26 +1,28 @@
 "use client";
 
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import Info from './components/Info';
 import CommentList from './components/CommentList';
 import { useAuthStore } from '@/zustand/stores/AuthStore';
 import LoadingScreen from '@/components/LoadingScreen';
 
 const ProfilePageView = () => {
+  const [mounted, setMounted] = useState(false);
   const { data: authData, getMyInfo } = useAuthStore();
 
   useEffect(() => {
+    setMounted(true);
     getMyInfo();
   }, [getMyInfo]);
-  console.log(111, authData);
 
   const userInfo = useMemo(() => {
     if (!authData?.user) return undefined;
     return authData.user;
   }, [authData?.user]);
 
-  if (!userInfo) {
-    return <div><LoadingScreen /></div>;
+  // Wait for client-side mounting to avoid hydration mismatch
+  if (!mounted || !userInfo) {
+    return <LoadingScreen />;
   }
 
   return (

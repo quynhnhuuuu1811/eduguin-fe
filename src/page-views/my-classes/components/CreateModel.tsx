@@ -1,3 +1,4 @@
+"use client";
 import { useClassStore } from "@/zustand/stores/ClassStore";
 import { Dialog, DialogContent, DialogTitle, TextField, DialogActions, Button, CircularProgress, MenuItem, IconButton } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
@@ -31,6 +32,7 @@ const initialFormData = {
   endTime: '',
   capacity: 0,
   linkMeeting: '',
+  price: 0,
 };
 
 const initialSchedule: ScheduleItem = {
@@ -53,6 +55,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
     if (!formData.startTime) return 'Ngày bắt đầu là bắt buộc';
     if (!formData.endTime) return 'Ngày kết thúc là bắt buộc';
     if (!formData.capacity || formData.capacity < 1) return 'Sĩ số tối đa phải lớn hơn 0';
+    if (!formData.price || formData.price < 0) return 'Giá tiền phải lớn hơn hoặc bằng 0';
     if (!formData.linkMeeting.trim()) return 'Link học trực tuyến là bắt buộc';
 
     if (dayjs(formData.startTime).isAfter(dayjs(formData.endTime))) {
@@ -113,14 +116,19 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
     setError(null);
 
     try {
-      // Step 1: Create the class and get the response with class ID
-      const createdClass = await createClass({
+      const classPayload = {
         name: formData.className,
         startTime: dayjs(formData.startTime).format('YYYY-MM-DD'),
         endTime: dayjs(formData.endTime).format('YYYY-MM-DD'),
         capacity: formData.capacity,
         linkMeeting: formData.linkMeeting,
-      });
+        price: formData.price,
+      };
+      console.log('Creating class with payload:', classPayload);
+
+      // Step 1: Create the class and get the response with class ID
+      const createdClass = await createClass(classPayload);
+      console.log('Created class:', createdClass);
 
       // Step 2: Create schedules for the class
       for (const schedule of schedules) {
@@ -142,8 +150,10 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
 
       // Refresh list
       fetchTutorClasses();
-    } catch (err) {
-      setError('Có lỗi xảy ra khi tạo lớp học');
+    } catch (err: any) {
+      console.error('Error creating class:', err);
+      console.error('Error response:', err?.response?.data);
+      setError(err?.response?.data?.message || 'Có lỗi xảy ra khi tạo lớp học');
     } finally {
       setIsSubmitting(false);
     }
@@ -272,6 +282,15 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
           </div>
         </div>
 
+        <TextField
+          label="Giá tiền"
+          name="price"
+          value={formData.price || ''}
+          onChange={handleChange}
+          fullWidth
+          variant="outlined"
+          type="number"
+        />
         <TextField
           label="Sĩ số tối đa"
           name="capacity"

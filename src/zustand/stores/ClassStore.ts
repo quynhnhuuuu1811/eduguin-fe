@@ -24,6 +24,7 @@ interface ClassState {
   setSchedule: (request: SetScheduleRequest) => Promise<void>;
   deleteClass: (classId: string) => Promise<void>;
   getClassesByTutorId: (tutorId: string) => Promise<Class[]>;
+  setOpenClass: (classId: string) => Promise<void>;
 
   // Actions cho Học sinh
   subscribeToClass: (request: ClassSubscriptionRequest) => Promise<void>;
@@ -44,6 +45,7 @@ export const useClassStore = create<ClassState>((set, get) => ({
   loading: false,
   error: null,
   tutorApplyList: [],
+
   async fetchTutorClasses() {
     set({ loading: true, error: null });
     try {
@@ -123,6 +125,28 @@ export const useClassStore = create<ClassState>((set, get) => ({
     }
   },
 
+  async setOpenClass(classId: string) {
+    set({ loading: true, error: null });
+    try {
+      await ClassesApi.setOpenClass(classId);
+      // Update local state - change status to OPEN
+      set((state) => ({
+        classes: state.classes.map((c) =>
+          c.id === classId ? { ...c, status: "OPEN" } : c
+        ),
+        loading: false,
+      }));
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      set({ loading: false, error: errorMessage || "Không thể mở lớp học" });
+      throw error;
+    }
+  },
+
   async subscribeToClass(request: ClassSubscriptionRequest) {
     set({ loading: true, error: null });
     try {
@@ -195,7 +219,8 @@ export const useClassStore = create<ClassState>((set, get) => ({
   async approveClassSubscription(subscriptionId: string) {
     set({ loading: true, error: null });
     try {
-      const res = await ClassesApi.approveClassSubscription(subscriptionId);
+      await ClassesApi.approveClassSubscription(subscriptionId);
+      set({ loading: false });
     }
     catch (error: unknown) {
       const errorMessage =
@@ -211,16 +236,17 @@ export const useClassStore = create<ClassState>((set, get) => ({
   async rejectClassSubscription(subscriptionId: string) {
     set({ loading: true, error: null });
     try {
-      const res = await ClassesApi.rejectClassSubscription(subscriptionId);
+      await ClassesApi.rejectClassSubscription(subscriptionId);
+      set({ loading: false });
     }
     catch (error: unknown) {
-    const errorMessage =
-      error && typeof error === "object" && "response" in error
-        ? (error as { response?: { data?: { message?: string } } }).response
-            ?.data?.message
-        : undefined;
-    set({ loading: false, error: errorMessage || "Không thể từ chối yêu cầu" });
-    throw error;
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      set({ loading: false, error: errorMessage || "Không thể từ chối yêu cầu" });
+      throw error;
     }
   },
 
@@ -288,4 +314,3 @@ export const useClassStore = create<ClassState>((set, get) => ({
     }
   },
 }));
-

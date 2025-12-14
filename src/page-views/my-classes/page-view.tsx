@@ -2,11 +2,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Table from '@/components/Table';
 import { ColumnData } from '@/components/Table';
-import { Typography, Tooltip, Modal, Dialog, Snackbar, Alert } from '@mui/material';
+import { Typography, Tooltip, Snackbar, Alert } from '@mui/material';
 import dayjs from 'dayjs';
 import { useAuthStore } from '@/zustand/stores/AuthStore';
 import { CustomButton } from '@/components/Button';
-import { AddCircleOutline, DeleteOutlined } from '@mui/icons-material';
+import { AddCircleOutline, DeleteOutlined, PublishOutlined } from '@mui/icons-material';
 import CreateModel from './components/CreateModel';
 import DeleteModel from './components/DeleteModel';
 import { useClassStore } from '@/zustand/stores/ClassStore';
@@ -30,7 +30,7 @@ interface ClassData {
   subject?: string;
   startDate?: string;
   endDate?: string;
-  status?: 'pending' | 'completed' | 'OPEN' | 'CLOSED';
+  status?: 'pending' | 'completed' | 'OPEN' | 'CLOSED' | 'DRAFT';
   schedule?: ScheduleItem[];
   studentCount?: number;
   capacity?: number;
@@ -40,18 +40,25 @@ interface ClassData {
 }
 
 const MyClassesPageView = () => {
+  const [mounted, setMounted] = useState(false);
   const { data: authData } = useAuthStore();
-  const { fetchTutorClasses, classes, loading, fetchStudentClasses } = useClassStore();
+  const { fetchTutorClasses, classes, loading, fetchStudentClasses, setOpenClass } = useClassStore();
   const isTutor = authData?.user?.role === 'tutor';
   const { t } = useTranslation();
+  const isEnglish = t.common.loading === "Loading...";
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     if (isTutor) {
       fetchTutorClasses();
     } else {
       fetchStudentClasses();
     }
-  }, [isTutor, fetchTutorClasses, fetchStudentClasses]);
+  }, [mounted, isTutor, fetchTutorClasses, fetchStudentClasses]);
 
 
   const router = useRouter();
@@ -83,8 +90,6 @@ const MyClassesPageView = () => {
       }));
   }, [classes, isTutor]);
 
-  console.log(classList);
-
   // Create Modal State
   const [openCreateModel, setOpenCreateModel] = useState(false);
   const [openListModal, setOpenListModal] = useState(false);
@@ -101,9 +106,12 @@ const MyClassesPageView = () => {
   const [openDeleteModel, setOpenDeleteModel] = useState(false);
   const [selectedClass, setSelectedClass] = useState<ClassData | null>(null);
 
-  // Snackbar for delete validation
+  // Snackbar states
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const [publishSuccess, setPublishSuccess] = useState(false);
+  const [publishError, setPublishError] = useState<string | null>(null);
+
   const { getListStudentofClass } = useClassStore();
 
   const handleOpenDeleteModel = async (classData: ClassData) => {
@@ -131,6 +139,17 @@ const MyClassesPageView = () => {
   const handleCloseDeleteModel = () => {
     setOpenDeleteModel(false);
     setSelectedClass(null);
+  };
+
+  // Handle publish class (set to OPEN)
+  const handlePublishClass = async (classId: string) => {
+    try {
+      await setOpenClass(classId);
+      setPublishSuccess(true);
+    } catch (error: any) {
+      console.error('Error publishing class:', error);
+      setPublishError(error?.response?.data?.message || (isEnglish ? 'Failed to publish class' : 'Không thể công khai lớp học'));
+    }
   };
 
   const currentDate = dayjs().format('YYYY-MM-DD');
@@ -215,11 +234,18 @@ const MyClassesPageView = () => {
           width: 120,
         },
         {
+          label: t.myClasses.price,
+          dataKey: 'price',
+          align: 'left',
+          width: 120,
+        },
+        {
           label: t.myClasses.status,
           dataKey: 'status',
           align: 'left',
           width: 120,
           render: (value: unknown) => {
+            if (value === 'DRAFT') return <span className='text-yellow-500'>{t.myClasses.draft}</span>;
             if (value === 'OPEN') return <span className='text-green-500'>{t.myClasses.active}</span>;
             if (value === 'CLOSED') return <span className='text-red-500'>{t.myClasses.inactive}</span>;
             return <span className='text-gray-500'>-</span>;
@@ -246,26 +272,43 @@ const MyClassesPageView = () => {
         },
       );
 
-      // Nút xóa cho gia sư
+      // Actions cho gia sư
       if (isTutor) {
         baseColumns.push({
           label: '',
           dataKey: 'action',
           align: 'center',
-          width: 50,
+          width: 100,
           render: (_value: unknown, row: ClassData) => {
             return (
-              <Tooltip title={t.common.delete} arrow placement="top">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleOpenDeleteModel(row);
-                  }}
-                  className="p-2 rounded-full hover:bg-red-100 transition-colors"
-                >
-                  <DeleteOutlined sx={{ fontSize: 20, color: 'var(--color-red500, #ef4444)' }} />
-                </button>
-              </Tooltip>
+              <div className="flex items-center gap-1">
+                {/* Nút publish - chỉ hiện khi status là DRAFT */}
+                {row.status === 'DRAFT' && (
+                  <Tooltip title={isEnglish ? 'Publish Class' : 'Công khai lớp học'} arrow placement="top">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePublishClass(row.id || '');
+                      }}
+                      className="p-2 rounded-full hover:bg-green-100 transition-colors"
+                    >
+                      <PublishOutlined sx={{ fontSize: 20, color: '#22c55e' }} />
+                    </button>
+                  </Tooltip>
+                )}
+                {/* Nút xóa */}
+                <Tooltip title={t.common.delete} arrow placement="top">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenDeleteModel(row);
+                    }}
+                    className="p-2 rounded-full hover:bg-red-100 transition-colors"
+                  >
+                    <DeleteOutlined sx={{ fontSize: 20, color: 'var(--color-red500, #ef4444)' }} />
+                  </button>
+                </Tooltip>
+              </div>
             );
           },
         });
@@ -298,10 +341,11 @@ const MyClassesPageView = () => {
 
       return baseColumns;
     },
-    [isTutor, currentDate, t]
+    [isTutor, currentDate, t, router, isEnglish]
   );
 
-  if (loading) {
+  // Wait for client-side mounting to avoid hydration mismatch
+  if (!mounted || loading) {
     return <LoadingScreen />;
   }
 
@@ -381,6 +425,40 @@ const MyClassesPageView = () => {
           sx={{ width: '100%' }}
         >
           {t.common.success}
+        </Alert>
+      </Snackbar>
+
+      {/* Snackbar for publish success */}
+      <Snackbar
+        open={publishSuccess}
+        autoHideDuration={2000}
+        onClose={() => setPublishSuccess(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setPublishSuccess(false)}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {isEnglish ? 'Class published successfully!' : 'Công khai lớp học thành công!'}
+        </Alert>
+      </Snackbar>
+
+      {/* Snackbar for publish error */}
+      <Snackbar
+        open={!!publishError}
+        autoHideDuration={4000}
+        onClose={() => setPublishError(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setPublishError(null)}
+          severity="error"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {publishError}
         </Alert>
       </Snackbar>
     </div>

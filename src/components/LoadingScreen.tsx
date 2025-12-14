@@ -3,15 +3,15 @@
 export default function LoadingScreen() {
   return (
     <div className="fixed inset-0 flex justify-center items-center bg-white/90 backdrop-blur-sm z-[99999]">
-      <div className="newtons-cradle">
-        <div className="newtons-cradle__dot"></div>
-        <div className="newtons-cradle__dot"></div>
-        <div className="newtons-cradle__dot"></div>
-        <div className="newtons-cradle__dot"></div>
+      <div className="loading-spinner">
+        <div className="loading-dot"></div>
+        <div className="loading-dot"></div>
+        <div className="loading-dot"></div>
+        <div className="loading-dot"></div>
       </div>
 
-      <style jsx>{`
-        .newtons-cradle {
+      <style>{`
+        .loading-spinner {
           --uib-size: 50px;
           --uib-speed: 1.2s;
           --uib-color: #474554;
@@ -23,7 +23,7 @@ export default function LoadingScreen() {
           height: var(--uib-size);
         }
 
-        .newtons-cradle__dot {
+        .loading-dot {
           position: relative;
           display: flex;
           align-items: center;
@@ -32,7 +32,7 @@ export default function LoadingScreen() {
           transform-origin: center top;
         }
 
-        .newtons-cradle__dot::after {
+        .loading-dot::after {
           content: '';
           display: block;
           width: 100%;
@@ -41,11 +41,11 @@ export default function LoadingScreen() {
           background-color: var(--uib-color);
         }
 
-        .newtons-cradle__dot:first-child {
+        .loading-dot:first-child {
           animation: swing var(--uib-speed) linear infinite;
         }
 
-        .newtons-cradle__dot:last-child {
+        .loading-dot:last-child {
           animation: swing2 var(--uib-speed) linear infinite;
         }
 

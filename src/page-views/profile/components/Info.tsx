@@ -24,6 +24,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "@/i18n";
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import DepositModal from "./DepositModal";
+import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
 
 interface InfoProps {
   userInfo: AuthUser;
@@ -331,9 +332,20 @@ const Info = ({ userInfo }: InfoProps) => {
               {/* Info */}
               <div className="flex flex-col col-span-12 md:col-span-5 gap-3">
                 <div className="flex flex-col gap-[10px]">
-                  <h2 className="text-black text-[28px] font-bold">
-                    {userInfo.fullName || userInfo.name || "-"}
-                  </h2>
+                  <div>
+                    <h2 className="text-black text-[28px] font-bold">
+                      {userInfo.fullName || userInfo.name || "-"}
+                    </h2>
+                    <h3 className="flex items-center">
+                      {userInfo.tutorProfile?.rating ? parseInt(userInfo.tutorProfile?.rating || "0") : "-"}
+                      <StarRateRoundedIcon
+                        sx={{
+                          fontSize: "30px",
+                          color: "var(--color-yellow500)",
+                        }}
+                      />
+                    </h3>
+                  </div>
                   <h6 className="text-blue600 font-semibold text-[15px]">
                     {isTutor
                       ? `${t.home.roleOptions.tutorTitle} ${userInfo.tutorProfile?.subject} ${userInfo.tutorProfile?.grade}`

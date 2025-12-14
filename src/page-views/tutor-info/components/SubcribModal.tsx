@@ -4,6 +4,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useClassStore } from "@/zustand/stores/ClassStore";
 import { Alert, Snackbar } from "@mui/material";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface SubcribModalProps {
   open: boolean;
@@ -27,19 +28,35 @@ export default function SubcribModal({
   teacherId,
 }: SubcribModalProps) {
   const { classes, subscribeToClass, error, loading } = useClassStore();
+  const router = useRouter();
 
   const [selectedClassId, setSelectedClassId] = useState<string>("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const handleSubscribe = async () => {
     try {
       await subscribeToClass({ classId: selectedClassId });
       setShowSuccess(true);
       onClose();
-    } catch {
+    } catch (err: any) {
+      const apiError = err?.response?.data?.message || error;
+
+      if (apiError === 'Insufficient balance to request this class') {
+        setErrorMessage('Số dư không đủ để đăng ký lớp học này. Vui lòng nạp thêm tiền!');
+      } else if (apiError === 'You already requested or joined this class') {
+        setErrorMessage('Bạn đã đăng kí lớp học này rồi!');
+      } else {
+        setErrorMessage('Đăng kí thất bại! Vui lòng thử lại.');
+      }
       setShowError(true);
     }
+  };
+
+  const handleGoToDeposit = () => {
+    setShowError(false);
+    router.push('/profile');
   };
 
   const snackbars = (
@@ -56,14 +73,26 @@ export default function SubcribModal({
       </Snackbar>
       <Snackbar
         open={showError}
-        autoHideDuration={2000}
+        autoHideDuration={5000}
         onClose={() => setShowError(false)}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Alert severity="error" variant="filled" sx={{ width: "100%" }}>
-          {
-            error == 'You already requested or joined this class' ? 'Bạn đã đăng kí lớp học này rồi!' : "Đăng kí thất bại! Vui lòng thử lại."
+        <Alert
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+          action={
+            errorMessage.includes('Số dư không đủ') ? (
+              <button
+                onClick={handleGoToDeposit}
+                className="text-white underline text-sm font-semibold ml-2"
+              >
+                Nạp tiền
+              </button>
+            ) : null
           }
+        >
+          {errorMessage}
         </Alert>
       </Snackbar>
     </>

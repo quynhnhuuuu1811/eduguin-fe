@@ -123,6 +123,8 @@ export const vi = {
     inactive: "Ngưng hoạt động",
     pending: "Chờ duyệt",
     noClasses: "Bạn chưa có lớp học nào",
+    draft: "Bản nháp",
+    price: "Giá tiền",
   },
 
   // Class Subscription page

@@ -41,6 +41,7 @@ export const ClassesApi = {
   subscribeToClass(request: ClassSubscriptionRequest): Promise<ClassSubscriptionResponse> {
     return instance.post('/class-subscriptions', request);
   },
+
   getClassesByTutorId(tutorId: string): Promise<ClassesResponse> {
     return instance.get(`/class-schedule/tutor/${tutorId}`);
   },
@@ -69,4 +70,8 @@ export const ClassesApi = {
     return instance.patch(`/user/tutor-applications/${id}/reject`);
   },
 
+  // Set class to OPEN status
+  setOpenClass(classId: string): Promise<ClassResponse> {
+    return instance.patch(`/classes/${classId}/setOpenClass`);
+  },
 };

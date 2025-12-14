@@ -24,7 +24,7 @@ export default function InputComment({
   const totalStars = 5;
 
   useEffect(() => {
-    if (newComment) {
+    if (newComment && idTutor) {
       getListCmtByTutorID(idTutor);
       setRating(0);
       setContent("");
@@ -33,6 +33,11 @@ export default function InputComment({
   }, [newComment, getListCmtByTutorID, idTutor]);
 
   const handleSubmit = async () => {
+    if (!idTutor) {
+      setLocalError("Không tìm thấy thông tin giáo viên.");
+      return;
+    }
+
     if (!rating) {
       setLocalError("Vui lòng chọn số sao đánh giá.");
       return;
@@ -49,6 +54,11 @@ export default function InputComment({
       await createComment(idTutor, content.trim(), rating);
     } catch { }
   };
+
+  // Don't render if no tutor ID
+  if (!idTutor) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-3 mt-4 w-full text-black font-quicksand">

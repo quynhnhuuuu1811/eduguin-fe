@@ -124,6 +124,8 @@ export const en: TranslationKeys = {
     inactive: 'Inactive',
     pending: 'Pending',
     noClasses: 'You don\'t have any classes yet',
+    draft: 'Draft',
+    price: 'Price',
   },
 
   // Class Subscription page
