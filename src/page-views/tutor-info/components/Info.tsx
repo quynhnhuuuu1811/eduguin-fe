@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useUserStore } from "@/zustand/stores/UserStore";
 import Img from "../../../assets/images/teacher.png";
 import Banner from "../../../assets/images/VideoThumbnail.png";
@@ -16,6 +16,7 @@ import SubcribModal from "./SubcribModal";
 import { useClassStore } from "@/zustand/stores/ClassStore";
 import Table, { ColumnData } from "@/components/Table";
 import { Class } from "@/zustand/types/Classes";
+import { useAuthStore } from "@/zustand/stores/AuthStore";
 
 const Info = ({ id }: { id: string }) => {
   const [openModal, setOpenModal] = useState(false);
@@ -25,12 +26,19 @@ const Info = ({ id }: { id: string }) => {
     error,
     fetchTutorByID,
   } = useUserStore();
+  const { data: authData, getMyInfo } = useAuthStore();
   const {
     comments: commentList,
     loading: commentLoading,
     error: commentError,
     getListCmtByTutorID,
   } = useCommentStore();
+
+  useEffect(() => {
+    if (!authData?.user) {
+      getMyInfo();
+    }
+  }, [authData]);
   useEffect(() => {
     if (!id) return;
     fetchTutorByID(id);
@@ -51,7 +59,6 @@ const Info = ({ id }: { id: string }) => {
   if (!id) {
     return <div>No tutor ID provided</div>;
   }
-
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -75,7 +82,7 @@ const Info = ({ id }: { id: string }) => {
       if (u.hostname === "youtu.be") {
         return `https://www.youtube.com/embed${u.pathname}`;
       }
-    } catch { }
+    } catch {}
     return null;
   };
   const embedUrl = introUrl ? getYoutubeEmbedUrl(introUrl) : null;
@@ -264,17 +271,22 @@ const Info = ({ id }: { id: string }) => {
         </div>
       </div>
       <div className="flex flex-col gap-5 text-black font-quicksand w-full">
-        <h3 className=" font-bold text-[15px] md:text-[20px] lg:text-[20px]">Danh sách lớp học</h3>
-        {
-          classes.length > 0 ? (
-            <Table columns={columns} data={classes} />
-          ) : (
-            <div className="flex flex-col justify-center items-center gap-2 ">
-              <img src="https://res.cloudinary.com/dh2uwapb8/image/upload/v1764778004/fe/fxvnauqnwitk0ixpkq2y.png" style={{ width: "70px", height: "70px" }} />
-              <h5 className=" text-gray-700 font-bold opacity-50">Có vẻ giáo viên hiện tại chưa có lớp học nào</h5>
-            </div>
-          )
-        }
+        <h3 className=" font-bold text-[15px] md:text-[20px] lg:text-[20px]">
+          Danh sách lớp học
+        </h3>
+        {classes.length > 0 ? (
+          <Table columns={columns} data={classes} />
+        ) : (
+          <div className="flex flex-col justify-center items-center gap-2 ">
+            <img
+              src="https://res.cloudinary.com/dh2uwapb8/image/upload/v1764778004/fe/fxvnauqnwitk0ixpkq2y.png"
+              style={{ width: "70px", height: "70px" }}
+            />
+            <h5 className=" text-gray-700 font-bold opacity-50">
+              Có vẻ giáo viên hiện tại chưa có lớp học nào
+            </h5>
+          </div>
+        )}
       </div>
       <hr className="my-5 border-t-2 border-[#737E91]" />
       <div className="flex flex-col gap-5 text-black font-quicksand">
@@ -306,7 +318,12 @@ const Info = ({ id }: { id: string }) => {
       </div>
       <InputComment
         idTutor={id}
-        user={{ avatar: "https://example.com/avatar.jpg", name: "User Name" }}
+        user={{
+          avatar:
+            authData?.user?.avatarUrl ||
+            "https://res.cloudinary.com/dh2uwapb8/image/upload/v1765078223/fe/fliiqbvbsfiwel8b3k2j.jpg",
+          name: authData?.user?.fullName || "User Name",
+        }}
       />
     </div>
   );

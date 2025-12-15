@@ -36,8 +36,6 @@ const Info = ({ userInfo }: InfoProps) => {
   const isTutor = userInfo.role === "tutor";
   const { t } = useTranslation();
   const isEnglish = t.common.loading === "Loading...";
-  console.log(222, isTutor);
-  // Format dateOfBirth to YYYY-MM-DD for input type="date"
   const formatDateForInput = (date: string | undefined | null): string => {
     if (!date) return "";
     const parsed = dayjs(date);
@@ -72,7 +70,6 @@ const Info = ({ userInfo }: InfoProps) => {
     setIsEditing(true);
   };
 
-  console.log(222, userInfo.tutorProfile);
 
   const handleCancel = () => {
     setEditedData({
