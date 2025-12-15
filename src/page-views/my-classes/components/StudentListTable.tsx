@@ -3,6 +3,7 @@ import React from 'react'
 import Table, { ColumnData } from '@/components/Table'
 import { useClassStore } from '@/zustand/stores/ClassStore'
 import LoadingScreen from '@/components/LoadingScreen'
+import dayjs from 'dayjs'
 
 export default function StudentListTable({ open, onClose, classId }: { open: boolean, onClose: () => void, classId: string }) {
   const columns: ColumnData[] = [
@@ -15,6 +16,9 @@ export default function StudentListTable({ open, onClose, classId }: { open: boo
       label: 'Ngày duyệt',
       dataKey: 'approvedAt',
       align: 'center',
+      render: (value: unknown) => {
+        return <div className="text-center">{dayjs(value as string).format('DD/MM/YYYY')}</div>
+      }
     },
   ]
 
