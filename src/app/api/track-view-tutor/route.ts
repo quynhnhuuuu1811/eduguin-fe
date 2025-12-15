@@ -19,21 +19,20 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
+    const apiUrl =
+      process.env.NEXT_PUBLIC_API_URL || "https://api.eduguin.mtri.online/api";
 
-    const res = await fetch(
-      "https://api.eduguin.mtri.online/api/rmq-publisher/event",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authHeader,
-        },
-        body: JSON.stringify({
-          eventType: "view_tutor",
-          tutorId,
-        }),
-      }
-    );
+    const res = await fetch(`${apiUrl}/rmq-publisher/event`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+      },
+      body: JSON.stringify({
+        eventType: "view_tutor",
+        tutorId,
+      }),
+    });
 
     if (!res.ok) {
       const text = await res.text();

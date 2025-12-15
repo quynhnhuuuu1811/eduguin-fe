@@ -1,7 +1,8 @@
 import { getTokenFromLocalStorage } from "@/utils/storage";
 import axios from "axios";
 const instance = axios.create({
-  baseURL: "https://api.eduguin.mtri.online/api",
+  baseURL:
+    process.env.NEXT_PUBLIC_API_URL || "https://api.eduguin.mtri.online/api",
 });
 
 instance.interceptors.request.use(

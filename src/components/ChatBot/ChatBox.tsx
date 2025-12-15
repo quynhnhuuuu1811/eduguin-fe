@@ -36,7 +36,6 @@ export default function ChatBox() {
   const { chatData, getHistoryChat, loading, error, clearError } =
     useChatStore();
 
-  // Mounted + lấy token từ localStorage (chỉ chạy ở client)
   useEffect(() => {
     setMounted(true);
     if (typeof window !== "undefined") {
@@ -45,7 +44,14 @@ export default function ChatBox() {
     }
   }, []);
 
-  // Khởi tạo socket khi đã mounted & có token
+  useEffect(() => {
+    if (!isOpen) {
+      if (error) clearError();
+      return;
+    }
+
+    void getHistoryChat();
+  }, [isOpen, getHistoryChat, clearError, error]);
   useEffect(() => {
     if (!mounted || !token) return;
 
@@ -113,15 +119,7 @@ export default function ChatBox() {
   }, [mounted, token]);
 
   const handleToggleOpen = () => {
-    setIsOpen((prev) => {
-      const next = !prev;
-      if (next) {
-        getHistoryChat();
-      } else {
-        if (error) clearError();
-      }
-      return next;
-    });
+    setIsOpen((prev) => !prev);
   };
 
   useEffect(() => {
