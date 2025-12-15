@@ -30,7 +30,7 @@ const TutorInfo = ({ id }: { id: string }) => {
           },
           body: JSON.stringify({ tutorId: id }),
         });
-      } catch (e) { }
+      } catch (e) {}
     };
 
     track();
@@ -69,7 +69,7 @@ const TutorInfo = ({ id }: { id: string }) => {
         {t.tutorInfo.title}
       </Typography>
       <Box width="100%" className="max-w-[80%] mx-auto">
-        <Info id={id} userInfo={userInfo ?? undefined} />
+        <Info id={id} userInfo={userInfo as any} />
       </Box>
     </div>
   );
