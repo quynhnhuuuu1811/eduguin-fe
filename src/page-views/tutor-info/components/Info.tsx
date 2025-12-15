@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useUserStore } from "@/zustand/stores/UserStore";
 import Img from "../../../assets/images/teacher.png";
 import Banner from "../../../assets/images/VideoThumbnail.png";
@@ -18,6 +18,7 @@ import Table, { ColumnData } from "@/components/Table";
 import { Class } from "@/zustand/types/Classes";
 import { useTranslation } from "@/i18n";
 import { AuthUser } from "@/zustand/types/Auth";
+import { useAuthStore } from "@/zustand/stores/AuthStore";
 
 const Info = ({ id, userInfo }: { id: string, userInfo: AuthUser }) => {
   const { t } = useTranslation();
@@ -30,6 +31,7 @@ const Info = ({ id, userInfo }: { id: string, userInfo: AuthUser }) => {
     error,
     fetchTutorByID,
   } = useUserStore();
+  const { data: authData, getMyInfo } = useAuthStore();
   const {
     comments: commentList,
     loading: commentLoading,
