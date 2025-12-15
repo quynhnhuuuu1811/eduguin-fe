@@ -153,7 +153,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         role: userData.role,
         avatarUrl: userData.avatarUrl ?? undefined,
         avatar: userData.avatarUrl ?? undefined,
-        description: userData.tutorProfile?.bio || "",
+        bio: userData.tutorProfile?.bio || "",
         dateOfBirth: userData.birthDate,
         birthDate: userData.birthDate,
         sex: userData.sex,

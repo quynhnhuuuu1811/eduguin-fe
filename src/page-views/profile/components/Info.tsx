@@ -54,7 +54,7 @@ const Info = ({ userInfo }: InfoProps) => {
   };
 
   const [editedData, setEditedData] = useState({
-    description: userInfo.description || userInfo.tutorProfile?.bio || "",
+    bio: userInfo.bio || userInfo.tutorProfile?.bio || "",
     dateOfBirth: formatDateForInput(userInfo.dateOfBirth || userInfo.birthDate),
     email: userInfo.email || "",
     sex: normalizeSex(userInfo.sex),
@@ -72,9 +72,11 @@ const Info = ({ userInfo }: InfoProps) => {
     setIsEditing(true);
   };
 
+  console.log(222, userInfo.tutorProfile);
+
   const handleCancel = () => {
     setEditedData({
-      description: userInfo.description || userInfo.tutorProfile?.bio || "",
+      bio: userInfo.bio || userInfo.tutorProfile?.bio || "",
       dateOfBirth: formatDateForInput(
         userInfo.dateOfBirth || userInfo.birthDate
       ),
@@ -190,8 +192,8 @@ const Info = ({ userInfo }: InfoProps) => {
       if (uploadVideo) {
         formData.append("introVideoUrl", uploadVideo);
       }
-      if (editedData.description) {
-        formData.append("description", editedData.description);
+      if (editedData.bio) {
+        formData.append("bio", editedData.bio);
       }
       if (editedData.dateOfBirth) {
         formData.append("dateOfBirth", editedData.dateOfBirth);
@@ -348,7 +350,7 @@ const Info = ({ userInfo }: InfoProps) => {
                   </div>
                   <h6 className="text-blue600 font-semibold text-[15px]">
                     {isTutor
-                      ? `${t.home.roleOptions.tutorTitle} ${userInfo.tutorProfile?.subject} ${userInfo.tutorProfile?.grade}`
+                      ? `${t.home.roleOptions.tutorTitle} ${userInfo.tutorProfile?.subject?.name} ${userInfo.tutorProfile?.grade}`
                       : t.home.roleOptions.studentTitle}
                   </h6>
                 </div>
@@ -356,15 +358,15 @@ const Info = ({ userInfo }: InfoProps) => {
                 {isTutor &&
                   (isEditing ? (
                     <CustomInput
-                      label={t.auth.tutorRegister.description}
+                      label={t.auth.tutorRegister.bio}
                       type="text"
-                      value={editedData.description}
-                      onChange={handleInputChange("description")}
-                      name="description"
+                      value={editedData.bio}
+                      onChange={handleInputChange("bio")}
+                      name="bio"
                     />
-                  ) : userInfo?.description || userInfo.tutorProfile?.bio ? (
+                  ) : userInfo?.bio || userInfo.tutorProfile?.bio ? (
                     <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">
-                      {userInfo.description || userInfo.tutorProfile?.bio}
+                      {userInfo.bio || userInfo.tutorProfile?.bio}
                     </p>
                   ) : (
                     <p className="text-black text-[14px] font-normal max-w-full md:max-w-[520px]">

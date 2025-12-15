@@ -21,7 +21,7 @@ interface TutorRegisterFormData {
   displayName: string;
   subjectId: string;
   grade: string;
-  description: string;
+  bio: string;
 }
 
 const TutorRegisterPageView = () => {
@@ -52,7 +52,7 @@ const TutorRegisterPageView = () => {
       displayName: '',
       subjectId: '',
       grade: '',
-      description: '',
+      bio: '',
     },
   });
 
@@ -107,7 +107,7 @@ const TutorRegisterPageView = () => {
         confirmPassword: data.confirmPassword,
         subjectId: data.subjectId,
         grade: Number(data.grade),
-        description: data.description,
+        bio: data.bio,
       };
 
       await tutorApply(applyData);
@@ -408,15 +408,15 @@ const TutorRegisterPageView = () => {
                 </div>
                 <div className='w-full md:w-1/2'>
                   <Controller
-                    name="description"
+                    name="bio"
                     control={control}
                     render={({ field }) => (
                       <CustomInput
-                        label={t.auth.tutorRegister.description}
+                        label={t.auth.tutorRegister.bio}
                         type="text"
                         value={field.value || ''}
                         onChange={field.onChange}
-                        name="description"
+                        name="bio"
                       />
                     )}
                   />

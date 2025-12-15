@@ -76,6 +76,25 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
       }
     }
 
+    // Check for duplicate/overlapping schedules on same day
+    for (let i = 0; i < schedules.length; i++) {
+      for (let j = i + 1; j < schedules.length; j++) {
+        if (schedules[i].days === schedules[j].days) {
+          const start1 = schedules[i].startTime;
+          const end1 = schedules[i].endTime;
+          const start2 = schedules[j].startTime;
+          const end2 = schedules[j].endTime;
+
+          // Check if time slots overlap
+          const isOverlapping = start1 < end2 && start2 < end1;
+          if (isOverlapping) {
+            const dayLabel = DAYS_OF_WEEK.find(d => d.value === schedules[i].days)?.label || schedules[i].days;
+            return `Lịch học ${i + 1} và ${j + 1} bị trùng khung giờ vào ${dayLabel}`;
+          }
+        }
+      }
+    }
+
     return null;
   };
 

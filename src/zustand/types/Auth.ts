@@ -25,7 +25,7 @@ export interface AuthUser {
   role?: string;
   avatar?: string;
   avatarUrl?: string;
-  description?: string;
+  bio?: string;
   dateOfBirth?: string;
   birthDate?: string;
   sex?: string;
@@ -42,7 +42,9 @@ export interface AuthUser {
     grade?: number;
     ratingCount?: number;
     meetingTool?: Record<string, any>;
-    subject?: string;
+    subject?: {
+      name: string;
+    }
   };
   studentProfile?: any;
 }

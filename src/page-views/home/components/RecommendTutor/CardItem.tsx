@@ -35,12 +35,12 @@ const CardItem = ({ tutor }: CardItemProps) => {
       className="w-[200px] h-[280px] shadow-md flex flex-col justify-center items-center py-2.5"
       style={{
         borderRadius: 20,
-        gap: 1,
+        gap: 3,
       }}>
       <img
         src={tutor.avatarUrl || Img.src}
         alt="Teacher"
-        className="w-[90%] h-full object-cover rounded-[16px]"
+        className="w-[90%] object-cover rounded-[16px] aspect-square"
       />
       <div className="w-[90%] flex justify-between pt-2">
         <div className="w-full flex flex-col items-start justify-start gap-1">
