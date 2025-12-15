@@ -61,6 +61,7 @@ const DepositModal: React.FC<DepositModalProps> = ({ open, onClose }) => {
     setIsLoading(true);
     try {
       const res = await createPayment(amountValue);
+      console.log(111, res);
       // createPayment returns res.data from API, so access order_url directly
       window.open(res?.order_url, "_blank");
     } catch (error) {

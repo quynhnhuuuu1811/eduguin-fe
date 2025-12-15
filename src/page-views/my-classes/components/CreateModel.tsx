@@ -203,11 +203,6 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
         Thêm lớp học
       </DialogTitle>
       <DialogContent className="flex flex-col gap-4 pt-4">
-        {error && (
-          <div className="text-red-500 text-sm bg-red-50 p-3 rounded-lg">
-            {error}
-          </div>
-        )}
         <TextField
           label="Tên lớp học"
           name="className"
@@ -276,7 +271,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
                   onChange={(e) => handleScheduleChange(index, 'startTime', e.target.value)}
                   size="small"
                   slotProps={{ inputLabel: { shrink: true } }}
-                  sx={{ width: 110 }}
+                  sx={{ width: 200 }}
                 />
                 <TextField
                   label="Đến"
@@ -285,7 +280,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
                   onChange={(e) => handleScheduleChange(index, 'endTime', e.target.value)}
                   size="small"
                   slotProps={{ inputLabel: { shrink: true } }}
-                  sx={{ width: 110 }}
+                  sx={{ width: 200 }}
                 />
                 {schedules.length > 1 && (
                   <IconButton
@@ -327,6 +322,11 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
           fullWidth
           variant="outlined"
         />
+        {error && (
+          <div className="text-red-500 text-sm bg-red-50 p-3 rounded-lg">
+            {error}
+          </div>
+        )}
       </DialogContent>
       <DialogActions className="px-6 pb-4">
         <Button onClick={handleClose} variant="outlined" color="inherit" disabled={isSubmitting}>

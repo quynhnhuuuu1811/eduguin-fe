@@ -151,7 +151,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, showStatus = false }) => {
                 alt={authorName || ""}
                 width={32}
                 height={32}
-                className="rounded-full object-cover"
+                className="rounded-full object-cover aspect-square"
               />
             ) : authorName ? (
               <Avatar sx={{ width: 32, height: 32, fontSize: 14 }}>

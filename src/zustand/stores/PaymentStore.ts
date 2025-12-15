@@ -21,7 +21,7 @@ export const usePaymentStore = create<PaymentState>((set) => ({
   createPayment: async (amount: number) => {
     try {
       const res = await PaymentApi.createPayment(amount);
-      return res.data;
+      return res.data.data;
     } catch (error: any) {
       set({ paymentResult: { status: "failed", amount: amount } });
       console.error("Failed to create payment:", error);
