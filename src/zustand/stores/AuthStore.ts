@@ -1,5 +1,12 @@
 import { create } from "zustand";
-import { AuthUser, LoginRequest, RegisterRequest, RegisterResponse, TutorApplyRequest, AdminLoginRequest } from "../types/Auth";
+import {
+  AuthUser,
+  LoginRequest,
+  RegisterRequest,
+  RegisterResponse,
+  TutorApplyRequest,
+  AdminLoginRequest,
+} from "../types/Auth";
 import { AuthApi } from "../api/AuthApi";
 import { setAuthCookies, clearAuthCookies } from "@/utils/cookies";
 
@@ -21,7 +28,7 @@ interface AuthState {
   banUser: (id: string) => Promise<void>;
 }
 
-const getInitialState = (): Pick<AuthState, 'data' | 'loading' | 'error'> => {
+const getInitialState = (): Pick<AuthState, "data" | "loading" | "error"> => {
   if (typeof window === "undefined") {
     return {
       data: { user: null, accessToken: null },
@@ -79,7 +86,10 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       if (typeof window !== "undefined" && accessToken) {
         localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("user", JSON.stringify({ ...user, role: "admin" }));
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...user, role: "admin" })
+        );
         // Set cookies for middleware
         setAuthCookies(accessToken, { ...user, role: "admin" });
       }
@@ -159,16 +169,18 @@ export const useAuthStore = create<AuthState>((set) => ({
         sex: userData.sex,
         phoneNumber: userData.phoneNumber ?? undefined,
         phone: userData.phoneNumber ?? undefined,
-        tutorProfile: userData.tutorProfile ? {
-          userId: userData.tutorProfile.userId,
-          bio: userData.tutorProfile.bio,
-          monthlyPrice: userData.tutorProfile.monthlyPrice,
-          introVideoUrl: userData.tutorProfile.introVideoUrl ?? undefined,
-          rating: userData.tutorProfile.rating,
-          grade: userData.tutorProfile.grade,
-          ratingCount: userData.tutorProfile.ratingCount,
-          meetingTool: userData.tutorProfile.meetingTool,
-        } : undefined,
+        tutorProfile: userData.tutorProfile
+          ? {
+              userId: userData.tutorProfile.userId,
+              bio: userData.tutorProfile.bio,
+              introVideoUrl: userData.tutorProfile.introVideoUrl ?? undefined,
+              rating: userData.tutorProfile.rating,
+              grade: userData.tutorProfile.grade,
+              ratingCount: userData.tutorProfile.ratingCount,
+              meetingTool: userData.tutorProfile.meetingTool,
+              subject: userData.tutorProfile.subject,
+            }
+          : undefined,
         studentProfile: userData.studentProfile ?? undefined,
         balance: userData.balance ?? undefined,
       };
@@ -205,5 +217,3 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 }));
-
-

@@ -177,6 +177,7 @@ export const vi = {
       success: "Gửi đơn ứng tuyển thành công! Vui lòng chờ admin duyệt.",
       isStudent: "Bạn là học sinh?",
       registerStudent: "Đăng ký học sinh",
+      bio:""
     },
   },
 

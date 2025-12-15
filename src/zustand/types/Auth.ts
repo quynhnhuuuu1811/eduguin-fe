@@ -11,7 +11,7 @@ export interface AdminLoginRequest {
 export interface LoginResponse {
   data: {
     data: {
-    access_token: string;
+      access_token: string;
       user: AuthUser;
     };
   };
@@ -36,15 +36,12 @@ export interface AuthUser {
   tutorProfile?: {
     userId: string;
     bio?: string;
-    monthlyPrice?: number;
     introVideoUrl?: string;
     rating?: string;
     grade?: number;
     ratingCount?: number;
     meetingTool?: Record<string, any>;
-    subject?: {
-      name: string;
-    }
+    subject: any;
   };
   studentProfile?: any;
 }
@@ -116,4 +113,3 @@ export interface ProfileResponse {
   timestamp: string;
   path: string;
 }
-

@@ -22,7 +22,7 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useUserStore } from "@/zustand/stores/UserStore";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslation } from "@/i18n";
-import LocalAtmIcon from '@mui/icons-material/LocalAtm';
+import LocalAtmIcon from "@mui/icons-material/LocalAtm";
 import DepositModal from "./DepositModal";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
 
@@ -99,12 +99,12 @@ const Info = ({ userInfo }: InfoProps) => {
 
   const handleInputChange =
     (field: keyof typeof editedData) =>
-      (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        setEditedData((prev) => ({
-          ...prev,
-          [field]: event.target.value,
-        }));
-      };
+    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setEditedData((prev) => ({
+        ...prev,
+        [field]: event.target.value,
+      }));
+    };
 
   const introVideoUrl = userInfo.tutorProfile?.introVideoUrl;
   const router = useRouter();
@@ -229,7 +229,7 @@ const Info = ({ userInfo }: InfoProps) => {
       const errorMessage =
         error && typeof error === "object" && "response" in error
           ? (error as { response?: { data?: { message?: string } } }).response
-            ?.data?.message
+              ?.data?.message
           : undefined;
       alert(errorMessage || "Có lỗi xảy ra khi cập nhật thông tin");
       // Reset on error
@@ -339,7 +339,9 @@ const Info = ({ userInfo }: InfoProps) => {
                       {userInfo.fullName || userInfo.name || "-"}
                     </h2>
                     <h3 className="flex items-center">
-                      {userInfo.tutorProfile?.rating ? parseInt(userInfo.tutorProfile?.rating || "0") : "-"}
+                      {userInfo.tutorProfile?.rating
+                        ? parseInt(userInfo.tutorProfile?.rating || "0")
+                        : "-"}
                       <StarRateRoundedIcon
                         sx={{
                           fontSize: "30px",
@@ -358,7 +360,7 @@ const Info = ({ userInfo }: InfoProps) => {
                 {isTutor &&
                   (isEditing ? (
                     <CustomInput
-                      label={t.auth.tutorRegister.bio}
+                      label={t.auth.tutorRegister.description}
                       type="text"
                       value={editedData.bio}
                       onChange={handleInputChange("bio")}
@@ -467,8 +469,8 @@ const Info = ({ userInfo }: InfoProps) => {
                     <span className="font-normal">
                       {userInfo.dateOfBirth || userInfo.birthDate
                         ? dayjs(
-                          userInfo.dateOfBirth || userInfo.birthDate
-                        ).format("DD/MM/YYYY")
+                            userInfo.dateOfBirth || userInfo.birthDate
+                          ).format("DD/MM/YYYY")
                         : "-"}
                     </span>
                   </p>
@@ -489,13 +491,18 @@ const Info = ({ userInfo }: InfoProps) => {
                   <div className="flex items-center gap-2">
                     <p className="font-bold">
                       {isEnglish ? "Balance:" : "Số dư tài khoản:"}
-                      <span className="font-normal"> {new Intl.NumberFormat("vi-VN").format(userInfo.balance || 0)} VND</span>
+                      <span className="font-normal">
+                        {" "}
+                        {new Intl.NumberFormat("vi-VN").format(
+                          userInfo.balance || 0
+                        )}{" "}
+                        VND
+                      </span>
                     </p>
                     <CustomButton
                       type="Secondary"
                       className="flex items-center gap-2 !bg-blue100 !text-blue700 !px-2 !py-1"
-                      onClick={handleDeposit}
-                    >
+                      onClick={handleDeposit}>
                       <LocalAtmIcon sx={{ fontSize: "18px" }} />
                       {isEnglish ? "Deposit" : "Nạp tiền"}
                     </CustomButton>
