@@ -69,6 +69,7 @@ export interface TutorApplyRequest {
   subjectId: string;
   grade: number;
   description?: string;
+  bio?: string;
 }
 
 export interface RegisterResponse {
