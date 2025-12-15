@@ -1,17 +1,20 @@
 import IntialAvatar from "@/components/IntialAvatar";
 import { useCommentStore } from "@/zustand/stores/CommentStore";
 import { useEffect, useState } from "react";
-
+import { useTranslation } from "@/i18n";
+import { AuthUser } from "@/zustand/types/Auth";
 export default function InputComment({
   idTutor,
-  user,
+  userInfo,
 }: {
-  user: { avatar: string; name: string };
+  userInfo: AuthUser;
   idTutor: string;
 }) {
+  const { t } = useTranslation();
   const [rating, setRating] = useState(0);
   const [content, setContent] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
+  console.log(33, userInfo)
 
   const {
     newComment,
@@ -34,17 +37,17 @@ export default function InputComment({
 
   const handleSubmit = async () => {
     if (!idTutor) {
-      setLocalError("Không tìm thấy thông tin giáo viên.");
+      setLocalError(t.tutorInfo.tutorNotFound);
       return;
     }
 
     if (!rating) {
-      setLocalError("Vui lòng chọn số sao đánh giá.");
+      setLocalError(t.tutorInfo.selectRating);
       return;
     }
 
     if (!content.trim()) {
-      setLocalError("Vui lòng nhập nội dung đánh giá.");
+      setLocalError(t.tutorInfo.enterReview);
       return;
     }
 
@@ -63,16 +66,16 @@ export default function InputComment({
   return (
     <div className="flex flex-col gap-3 mt-4 w-full text-black font-quicksand">
       <div className="flex items-center gap-3">
-        {user?.avatar ? (
+        {userInfo?.avatar ? (
           <img
-            src={user?.avatar}
+            src={userInfo?.avatar}
             alt="avatar"
             className="w-10 h-10 rounded-full object-cover"
           />
         ) : (
-          <IntialAvatar name={user?.name || ""} width={40} />
+          <IntialAvatar name={userInfo?.name || ""} width={40} />
         )}
-        <h5>{user?.name || "Học sinh"}</h5>
+        <h5>{userInfo?.fullName || t.tutorInfo.student}</h5>
       </div>
 
       <div className="flex gap-2 items-center">
@@ -94,7 +97,7 @@ export default function InputComment({
       <textarea
         className="w-full border border-gray-300 rounded-xl p-4 outline-none disabled:bg-gray-100"
         rows={3}
-        placeholder="Nhập đánh giá của bạn..."
+        placeholder={t.tutorInfo.reviewPlaceholder}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         disabled={commentLoading}></textarea>
@@ -108,7 +111,7 @@ export default function InputComment({
           className="bg-[#025A2F] cursor-pointer text-white px-4 py-2 rounded-full flex items-center gap-2 hover:bg-green-800 duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
           onClick={handleSubmit}
           disabled={commentLoading}>
-          {commentLoading ? "Đang gửi..." : "Gửi đánh giá"}
+          {commentLoading ? t.tutorInfo.sending : t.tutorInfo.sendReview}
           <img
             src="https://res.cloudinary.com/dh2uwapb8/image/upload/v1764430229/fe/uwhg9axscm9mlid8fdkr.png"
             className="w-4 h-4"

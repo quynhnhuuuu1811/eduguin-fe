@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogTitle, TextField, DialogActions, Button, C
 import { Add, Delete } from "@mui/icons-material";
 import dayjs from "dayjs";
 import { useState } from "react";
+import { useTranslation } from "@/i18n";
 
 interface CreateModelProps {
   open: boolean;
@@ -15,16 +16,6 @@ interface ScheduleItem {
   startTime: string;
   endTime: string;
 }
-
-const DAYS_OF_WEEK = [
-  { value: '2', label: 'Thứ hai' },
-  { value: '3', label: 'Thứ ba' },
-  { value: '4', label: 'Thứ tư' },
-  { value: '5', label: 'Thứ năm' },
-  { value: '6', label: 'Thứ sáu' },
-  { value: '7', label: 'Thứ bảy' },
-  { value: '8', label: 'Chủ nhật' },
-];
 
 const initialFormData = {
   className: '',
@@ -42,6 +33,19 @@ const initialSchedule: ScheduleItem = {
 };
 
 export default function CreateModel({ open, onClose }: CreateModelProps) {
+  const { t } = useTranslation();
+  const isEnglish = t.common.loading === "Loading...";
+
+  const DAYS_OF_WEEK = [
+    { value: '2', label: t.myClasses.monday },
+    { value: '3', label: t.myClasses.tuesday },
+    { value: '4', label: t.myClasses.wednesday },
+    { value: '5', label: t.myClasses.thursday },
+    { value: '6', label: t.myClasses.friday },
+    { value: '7', label: t.myClasses.saturday },
+    { value: '8', label: t.myClasses.sunday },
+  ];
+
   const currentDate = dayjs().format('YYYY-MM-DD');
   const { createClass, setSchedule, loading, fetchTutorClasses } = useClassStore();
 
@@ -51,28 +55,29 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateForm = () => {
-    if (!formData.className.trim()) return 'Tên lớp học là bắt buộc';
-    if (!formData.startTime) return 'Ngày bắt đầu là bắt buộc';
-    if (!formData.endTime) return 'Ngày kết thúc là bắt buộc';
-    if (!formData.capacity || formData.capacity < 1) return 'Sĩ số tối đa phải lớn hơn 0';
-    if (!formData.price || formData.price < 0) return 'Giá tiền phải lớn hơn hoặc bằng 0';
-    if (!formData.linkMeeting.trim()) return 'Link học trực tuyến là bắt buộc';
+    if (!formData.className.trim()) return t.myClasses.classNameRequired;
+    if (!formData.startTime) return t.myClasses.startDateRequired;
+    if (!formData.endTime) return t.myClasses.endDateRequired;
+    if (!formData.capacity || formData.capacity < 1) return t.myClasses.capacityRequired;
+    if (!formData.price || formData.price < 0) return t.myClasses.priceRequired;
+    if (!formData.linkMeeting.trim()) return t.myClasses.linkRequired;
 
     if (dayjs(formData.startTime).isAfter(dayjs(formData.endTime))) {
-      return 'Ngày bắt đầu phải trước ngày kết thúc';
+      return t.myClasses.startBeforeEnd;
     }
     if (dayjs(formData.startTime).isBefore(currentDate)) {
-      return 'Ngày bắt đầu phải sau ngày hiện tại';
+      return t.myClasses.startAfterToday;
     }
 
     // Validate schedules
     for (let i = 0; i < schedules.length; i++) {
       const schedule = schedules[i];
-      if (!schedule.days) return `Lịch học ${i + 1}: Vui lòng chọn ngày`;
-      if (!schedule.startTime) return `Lịch học ${i + 1}: Vui lòng nhập giờ bắt đầu`;
-      if (!schedule.endTime) return `Lịch học ${i + 1}: Vui lòng nhập giờ kết thúc`;
+      const scheduleNum = isEnglish ? `Schedule ${i + 1}` : `Lịch học ${i + 1}`;
+      if (!schedule.days) return `${scheduleNum}: ${t.myClasses.selectDay}`;
+      if (!schedule.startTime) return `${scheduleNum}: ${t.myClasses.enterStartTime}`;
+      if (!schedule.endTime) return `${scheduleNum}: ${t.myClasses.enterEndTime}`;
       if (schedule.startTime >= schedule.endTime) {
-        return `Lịch học ${i + 1}: Giờ bắt đầu phải trước giờ kết thúc`;
+        return `${scheduleNum}: ${t.myClasses.startBeforeEndTime}`;
       }
     }
 
@@ -89,7 +94,10 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
           const isOverlapping = start1 < end2 && start2 < end1;
           if (isOverlapping) {
             const dayLabel = DAYS_OF_WEEK.find(d => d.value === schedules[i].days)?.label || schedules[i].days;
-            return `Lịch học ${i + 1} và ${j + 1} bị trùng khung giờ vào ${dayLabel}`;
+            const scheduleText = isEnglish
+              ? `Schedule ${i + 1} and ${j + 1} ${t.myClasses.scheduleOverlap} ${dayLabel}`
+              : `Lịch học ${i + 1} và ${j + 1} ${t.myClasses.scheduleOverlap} ${dayLabel}`;
+            return scheduleText;
           }
         }
       }
@@ -172,7 +180,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
     } catch (err: any) {
       console.error('Error creating class:', err);
       console.error('Error response:', err?.response?.data);
-      setError(err?.response?.data?.message || 'Có lỗi xảy ra khi tạo lớp học');
+      setError(err?.response?.data?.message || t.myClasses.createError);
     } finally {
       setIsSubmitting(false);
     }
@@ -200,11 +208,11 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
       }}
     >
       <DialogTitle className="text-2xl font-bold font-quicksand text-blue700">
-        Thêm lớp học
+        {t.myClasses.addClass}
       </DialogTitle>
       <DialogContent className="flex flex-col gap-4 pt-4">
         <TextField
-          label="Tên lớp học"
+          label={t.myClasses.className}
           name="className"
           value={formData.className}
           onChange={handleChange}
@@ -213,7 +221,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
         />
         <div className="grid grid-cols-2 gap-4">
           <TextField
-            label="Ngày bắt đầu"
+            label={t.myClasses.startDate}
             name="startTime"
             value={formData.startTime}
             onChange={handleChange}
@@ -223,7 +231,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
             slotProps={{ inputLabel: { shrink: true } }}
           />
           <TextField
-            label="Ngày kết thúc"
+            label={t.myClasses.endDate}
             name="endTime"
             value={formData.endTime}
             onChange={handleChange}
@@ -237,14 +245,14 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
         {/* Lịch học */}
         <div className="border border-gray-200 rounded-lg p-4">
           <div className="flex justify-between items-center mb-3">
-            <span className="font-semibold text-gray-700">Lịch học</span>
+            <span className="font-semibold text-gray-700">{t.myClasses.scheduleLabel}</span>
             <Button
               size="small"
               startIcon={<Add />}
               onClick={addSchedule}
               variant="text"
             >
-              Thêm
+              {t.myClasses.add}
             </Button>
           </div>
           <div className="flex flex-col gap-3">
@@ -252,7 +260,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
               <div key={index} className="flex items-center gap-2">
                 <TextField
                   select
-                  label="Ngày"
+                  label={t.myClasses.day}
                   value={schedule.days}
                   onChange={(e) => handleScheduleChange(index, 'days', e.target.value)}
                   size="small"
@@ -265,7 +273,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
                   ))}
                 </TextField>
                 <TextField
-                  label="Từ"
+                  label={t.myClasses.from}
                   type="time"
                   value={schedule.startTime}
                   onChange={(e) => handleScheduleChange(index, 'startTime', e.target.value)}
@@ -274,7 +282,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
                   sx={{ width: 200 }}
                 />
                 <TextField
-                  label="Đến"
+                  label={t.myClasses.to}
                   type="time"
                   value={schedule.endTime}
                   onChange={(e) => handleScheduleChange(index, 'endTime', e.target.value)}
@@ -297,7 +305,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
         </div>
 
         <TextField
-          label="Giá tiền"
+          label={t.myClasses.price}
           name="price"
           value={formData.price || ''}
           onChange={handleChange}
@@ -306,7 +314,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
           type="number"
         />
         <TextField
-          label="Sĩ số tối đa"
+          label={t.myClasses.maxCapacity}
           name="capacity"
           value={formData.capacity || ''}
           onChange={handleChange}
@@ -315,7 +323,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
           type="number"
         />
         <TextField
-          label="Link học trực tuyến"
+          label={t.myClasses.onlineLink}
           name="linkMeeting"
           value={formData.linkMeeting}
           onChange={handleChange}
@@ -330,7 +338,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
       </DialogContent>
       <DialogActions className="px-6 pb-4">
         <Button onClick={handleClose} variant="outlined" color="inherit" disabled={isSubmitting}>
-          Hủy
+          {t.myClasses.cancel}
         </Button>
         <Button
           onClick={handleCreateClass}
@@ -339,7 +347,7 @@ export default function CreateModel({ open, onClose }: CreateModelProps) {
           disabled={isSubmitting}
           startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : null}
         >
-          {isSubmitting ? 'Đang tạo...' : 'Tạo lớp'}
+          {isSubmitting ? t.myClasses.creating : t.myClasses.create}
         </Button>
       </DialogActions>
     </Dialog>

@@ -237,7 +237,6 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                   flexDirection: "column",
                   gap: { xs: "3px", sm: "5px", md: "10px", lg: "10px" },
                 }}>
-                <CustomButton type="Secondary">{t.tutorInfo.subscribe}</CustomButton>
                 <CustomButton
                   type="SecondaryOutlined"
                   className="border-none"

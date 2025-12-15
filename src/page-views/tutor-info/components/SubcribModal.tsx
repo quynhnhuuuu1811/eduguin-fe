@@ -5,6 +5,7 @@ import { useClassStore } from "@/zustand/stores/ClassStore";
 import { Alert, Snackbar } from "@mui/material";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/i18n";
 
 interface SubcribModalProps {
   open: boolean;
@@ -27,6 +28,9 @@ export default function SubcribModal({
   teacherPrice,
   teacherId,
 }: SubcribModalProps) {
+  const { t } = useTranslation();
+  const isEnglish = t.common.loading === "Loading...";
+
   const { classes, subscribeToClass, error, loading } = useClassStore();
   const router = useRouter();
 
@@ -44,11 +48,11 @@ export default function SubcribModal({
       const apiError = err?.response?.data?.message || error;
 
       if (apiError === 'Insufficient balance to request this class') {
-        setErrorMessage('Số dư không đủ để đăng ký lớp học này. Vui lòng nạp thêm tiền!');
+        setErrorMessage(t.tutorInfo.insufficientBalance);
       } else if (apiError === 'You already requested or joined this class') {
-        setErrorMessage('Bạn đã đăng kí lớp học này rồi!');
+        setErrorMessage(t.tutorInfo.alreadySubscribed);
       } else {
-        setErrorMessage('Đăng kí thất bại! Vui lòng thử lại.');
+        setErrorMessage(t.tutorInfo.subscribeFailed);
       }
       setShowError(true);
     }
@@ -59,6 +63,8 @@ export default function SubcribModal({
     router.push('/profile');
   };
 
+  const isInsufficientBalance = errorMessage === t.tutorInfo.insufficientBalance;
+
   const snackbars = (
     <>
       <Snackbar
@@ -68,7 +74,7 @@ export default function SubcribModal({
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert severity="success" variant="filled" sx={{ width: "100%" }}>
-          Đã đăng kí lớp học thành công! Chúng tôi sẽ thông báo sớm nhất có thể khi có phản hồi từ giáo viên!
+          {t.tutorInfo.subscribeSuccess}
         </Alert>
       </Snackbar>
       <Snackbar
@@ -82,12 +88,12 @@ export default function SubcribModal({
           variant="filled"
           sx={{ width: "100%" }}
           action={
-            errorMessage.includes('Số dư không đủ') ? (
+            isInsufficientBalance ? (
               <button
                 onClick={handleGoToDeposit}
                 className="text-white underline text-sm font-semibold ml-2"
               >
-                Nạp tiền
+                {t.tutorInfo.deposit}
               </button>
             ) : null
           }
@@ -135,7 +141,7 @@ export default function SubcribModal({
             className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold">
             ✕
           </button>
-          <h4 className="text-xl font-bold mb-4">Đăng kí học</h4>
+          <h4 className="text-xl font-bold mb-4">{t.tutorInfo.subscribeTitle}</h4>
           <div>
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
@@ -146,12 +152,14 @@ export default function SubcribModal({
                 />
                 <h5>{teacherName}</h5>
               </div>
-              <span className="text-gray-600">{`Giáo viên ${teacherSubject} - lớp ${teacherGrade}`}</span>
+              <span className="text-gray-600">
+                {t.tutorInfo.teacher} {teacherSubject} - {t.tutorInfo.grade} {teacherGrade}
+              </span>
             </div>
             <div className="flex flex-col gap-2 mt-4">
-              <span className="text-sm text-gray-500">Chọn lịch học</span>
+              <span className="text-sm text-gray-500">{t.tutorInfo.selectSchedule}</span>
               <CustomInput
-                label="Lịch học"
+                label={t.tutorInfo.scheduleLabel}
                 select
                 options={Array.isArray(classes) ? classes.map((item) => ({
                   label: `${item.className} (${item.startDate} - ${item.endDate})`,
@@ -169,7 +177,7 @@ export default function SubcribModal({
               onClick={onClose}
               className="w-full !bg-gray-200 !text-gray-700"
             >
-              Hủy
+              {t.tutorInfo.cancel}
             </CustomButton>
             <CustomButton
               type="Secondary"
@@ -177,7 +185,7 @@ export default function SubcribModal({
               disabled={!selectedClassId}
               className="w-full !text-white"
             >
-              Đăng kí
+              {t.tutorInfo.register}
             </CustomButton>
           </div>
         </div>

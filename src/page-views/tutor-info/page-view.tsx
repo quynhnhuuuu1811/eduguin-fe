@@ -1,9 +1,23 @@
 "use client";
-import { Box, Grid, Typography } from "@mui/material";
-import React, { useEffect } from "react";
+import { Box, Typography } from "@mui/material";
+import React, { useEffect, useMemo } from "react";
 import Info from "./components/Info";
+import { useTranslation } from "@/i18n";
+import { useAuthStore } from "@/zustand/stores/AuthStore";
 
 const TutorInfo = ({ id }: { id: string }) => {
+  const { t } = useTranslation();
+  const { data: authData, getMyInfo } = useAuthStore();
+
+  useEffect(() => {
+    getMyInfo();
+  }, [getMyInfo]);
+
+  const userInfo = useMemo(() => {
+    if (!authData?.user) return undefined;
+    return authData.user;
+  }, [authData?.user]);
+
   useEffect(() => {
     const track = async () => {
       console.log("Tracking view_tutor for tutorId:", id);
@@ -16,11 +30,12 @@ const TutorInfo = ({ id }: { id: string }) => {
           },
           body: JSON.stringify({ tutorId: id }),
         });
-      } catch (e) {}
+      } catch (e) { }
     };
 
     track();
   }, [id]);
+
   return (
     <div>
       <Typography
@@ -51,10 +66,10 @@ const TutorInfo = ({ id }: { id: string }) => {
             lg: "50px",
           },
         }}>
-        Thông tin giáo viên
+        {t.tutorInfo.title}
       </Typography>
       <Box width="100%" className="max-w-[80%] mx-auto">
-        <Info id={id} />
+        <Info id={id} userInfo={userInfo ?? undefined} />
       </Box>
     </div>
   );
