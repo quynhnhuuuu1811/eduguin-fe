@@ -30,7 +30,7 @@ const TutorInfo = ({ id }: { id: string }) => {
           },
           body: JSON.stringify({ tutorId: id }),
         });
-      } catch (e) {}
+      } catch (e) { }
     };
 
     track();

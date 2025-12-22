@@ -7,8 +7,8 @@ import { Providers } from "./providers";
 import ChatBox from "@/components/ChatBot/ChatBox";
 
 export const metadata: Metadata = {
-  title: "Eduguin",
-  description: "Eduguin - Your Educational Companion",
+  title: "EduGuin - Nền tảng kết nối học sinh và gia sư",
+  description: "EduGuin là nền tảng giáo dục trực tuyến kết nối học sinh với các gia sư chất lượng cao tại Việt Nam",
 };
 
 export default function RootLayout({

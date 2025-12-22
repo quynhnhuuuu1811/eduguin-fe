@@ -36,6 +36,7 @@ interface ClassData {
   capacity?: number;
   onlineLink?: string;
   linkMeeting?: string;
+  price?: number;
   [key: string]: unknown;
 }
 
@@ -86,7 +87,8 @@ const MyClassesPageView = () => {
         capacity: subscription.class?.capacity,
         linkMeeting: subscription.class?.linkMeeting,
         requestedAt: subscription.requestedAt,
-        teacherId: subscription.class?.tutorId || subscription.class?.tutorProfile?.userId
+        teacherId: subscription.class?.tutorId || subscription.class?.tutorProfile?.userId,
+        price: subscription.class?.price,
       }));
   }, [classes, isTutor]);
 
@@ -114,13 +116,14 @@ const MyClassesPageView = () => {
 
   const { getListStudentofClass } = useClassStore();
 
+  console.log(111, getListStudentofClass);
+
   const handleOpenDeleteModel = async (classData: ClassData) => {
     const today = dayjs();
     const classStartDate = classData.startDate ? dayjs(classData.startDate) : null;
 
     // Kiểm tra lớp học đã bắt đầu chưa
     if (classStartDate && classStartDate.isBefore(today, 'day') || classStartDate?.isSame(today, 'day')) {
-      // Kiểm tra có học sinh không
       try {
         const students = await getListStudentofClass(classData.id || '');
         if (students && students.length > 0) {
@@ -238,6 +241,9 @@ const MyClassesPageView = () => {
           dataKey: 'price',
           align: 'left',
           width: 120,
+          render: (value: unknown, row: ClassData) => {
+            return <span>{row.price ? `${row.price} VND` : '-'}</span>;
+          },
         },
         {
           label: t.myClasses.status,

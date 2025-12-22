@@ -162,7 +162,7 @@ export const vi = {
     className: "Tên lớp",
     subject: "Môn học",
     schedule: "Lịch học",
-    students: "Sĩ số",
+    students: "Học sinh",
     status: "Trạng thái",
     actions: "Hành động",
     active: "Đang hoạt động",

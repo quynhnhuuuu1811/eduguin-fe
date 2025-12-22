@@ -1,7 +1,9 @@
 "use client";
 import React from "react";
 import BgImg from "../assets/images/footer-bg.png";
+import LogoImg from "../assets/images/Logo-Photoroom.png";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
@@ -113,20 +115,29 @@ const Footer = () => {
           </Link>
         ))}
       </div>
-      <Typography
-        className="!font-[900] text-blue700"
-        sx={{
-          fontSize: {
-            xs: "15px",
-            sm: "20px",
-            md: "25px",
-            lg: "30px",
-          },
-          fontFamily: "quicksand",
-        }}
-      >
-        Eduguin
-      </Typography>
+      <div className="flex items-center gap-2">
+        <Image
+          src={LogoImg}
+          alt="EduGuin Logo"
+          width={40}
+          height={40}
+          className="object-contain"
+        />
+        <Typography
+          className="!font-[900] text-blue700"
+          sx={{
+            fontSize: {
+              xs: "15px",
+              sm: "20px",
+              md: "25px",
+              lg: "30px",
+            },
+            fontFamily: "quicksand",
+          }}
+        >
+          EduGuin
+        </Typography>
+      </div>
       <div className="flex flex-col justify-center text-center">
         <Typography
           className="text-blue700 font-500"

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import SchoolIcon from '@mui/icons-material/School';
 import PersonIcon from '@mui/icons-material/Person';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
@@ -13,6 +13,7 @@ import LanguageIcon from '@mui/icons-material/Language';
 import { useAuthStore } from '@/zustand/stores/AuthStore';
 import { useTranslation } from '@/i18n';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import LogoImg from '@/assets/images/Logo-Photoroom.png';
 
 const AdminSidebar = () => {
   const pathname = usePathname();
@@ -58,10 +59,23 @@ const AdminSidebar = () => {
     <aside className="w-64 min-h-screen bg-blue600 text-white flex flex-col rounded-r-2xl shadow-lg">
       {/* Logo / Brand */}
       <div className="p-6 border-b border-slate-700">
-        <h1 className="text-xl font-bold flex items-center gap-2">
-          <DashboardIcon />
-          {mounted ? (user?.fullName || user?.name || 'Admin') : 'Admin'}
-        </h1>
+        <div className="flex items-center gap-3">
+          <div className="bg-white rounded-full p-2">
+            <Image
+              src={LogoImg}
+              alt="EduGuin Logo"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold">EduGuin</h1>
+            <p className="text-xs text-slate-300">
+              {mounted ? (user?.fullName || user?.name || 'Admin') : 'Admin'}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Navigation */}
