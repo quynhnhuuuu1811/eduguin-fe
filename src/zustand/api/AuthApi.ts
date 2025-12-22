@@ -31,4 +31,10 @@ export const AuthApi = {
   verifyOtp(payload: { email: string; otp: string }): Promise<any> {
     return instance.post(`/auth/verify-otp`, payload);
   },
+  forgotPassword(email: string): Promise<any> {
+    return instance.post(`/auth/forgot-password`, { email });
+  },
+  resetPassword(payload: { email: string; otp: string; password: string; confirmPassword: string }): Promise<any> {
+    return instance.post(`/auth/reset-password`, payload);
+  },
 };

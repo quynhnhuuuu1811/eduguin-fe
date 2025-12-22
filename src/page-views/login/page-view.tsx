@@ -9,6 +9,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useTranslation } from "@/i18n";
+import OtpInput from "@/components/OTPInput";
 
 const LoginPageView = () => {
   const { t } = useTranslation();
@@ -28,13 +29,13 @@ const LoginPageView = () => {
 
   const handleInputChange =
     (field: "email" | "password") =>
-    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      if (field === "email") {
-        setEmail(event.target.value);
-      } else {
-        setPassword(event.target.value);
-      }
-    };
+      (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        if (field === "email") {
+          setEmail(event.target.value);
+        } else {
+          setPassword(event.target.value);
+        }
+      };
 
   const handleOtpChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -208,12 +209,10 @@ const LoginPageView = () => {
                   Một mã OTP đã được gửi tới email {data?.user?.email || email}.
                   Vui lòng nhập mã để xác minh.
                 </Typography>
-                <CustomInput
-                  label="OTP"
-                  type="text"
+                <OtpInput
+                  length={6}
                   value={otp}
-                  onChange={handleOtpChange}
-                  name="otp"
+                  onChange={(val) => setOtp(val)}
                 />
                 <CustomButton
                   type="Primary"

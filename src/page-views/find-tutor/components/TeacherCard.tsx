@@ -16,6 +16,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
   const hlsRef = useRef<any>(null);
   const router = useRouter();
 
+
   const videoUrl = teacher?.tutorProfile?.introVideoUrl;
 
   useEffect(() => {
@@ -138,7 +139,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                   fontSize: { xs: "7px", sm: "9px", md: "13px", lg: "15px" },
                 }}
                 className="text-blue600">
-                {t.home.roleOptions.tutorTitle} {teacher?.tutorProfile?.subject}
+                {t.home.roleOptions.tutorTitle} {teacher?.tutorProfile?.subject} lớp {teacher?.tutorProfile?.grade}
               </Typography>
               <Typography
                 sx={{
@@ -159,74 +160,38 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
                 flexDirection: "column",
                 justifyContent: "space-between",
               }}>
-              <Box sx={{ display: "flex", width: "100%" }}>
+              <Box sx={{ display: "flex", justifyContent: "end", width: "100%" }}>
                 <Box
                   sx={{
                     display: "flex",
                     flexDirection: "column",
-                    borderRight: "1px solid black",
                     px: { xs: "2px", sm: "5px", md: "10px", lg: "10px" },
                   }}>
                   <Typography
                     sx={{
                       fontFamily: "quicksand",
                       fontSize: {
-                        xs: "9px",
-                        sm: "9px",
-                        md: "11px",
-                        lg: "15px",
+                        xs: "20px",
+                        sm: "20px",
+                        md: "24px",
+                        lg: "28px",
                       },
                       fontWeight: "bold",
                       display: "flex",
                       alignItems: "center",
                     }}>
-                    {teacher?.rating == 0 ? teacher?.rating : "-"}{" "}
+                    {teacher?.tutorProfile?.rating == 0 ? "-" : teacher?.tutorProfile?.rating}{" "}
                     <StarRateRoundedIcon
                       sx={{
                         fontSize: {
-                          xs: "13px",
-                          sm: "15px",
+                          xs: "20px",
+                          sm: "20px",
                           md: "22px",
-                          lg: "17px",
+                          lg: "24px",
                         },
                         verticalAlign: "middle",
                       }}
                     />
-                  </Typography>
-                  <Typography
-                    fontFamily="quicksand"
-                    sx={{
-                      fontSize: { xs: "7px", sm: "7px", md: "9px", lg: "11px" },
-                    }}>
-                    {teacher?.cmt} {t.tutorInfo.reviews.toLowerCase()}
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    px: { xs: "5px", sm: "5px", md: "10px", lg: "10px" },
-                    flexDirection: "column",
-                  }}>
-                  <Typography
-                    sx={{
-                      fontFamily: "quicksand",
-                      fontWeight: 600,
-                      fontSize: {
-                        xs: "9px",
-                        sm: "9px",
-                        md: "11px",
-                        lg: "15px",
-                      },
-                    }}>
-                    {teacher?.tutorProfile?.price} VND
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontFamily: "quicksand",
-                      fontWeight: 500,
-                      fontSize: { xs: "7px", sm: "7px", md: "9px", lg: "11px" },
-                    }}>
-                    {t.findTutor.perMonth}
                   </Typography>
                 </Box>
               </Box>
@@ -330,7 +295,7 @@ const TeacherCard = ({ teacher }: { teacher: any }) => {
           </Box>
         </div>
       </div>
-    </Box>
+    </Box >
   );
 };
 

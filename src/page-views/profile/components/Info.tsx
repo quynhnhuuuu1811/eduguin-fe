@@ -1,17 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import Img from "../../../assets/images/FindTutor.jpg";
-import TeacherImg from "../../../assets/images/teacher.png";
-import Banner from "../../../assets/images/VideoThumbnail.png";
+import { useEffect, useState } from "react";
 import { CustomButton } from "@/components/Button";
 import EditIcon from "@mui/icons-material/Edit";
 import LogoutIcon from "@mui/icons-material/Logout";
-import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { Typography, TextField } from "@mui/material";
+import { Typography } from "@mui/material";
 import dayjs from "dayjs";
 import CustomInput from "@/components/Input";
 import { useRouter } from "next/navigation";
@@ -25,6 +21,8 @@ import { useTranslation } from "@/i18n";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
 import DepositModal from "./DepositModal";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
+import ChangePasswordModal from "./ChangePasswordModal";
+import PasswordIcon from '@mui/icons-material/Password';
 
 interface InfoProps {
   userInfo: AuthUser;
@@ -70,6 +68,9 @@ const Info = ({ userInfo }: InfoProps) => {
     setIsEditing(true);
   };
 
+  const { forgotPassword, resetPassword } = useAuthStore();
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+
 
   const handleCancel = () => {
     setEditedData({
@@ -94,14 +95,19 @@ const Info = ({ userInfo }: InfoProps) => {
     await handleUpdate();
   };
 
+  const handleChangePassword = () => {
+    forgotPassword(userInfo.email);
+    setIsChangePasswordModalOpen(true);
+  };
+
   const handleInputChange =
     (field: keyof typeof editedData) =>
-    (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      setEditedData((prev) => ({
-        ...prev,
-        [field]: event.target.value,
-      }));
-    };
+      (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setEditedData((prev) => ({
+          ...prev,
+          [field]: event.target.value,
+        }));
+      };
 
   const introVideoUrl = userInfo.tutorProfile?.introVideoUrl;
   const router = useRouter();
@@ -226,7 +232,7 @@ const Info = ({ userInfo }: InfoProps) => {
       const errorMessage =
         error && typeof error === "object" && "response" in error
           ? (error as { response?: { data?: { message?: string } } }).response
-              ?.data?.message
+            ?.data?.message
           : undefined;
       alert(errorMessage || "Có lỗi xảy ra khi cập nhật thông tin");
       // Reset on error
@@ -335,17 +341,24 @@ const Info = ({ userInfo }: InfoProps) => {
                     <h2 className="text-black text-[28px] font-bold">
                       {userInfo.fullName || userInfo.name || "-"}
                     </h2>
-                    <h3 className="flex items-center">
-                      {userInfo.tutorProfile?.rating
-                        ? parseInt(userInfo.tutorProfile?.rating || "0")
-                        : "-"}
-                      <StarRateRoundedIcon
-                        sx={{
-                          fontSize: "30px",
-                          color: "var(--color-yellow500)",
-                        }}
-                      />
-                    </h3>
+                    {
+                      userInfo.role === "tutor" && (
+                        <>
+                          <h3 className="flex items-center">
+                            {userInfo.tutorProfile?.rating
+                              ? parseInt(userInfo.tutorProfile?.rating || "0")
+                              : "-"}
+                          </h3>
+                          <StarRateRoundedIcon
+                            sx={{
+                              fontSize: "30px",
+                              color: "var(--color-yellow500)",
+                            }}
+                          />
+                        </>
+                      )
+                    }
+
                   </div>
                   <h6 className="text-blue600 font-semibold text-[15px]">
                     {isTutor
@@ -466,8 +479,8 @@ const Info = ({ userInfo }: InfoProps) => {
                     <span className="font-normal">
                       {userInfo.dateOfBirth || userInfo.birthDate
                         ? dayjs(
-                            userInfo.dateOfBirth || userInfo.birthDate
-                          ).format("DD/MM/YYYY")
+                          userInfo.dateOfBirth || userInfo.birthDate
+                        ).format("DD/MM/YYYY")
                         : "-"}
                     </span>
                   </p>
@@ -555,6 +568,13 @@ const Info = ({ userInfo }: InfoProps) => {
                   <LogoutIcon sx={{ fontSize: "18px" }} />
                   {t.common.logout}
                 </CustomButton>
+                <CustomButton
+                  type="Secondary"
+                  className="flex items-center gap-2 !bg-primary200 !text-primary500"
+                  onClick={handleChangePassword}>
+                  <PasswordIcon sx={{ fontSize: "18px" }} />
+                  {t.common.changePassword}
+                </CustomButton>
               </>
             )}
           </div>
@@ -566,6 +586,16 @@ const Info = ({ userInfo }: InfoProps) => {
         open={isDepositModalOpen}
         onClose={() => setIsDepositModalOpen(false)}
       />
+
+      {/* Change Password Modal */}
+      <div
+        className="flex justify-center items-center w-full"
+      >
+        <ChangePasswordModal
+          open={isChangePasswordModalOpen}
+          onClose={() => setIsChangePasswordModalOpen(false)}
+        />
+      </div>
     </>
   );
 };

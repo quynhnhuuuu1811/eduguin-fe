@@ -21,6 +21,7 @@ export const en: TranslationKeys = {
     previous: "Previous",
     seeMore: "See more",
     seeAll: "See all",
+    changePassword: "Change Password",
   },
 
   // Navbar

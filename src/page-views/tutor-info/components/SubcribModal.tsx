@@ -70,7 +70,10 @@ export default function SubcribModal({
       <Snackbar
         open={showSuccess}
         autoHideDuration={3000}
-        onClose={() => setShowSuccess(false)}
+        onClose={(_, reason) => {
+          if (reason === 'clickaway') return;
+          setShowSuccess(false);
+        }}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert severity="success" variant="filled" sx={{ width: "100%" }}>
@@ -80,7 +83,10 @@ export default function SubcribModal({
       <Snackbar
         open={showError}
         autoHideDuration={5000}
-        onClose={() => setShowError(false)}
+        onClose={(_, reason) => {
+          if (reason === 'clickaway') return;
+          setShowError(false);
+        }}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Alert

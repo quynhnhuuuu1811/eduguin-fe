@@ -56,7 +56,7 @@ const SearchContent = () => {
   const handleFilter = () => {
     fetchAllTutors({
       page: 1,
-      limit: 10,
+      limit: 1000000,
       ...(filters.subject && { subject: filters.subject }),
       ...(filters.grade && { grade: Number(filters.grade) }),
       ...(filters.gender && { sex: filters.gender }),

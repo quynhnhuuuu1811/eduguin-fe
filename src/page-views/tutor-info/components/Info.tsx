@@ -6,7 +6,6 @@ import { useUserStore } from "@/zustand/stores/UserStore";
 import Img from "../../../assets/images/teacher.png";
 import Banner from "../../../assets/images/VideoThumbnail.png";
 import { useCommentStore } from "@/zustand/stores/CommentStore";
-import { CustomButton } from "@/components/Button";
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import Comment from "./Comment";
@@ -19,12 +18,21 @@ import { Class } from "@/zustand/types/Classes";
 import { useTranslation } from "@/i18n";
 import { AuthUser } from "@/zustand/types/Auth";
 import { useAuthStore } from "@/zustand/stores/AuthStore";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Snackbar } from '@mui/material';
+import { useRouter } from "next/navigation";
+import { CustomButton } from "@/components/Button";
 
 const Info = ({ id, userInfo }: { id: string, userInfo: AuthUser }) => {
   const { t } = useTranslation();
   const isEnglish = t.common.loading === "Loading...";
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
+  const user = useAuthStore();
+
+  console.log(111, user.data.user?.role)
+  const router = useRouter();
   const [openModal, setOpenModal] = useState(false);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
   const {
     selectedUser: teacher,
     loading,
@@ -118,6 +126,50 @@ const Info = ({ id, userInfo }: { id: string, userInfo: AuthUser }) => {
 
   return (
     <div className="font-quicksand">
+      <Dialog
+        open={showLoginPopup}
+        onClose={() => setShowLoginPopup(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            padding: '8px',
+            minWidth: '350px',
+          }
+        }}
+      >
+        <DialogTitle className="text-center font-quicksand font-bold text-blue700">
+          {t.auth.login.noAccount?.replace('?', '') || 'Bạn chưa đăng nhập'}
+        </DialogTitle>
+        <DialogContent>
+          <p className="text-center text-gray-600 font-quicksand">
+            {t.auth.login.loginFailed ? 'Vui lòng đăng nhập để truy cập trang này.' : 'Vui lòng đăng nhập để truy cập trang này.'}
+          </p>
+        </DialogContent>
+        <DialogActions className="justify-center gap-2 pb-4">
+          <Button
+            onClick={() => setShowLoginPopup(false)}
+            variant="outlined"
+            color="inherit"
+            sx={{ borderRadius: '20px', px: 3 }}
+          >
+            {t.common.cancel}
+          </Button>
+          <Button
+            onClick={() => router.push("/login")}
+            variant="contained"
+            sx={{
+              borderRadius: '20px',
+              px: 3,
+              backgroundColor: 'var(--color-blue700)',
+              '&:hover': {
+                backgroundColor: 'var(--color-blue800)',
+              }
+            }}
+          >
+            {t.common.login}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <SubcribModal
         open={openModal}
         onClose={() => setOpenModal(false)}
@@ -191,48 +243,23 @@ const Info = ({ id, userInfo }: { id: string, userInfo: AuthUser }) => {
                 </div>
               )}
             </div>
-            {/* Rating and Price */}
-            <div className="px-4 py-3 flex items-stretch justify-between text-[20px] md:text-[28px] min-h-[80px]">
-              {/* Rating */}
-              <div className="flex flex-col pr-4 items-center justify-center w-full">
-                <div className="flex items-center justify-center gap-1 font-bold text-[15px] md:text-[20px] lg:text-[28px] text-yellow-500">
-                  <span>{rating || 5}</span>
-                  <StarRateRoundedIcon
-                    sx={{
-                      fontSize: {
-                        xs: "15px",
-                        sm: "20px",
-                        md: "25px",
-                        lg: "30px",
-                      },
-                      verticalAlign: "middle",
-                      color: "var(--color-yellow500)",
-                      marginBlock: 0.5,
-                    }}
-                  />
-                </div>
-                <span className="text-[12px] text-gray-700">
-                  {commentList.length || 0} {t.tutorInfo.comments}
-                </span>
-              </div>
-
-              <div className="w-px bg-[#FBBF77]" />
-
-              {/* Price */}
-              <div className="flex flex-col pl-4 items-center justify-center w-full text-[15px] md:text-[20px] lg:text-[28px]">
-                <span className="font-bold text-yellow-500 font-bold">
-                  {price.toLocaleString("vi-VN")} VND
-                </span>
-                <span className="text-[12px] text-gray-700">{t.tutorInfo.perMonth}</span>
-              </div>
-            </div>
 
             {/* Register Button */}
-            <div className="flex justify-center">
+            <div className="flex justify-center mt-3">
               <CustomButton
                 type="Secondary"
                 className="w-2/3"
-                onClick={() => setOpenModal(true)}>
+                onClick={() => {
+                  if (user.data.user?.role === "student") {
+                    setOpenModal(true);
+                  }
+                  else if (user.data.user?.role === "tutor") {
+                    setOpenSnackbar(true);
+                  }
+                  else {
+                    setShowLoginPopup(true);
+                  }
+                }}>
                 {t.tutorInfo.registerNow}
                 <ArrowForwardRoundedIcon
                   sx={{
@@ -320,6 +347,11 @@ const Info = ({ id, userInfo }: { id: string, userInfo: AuthUser }) => {
       <InputComment
         idTutor={id}
         userInfo={userInfo}
+      />
+      <Snackbar
+        open={openSnackbar}
+        onClose={() => setOpenSnackbar(false)}
+        message="Chỉ được đăng ký lớp học dưới vai trò học sinh"
       />
     </div>
   );

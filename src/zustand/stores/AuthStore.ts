@@ -28,6 +28,8 @@ interface AuthState {
   clearError: () => void;
   getMyInfo: () => Promise<void>;
   banUser: (id: string) => Promise<void>;
+  forgotPassword: (email: string) => Promise<any>;
+  resetPassword: (payload: { email: string; otp: string; password: string; confirmPassword: string }) => Promise<any>;
 }
 
 const getInitialState = (): Pick<AuthState, "data" | "loading" | "error"> => {
@@ -250,6 +252,30 @@ export const useAuthStore = create<AuthState>((set) => ({
       return res;
     } catch (error) {
       set({ loading: false, error: "Khóa người dùng thất bại" });
+      throw error;
+    }
+  },
+
+  async forgotPassword(email: string) {
+    set({ loading: true, error: null });
+    try {
+      const res = await AuthApi.forgotPassword(email);
+      set({ loading: false });
+      return res;
+    } catch (error) {
+      set({ loading: false, error: "Có lỗi xảy ra" });
+      throw error;
+    }
+  },
+
+  async resetPassword(payload: { email: string; otp: string; password: string; confirmPassword: string }) {
+    set({ loading: true, error: null });
+    try {
+      const res = await AuthApi.resetPassword(payload);
+      set({ loading: false });
+      return res;
+    } catch (error) {
+      set({ loading: false, error: "Đổi mật khẩu thất bại" });
       throw error;
     }
   },

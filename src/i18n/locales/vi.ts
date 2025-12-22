@@ -19,6 +19,7 @@ export const vi = {
     previous: "Trước đó",
     seeMore: "Xem thêm",
     seeAll: "Xem tất cả",
+    changePassword: "Đổi mật khẩu",
   },
 
   // Navbar
