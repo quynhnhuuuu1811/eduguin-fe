@@ -14,11 +14,13 @@ interface AuthState {
   data: {
     user: AuthUser | null;
     accessToken: string | null;
+    isVerified?: boolean | null;
   };
   loading: boolean;
   error: string | null;
 
   login: (credentials: LoginRequest) => Promise<void>;
+  verifyOtp: (email: string, otp: string) => Promise<any>;
   adminLogin: (credentials: AdminLoginRequest) => Promise<void>;
   register: (credentials: RegisterRequest) => Promise<RegisterResponse>;
   tutorApply: (data: TutorApplyRequest) => Promise<RegisterResponse>;
@@ -42,7 +44,7 @@ const getInitialState = (): Pick<AuthState, "data" | "loading" | "error"> => {
   const user = userStr ? JSON.parse(userStr) : null;
 
   return {
-    data: { user, accessToken },
+    data: { user, accessToken, isVerified: null },
     loading: false,
     error: null,
   };
@@ -57,6 +59,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       const res = await AuthApi.login(credentials);
       const user = res.data?.data?.user;
       const accessToken = res.data?.data?.access_token;
+      const isVerified =
+        (res.data?.data as { isVerified?: boolean } | undefined)?.isVerified ??
+        false;
 
       if (typeof window !== "undefined" && accessToken) {
         localStorage.setItem("accessToken", accessToken);
@@ -66,7 +71,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       }
 
       set({
-        data: { user, accessToken },
+        data: { user, accessToken, isVerified },
         loading: false,
       });
     } catch {
@@ -74,6 +79,38 @@ export const useAuthStore = create<AuthState>((set) => ({
         loading: false,
         error: "Đăng nhập thất bại",
       });
+    }
+  },
+
+  async verifyOtp(email: string, otp: string) {
+    set({ loading: true, error: null });
+    try {
+      const res = await AuthApi.verifyOtp({ email, otp });
+      const user = res.data?.data?.user;
+      const accessToken = res.data?.data?.access_token;
+      const isVerified = res.data?.data?.isVerified ?? true;
+
+      if (typeof window !== "undefined" && accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+        if (user) {
+          localStorage.setItem("user", JSON.stringify(user));
+        }
+        setAuthCookies(accessToken, user ?? undefined);
+      }
+
+      set({
+        data: {
+          user: user ?? null,
+          accessToken: accessToken ?? null,
+          isVerified,
+        },
+        loading: false,
+      });
+
+      return res;
+    } catch (error) {
+      set({ loading: false, error: "Xác minh OTP thất bại" });
+      throw error;
     }
   },
 

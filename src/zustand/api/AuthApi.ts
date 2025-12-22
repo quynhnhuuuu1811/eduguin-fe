@@ -1,4 +1,12 @@
-import { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, ProfileResponse, TutorApplyRequest, AdminLoginRequest } from "../types/Auth";
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RegisterResponse,
+  ProfileResponse,
+  TutorApplyRequest,
+  AdminLoginRequest,
+} from "../types/Auth";
 import instance from "@/lib/httpService";
 
 export const AuthApi = {
@@ -20,6 +28,7 @@ export const AuthApi = {
   banUser(id: string): Promise<void> {
     return instance.patch(`/user/${id}/ban`);
   },
+  verifyOtp(payload: { email: string; otp: string }): Promise<any> {
+    return instance.post(`/auth/verify-otp`, payload);
+  },
 };
-
-

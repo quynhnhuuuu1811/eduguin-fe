@@ -1,21 +1,24 @@
 "use client";
-import { CustomButton } from '@/components/Button';
-import CustomInput from '@/components/Input';
-import { useAuthStore } from '@/zustand/stores/AuthStore';
-import { Box, Link, Typography } from '@mui/material';
-import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import LoadingScreen from '@/components/LoadingScreen';
-import { useTranslation } from '@/i18n';
+import { CustomButton } from "@/components/Button";
+import CustomInput from "@/components/Input";
+import { useAuthStore } from "@/zustand/stores/AuthStore";
+import { Box, Link, Typography } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import LoadingScreen from "@/components/LoadingScreen";
+import { useTranslation } from "@/i18n";
 
 const LoginPageView = () => {
   const { t } = useTranslation();
-  const imageUrl = 'https://res.cloudinary.com/dh2uwapb8/image/upload/v1763998645/fe/yjifhjaytvbt3fmxvdig.png';
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { data, loading, error, login, clearError } = useAuthStore();
+  const imageUrl =
+    "https://res.cloudinary.com/dh2uwapb8/image/upload/v1763998645/fe/yjifhjaytvbt3fmxvdig.png";
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { data, loading, error, login, clearError, verifyOtp } = useAuthStore();
+  const [otp, setOtp] = useState("");
+  const [otpMessage, setOtpMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -23,18 +26,36 @@ const LoginPageView = () => {
     await login({ email, password });
   };
 
-  const handleInputChange = (field: 'email' | 'password') =>
+  const handleInputChange =
+    (field: "email" | "password") =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      if (field === 'email') {
+      if (field === "email") {
         setEmail(event.target.value);
       } else {
         setPassword(event.target.value);
       }
     };
 
+  const handleOtpChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setOtp(event.target.value);
+  };
+
+  const handleVerify = async () => {
+    setOtpMessage(null);
+    try {
+      const emailToUse = data?.user?.email || email;
+      await verifyOtp(emailToUse ?? "", otp);
+      setOtpMessage("Xác minh thành công");
+    } catch (err) {
+      setOtpMessage("Xác minh thất bại");
+    }
+  };
+
   useEffect(() => {
     if (data?.accessToken && !loading) {
-      router.push('/');
+      router.push("/");
     }
   }, [data?.accessToken, loading, router]);
 
@@ -43,38 +64,36 @@ const LoginPageView = () => {
   }
 
   return (
-    <div className='flex flex-row h-screen overflow-hidden relative'>
+    <div className="flex flex-row h-screen overflow-hidden relative">
       <Snackbar
         open={!!error}
         autoHideDuration={3000}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
         onClose={clearError}
-        sx={{ marginTop: '50px' }}
-      >
+        sx={{ marginTop: "50px" }}>
         <Alert
           onClose={clearError}
           severity="error"
           sx={{
-            width: '100%',
-            backgroundColor: 'error.main',
-            color: 'white',
-            '& .MuiAlert-icon': { color: 'white' },
-          }}
-        >
+            width: "100%",
+            backgroundColor: "error.main",
+            color: "white",
+            "& .MuiAlert-icon": { color: "white" },
+          }}>
           {error || t.auth.login.loginFailed}
         </Alert>
       </Snackbar>
       <Box
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
           backgroundImage: `url('${imageUrl}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
           opacity: {
             xs: 0.05,
             sm: 0.05,
@@ -83,39 +102,40 @@ const LoginPageView = () => {
           },
           zIndex: 0,
           display: {
-            xs: 'block',
-            sm: 'block',
-            md: 'none',
-            lg: 'none',
+            xs: "block",
+            sm: "block",
+            md: "none",
+            lg: "none",
           },
         }}
       />
       <Box
-        className='w-auto h-screen mx-auto'
+        className="w-auto h-screen mx-auto"
         sx={{
-          height: '100vh',
+          height: "100vh",
           backgroundImage: `url('${imageUrl}')`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundBlendMode: 'overlay',
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          backgroundBlendMode: "overlay",
           aspectRatio: 800 / 1024,
           display: {
-            xs: 'none',
-            sm: 'none',
-            md: 'flex',
-            lg: 'flex',
+            xs: "none",
+            sm: "none",
+            md: "flex",
+            lg: "flex",
           },
-        }}
-      ></Box>
-      <div className='w-full flex flex-col h-screen justify-center items-center relative z-10' >
-        <Box component='div' className='w-full flex flex-col justify-center items-center '
+        }}></Box>
+      <div className="w-full flex flex-col h-screen justify-center items-center relative z-10">
+        <Box
+          component="div"
+          className="w-full flex flex-col justify-center items-center "
           sx={{
             width: {
-              xs: '80%',
-              sm: '80%',
-              md: '50%',
-              lg: '50%',
+              xs: "80%",
+              sm: "80%",
+              md: "50%",
+              lg: "50%",
             },
             gap: {
               xs: 2,
@@ -123,83 +143,114 @@ const LoginPageView = () => {
               md: 5,
               lg: 5,
             },
-          }}
-        >
-          <div className='w-full flex flex-col justify-center items-center '
+          }}>
+          <div
+            className="w-full flex flex-col justify-center items-center "
             style={{
-              gap: '10px'
-            }}
-          >
+              gap: "10px",
+            }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://res.cloudinary.com/dh2uwapb8/image/upload/v1763999309/fe/g5uy8ax9vwjidmvjz620.png"
               alt="logo"
               width={80}
               height={80}
-              className='h-30 w-auto object-contain'
+              className="h-30 w-auto object-contain"
             />
             <Typography
               variant="h1"
               sx={{
-                color: 'var(--color-primary600)',
-                fontFamily: 'Sugar',
+                color: "var(--color-primary600)",
+                fontFamily: "Sugar",
                 fontSize: {
-                  xs: '24px',
-                  sm: '28px',
-                  md: '32px',
-                  lg: '42px',
+                  xs: "24px",
+                  sm: "28px",
+                  md: "32px",
+                  lg: "42px",
                 },
-                fontStyle: 'normal',
-                fontWeight: '400',
-                lineHeight: 'normal',
-              }}
-            >
+                fontStyle: "normal",
+                fontWeight: "400",
+                lineHeight: "normal",
+              }}>
               {t.auth.login.title}
             </Typography>
           </div>
-          <div className='w-full flex flex-col justify-center'
+          <div
+            className="w-full flex flex-col justify-center"
             style={{
-              gap: '30px'
-            }}
-          >
+              gap: "30px",
+            }}>
             <CustomInput
               label={t.auth.login.email}
               type="email"
               value={email}
-              onChange={handleInputChange('email')}
+              onChange={handleInputChange("email")}
               name="email"
             />
             <CustomInput
               label={t.auth.login.password}
               type="password"
               value={password}
-              onChange={handleInputChange('password')}
+              onChange={handleInputChange("password")}
               name="password"
             />
             <CustomButton
-              type='Primary'
+              type="Primary"
               onClick={handleLogin}
-              disabled={loading}
-            >
+              disabled={loading}>
               {loading ? t.common.loading : t.common.login}
             </CustomButton>
+            {data?.isVerified === false && (
+              <div
+                className="w-full flex flex-col items-center mt-4"
+                style={{ gap: "12px" }}>
+                <Typography variant="body1" sx={{ fontFamily: "Quicksand" }}>
+                  Một mã OTP đã được gửi tới email {data?.user?.email || email}.
+                  Vui lòng nhập mã để xác minh.
+                </Typography>
+                <CustomInput
+                  label="OTP"
+                  type="text"
+                  value={otp}
+                  onChange={handleOtpChange}
+                  name="otp"
+                />
+                <CustomButton
+                  type="Primary"
+                  onClick={handleVerify}
+                  disabled={loading || !otp}>
+                  Xác minh OTP
+                </CustomButton>
+                {otpMessage && (
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: otpMessage.includes("thất bại")
+                        ? "error.main"
+                        : "success.main",
+                    }}>
+                    {otpMessage}
+                  </Typography>
+                )}
+              </div>
+            )}
           </div>
           <div>
             <Typography
               variant="body1"
               sx={{
-                fontSize: { xs: '12px', sm: '14px' },
-                textAlign: 'center',
-                fontFamily: 'Quicksand',
-              }}
-            >
-              {t.auth.login.noAccount} <Link href="/register">{t.auth.login.registerNow}</Link>
+                fontSize: { xs: "12px", sm: "14px" },
+                textAlign: "center",
+                fontFamily: "Quicksand",
+              }}>
+              {t.auth.login.noAccount}{" "}
+              <Link href="/register">{t.auth.login.registerNow}</Link>
             </Typography>
           </div>
         </Box>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default LoginPageView;
