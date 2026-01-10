@@ -15,6 +15,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useRouter } from 'next/navigation';
 import StudentListTable from './components/StudentListTable';
 import { useTranslation } from '@/i18n';
+import BG from '../../assets/images/myClasses-bg.jpg'
 
 interface ScheduleItem {
   days: string;
@@ -356,7 +357,20 @@ const MyClassesPageView = () => {
   }
 
   return (
-    <div style={{ padding: '20px' }} className='flex flex-col mt-20'>
+    <div  className='flex flex-col mt-20'
+    style={{
+      padding: '20px',
+    }}>
+      <div
+      className='w-full h-full absolute -top-20 left-0 -z-10'
+      style={{
+      backgroundImage: `url(${BG.src})`,
+      backgroundSize: 'contain',
+      backgroundPosition: 'bottom',
+      backgroundRepeat: 'no-repeat',
+      height:'100%',
+      minHeight: '120vh',
+      }}></div>
       <StudentListTable open={openListModal} onClose={() => setOpenListModal(false)} classId={selectedClassId || ''} />
       <div className='flex justify-between items-center w-full mb-10'>
         <Typography

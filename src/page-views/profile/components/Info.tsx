@@ -343,7 +343,7 @@ const Info = ({ userInfo }: InfoProps) => {
                     </h2>
                     {
                       userInfo.role === "tutor" && (
-                        <>
+                        < div className="flex items-center gap-1">
                           <h3 className="flex items-center">
                             {userInfo.tutorProfile?.rating
                               ? parseInt(userInfo.tutorProfile?.rating || "0")
@@ -355,7 +355,7 @@ const Info = ({ userInfo }: InfoProps) => {
                               color: "var(--color-yellow500)",
                             }}
                           />
-                        </>
+                        </div>
                       )
                     }
 
@@ -498,7 +498,8 @@ const Info = ({ userInfo }: InfoProps) => {
                           : "-"}
                     </span>
                   </p>
-                  <div className="flex items-center gap-2">
+                  {!isTutor && (
+                    <div className="flex items-center gap-2">
                     <p className="font-bold">
                       {isEnglish ? "Balance:" : "Số dư tài khoản:"}
                       <span className="font-normal">
@@ -516,7 +517,9 @@ const Info = ({ userInfo }: InfoProps) => {
                       <LocalAtmIcon sx={{ fontSize: "18px" }} />
                       {isEnglish ? "Deposit" : "Nạp tiền"}
                     </CustomButton>
-                  </div>
+                  </div>)
+                    }
+                
                 </>
               )}
             </div>

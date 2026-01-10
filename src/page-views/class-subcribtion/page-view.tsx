@@ -11,6 +11,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import Snackbar from '@mui/material/Snackbar';
 import { useTranslation } from '@/i18n';
+import BG from '../../assets/images/requestStudents-bg.jpg'
 
 interface SubscriptionData {
   id: string;
@@ -172,6 +173,18 @@ const ClassSubcribtionPageView = () => {
   return (
     <>
       <div className="pt-28 pb-10 w-full max-w-[80%] mx-auto">
+       <div
+      className='w-full h-full absolute -top-20 left-0 -z-10'
+      style={{
+      backgroundImage: `url(${BG.src})`,
+      backgroundSize: 'contain',
+      backgroundPosition: 'bottom',
+      backgroundRepeat: 'no-repeat',
+      height:'100%',
+      width:'100%',
+      minHeight: '120vh',
+      opacity: 0.5,
+      }}></div>
         <Typography
           variant="h4"
           sx={{
