@@ -51,15 +51,19 @@ function matchesPath(pathname: string, patterns: string[]): boolean {
 
 // Helper function to get user data from cookie
 function getUserFromCookie(request: NextRequest): { token: string | null; role: string | null } {
-  // Try to get token from cookie
-  const token = request.cookies.get("accessToken")?.value || null;
+  // Try to get token from cookie (decode in case it was URL-encoded)
+  const rawToken = request.cookies.get("accessToken")?.value;
+  const token = rawToken ? decodeURIComponent(rawToken) : null;
+  
   const userCookie = request.cookies.get("user")?.value;
 
   let role: string | null = null;
 
   if (userCookie) {
     try {
-      const user = JSON.parse(userCookie);
+      // Decode the URL-encoded cookie value before parsing
+      const decodedUserCookie = decodeURIComponent(userCookie);
+      const user = JSON.parse(decodedUserCookie);
       role = user.role || null;
     } catch {
       role = null;
@@ -116,17 +120,24 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Tutor-only routes
-  if (matchesPath(pathname, routeConfig.roleSpecific.tutor)) {
-    if (role !== "tutor") {
+  // Check if route is accessible by tutor OR student (like /class-subcribtion)
+  const isTutorRoute = matchesPath(pathname, routeConfig.roleSpecific.tutor);
+  const isStudentRoute = matchesPath(pathname, routeConfig.roleSpecific.student);
+  
+  if (isTutorRoute || isStudentRoute) {
+    // If route is for both roles, allow either
+    if (isTutorRoute && isStudentRoute) {
+      if (role !== "tutor" && role !== "student") {
+        return NextResponse.redirect(new URL("/profile", request.url));
+      }
+      return NextResponse.next();
+    }
+    // Tutor-only route
+    if (isTutorRoute && role !== "tutor") {
       return NextResponse.redirect(new URL("/profile", request.url));
     }
-    return NextResponse.next();
-  }
-
-  // Student-only routes (if any in the future)
-  if (matchesPath(pathname, routeConfig.roleSpecific.student)) {
-    if (role !== "student") {
+    // Student-only route
+    if (isStudentRoute && role !== "student") {
       return NextResponse.redirect(new URL("/profile", request.url));
     }
     return NextResponse.next();
